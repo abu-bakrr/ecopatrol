@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+		/>
+		<title>Экопатруль</title>
+		<link
+			href="https://unpkg.com/maplibre-gl@4.0.0/dist/maplibre-gl.css"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="style.css" />
+		<script src="https://telegram.org/js/telegram-web-app.js"></script>
+	</head>
+	<body>
+		<div id="map"></div>
+
+		<!-- Центральная метка (прицел) -->
+		<div id="map-center-marker">
+			<div class="marker-pin"></div>
+		</div>
+
+		<!-- UI Оверлеи -->
+		<div id="ui-container">
+			<!-- Верхняя панель -->
+			<div class="top-bar">
+				<div id="user-info">
+					<span id="username">Загрузка...</span>
+					<span id="balance">💰 0</span>
+				</div>
+				<button id="profile-btn" class="icon-btn">👤</button>
+			</div>
+
+			<!-- Кнопки действий снизу -->
+			<div class="bottom-actions">
+				<button id="list-btn" class="action-btn secondary">📋 Биржа</button>
+				<button id="add-btn" class="action-btn primary">📍 Отметить</button>
+			</div>
+		</div>
+
+		<!-- Модальные окна -->
+		<div id="modal-overlay" class="hidden">
+			<div id="modal-content">
+				<button id="close-modal" class="close-btn">&times;</button>
+				<div id="modal-body"></div>
+			</div>
+		</div>
+
+		<script type="module" src="main.js"></script>
+	</body>
+</html>
