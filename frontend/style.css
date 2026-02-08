@@ -465,9 +465,13 @@ html {
 
 .user-id {
 	font-size: 13px;
-	color: var(--text-secondary);
+	color: #4b5563; /* Darker gray for better visibility in light mode */
 	font-weight: 700;
 	letter-spacing: 0.5px;
+}
+
+[data-theme='dark'] .user-id {
+	color: var(--text-secondary); /* Original gray for dark mode */
 }
 
 .sidebar-close {

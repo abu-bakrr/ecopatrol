@@ -835,7 +835,7 @@ async function showAboutInfo() {
             </div>
             
             <div style="text-align: center; margin-top: 24px; opacity: 0.4; font-size: 12px; font-weight: 500;">
-                EcoPatrol Institutional Edition v33.0<br>
+                EcoPatrol Institutional Edition v35.0<br>
                 Алмазарский район, г. Ташкент
             </div>
         </div>
