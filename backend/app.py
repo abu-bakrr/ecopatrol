@@ -57,7 +57,8 @@ def init_user():
             'last_name': user.last_name,
             'age': user.age,
             'phone': user.phone,
-            'balance': user.balance
+            'balance': user.balance,
+            'language': user.language
         }
     })
 
