@@ -36,13 +36,9 @@
 body,
 html {
 	width: 100%;
-	height: 100%;
 	height: 100vh;
-	height: -webkit-fill-available;
-	font-family:
-		-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
-	color: var(--text-primary);
-	background: var(--bg-primary);
+	margin: 0;
+	padding: 0;
 	overflow: hidden;
 	position: fixed;
 	top: 0;
@@ -50,19 +46,21 @@ html {
 	right: 0;
 	bottom: 0;
 	-webkit-font-smoothing: antialiased;
+	font-family:
+		-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+	color: var(--text-primary);
+	background: var(--bg-primary);
 	transition:
 		background 0.3s,
 		color 0.3s;
 }
 
 #map {
-	position: fixed;
+	position: absolute;
 	top: 0;
 	left: 0;
 	width: 100%;
 	height: 100%;
-	height: 100vh;
-	height: -webkit-fill-available;
 	z-index: 1;
 	background: var(--map-bg);
 }
@@ -117,11 +115,12 @@ html {
 	}
 }
 
-/* Top Buttons - Icons always green */
+/* Top Buttons - Icons always green with extra top spacing */
 .profile-btn,
 .balance-btn {
 	position: absolute;
-	top: max(16px, env(safe-area-inset-top) + 16px);
+	/* Add 44px for Telegram header + safe area */
+	top: calc(44px + env(safe-area-inset-top) + 12px);
 	z-index: 100;
 	width: 44px;
 	height: 44px;
@@ -139,10 +138,10 @@ html {
 }
 
 .profile-btn {
-	left: 16px;
+	left: 12px;
 }
 .balance-btn {
-	right: 16px;
+	right: 12px;
 }
 
 .profile-btn:active,
@@ -284,9 +283,13 @@ html {
 }
 
 .sidebar-header {
-	padding: 60px 20px 20px;
-	background: var(--primary);
-	color: white;
+	padding: 20px;
+	/* Extra padding top for safe area + Telegram header */
+	padding-top: calc(44px + env(safe-area-inset-top) + 20px);
+	border-bottom: 1px solid var(--border);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
 .sidebar-content {
