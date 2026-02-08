@@ -522,11 +522,11 @@ function setupEventListeners() {
 		showMyReports()
 	})
 	document.getElementById('menu-history').addEventListener('click', () => {
-		tg.showAlert('Раздел "История начислений" в разработке')
+		showMyHistory()
 	})
 	document.getElementById('menu-info').addEventListener('click', () => {
 		tg.showAlert(
-			'Приложение EcoPatrol v28.0\nРазработано для чистого будущего.',
+			'Приложение EcoPatrol v29.0\nРазработано для чистого будущего.',
 		)
 	})
 
@@ -665,6 +665,66 @@ window.flyToReport = (lng, lat) => {
 	closeBottomSheet()
 	map.flyTo({ center: [lng, lat], zoom: 17, duration: 1500 })
 	tg.HapticFeedback.impactOccurred('medium')
+}
+
+async function showMyHistory() {
+	if (!currentUser) return
+	closeSidebar()
+	const content = document.getElementById('sheet-content')
+	content.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+            <h2 style="font-size: 20px; font-weight: 600;">История начислений</h2>
+            <div id="history-loader" class="loader-small" style="display: none;"></div>
+        </div>
+        <div id="history-list" class="history-list">
+            <div style="padding: 20px; text-align: center; opacity: 0.5;">Загрузка...</div>
+        </div>
+        <div style="height: 20px;"></div>
+    `
+	openBottomSheet()
+
+	try {
+		const response = await fetch(`${API_URL}/history/user/${currentUser.id}`)
+		if (!response.ok) throw new Error('Fetch failed')
+		const history = await response.json()
+
+		const list = document.getElementById('history-list')
+		if (history.length === 0) {
+			list.innerHTML = `
+                <div style="padding: 40px 20px; text-align: center;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">💰</div>
+                    <div style="font-size: 16px; font-weight: 500; color: var(--text-primary);">У вас пока нет начислений</div>
+                    <div style="font-size: 14px; color: var(--text-secondary); margin-top: 4px;">Очищайте территорию, чтобы зарабатывать!</div>
+                </div>
+            `
+			return
+		}
+
+		list.innerHTML = history
+			.map(h => {
+				const date = new Date(h.date).toLocaleDateString('ru-RU', {
+					day: 'numeric',
+					month: 'short',
+				})
+				return `
+                <div class="history-item">
+                    <div class="history-left">
+                        <div class="history-title">${h.description || 'Уборка территории'}</div>
+                        <div class="history-date">${date}</div>
+                    </div>
+                    <div class="history-amount">+$${h.reward}</div>
+                </div>
+            `
+			})
+			.join('')
+	} catch (e) {
+		console.error(e)
+		document.getElementById('history-list').innerHTML = `
+            <div style="padding: 20px; text-align: center; color: #ef4444;">
+                Ошибка при загрузке данных
+            </div>
+        `
+	}
 }
 
 async function loadProfileStats() {

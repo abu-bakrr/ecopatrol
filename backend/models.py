@@ -29,6 +29,7 @@ class Pollution(db.Model):
     description = db.Column(db.Text)
     status = db.Column(db.String(20), default='active')  # 'active', 'cleaned'
     reward = db.Column(db.Float, default=0.0)
+    cleaner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     clean_comment = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 

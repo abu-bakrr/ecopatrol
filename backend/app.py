@@ -112,22 +112,39 @@ def clean_pollution(p_id):
     p.status = 'cleaned'
     p.clean_comment = data.get('comment', '')
     
-    for photo_url in data.get('photos', []):
-        new_photo = Photo(pollution_id=p.id, url=photo_url, type='after')
-        db.session.add(new_photo)
-    
     # Reward the cleaner (from request), not the pollution creator
     cleaner_id = data.get('user_id')
     if cleaner_id:
+        p.cleaner_id = cleaner_id # Save who cleaned it
         cleaner = User.query.get(cleaner_id)
         if cleaner:
             cleaner.balance += p.reward
+    
+    for photo_url in data.get('photos', []):
+        new_photo = Photo(pollution_id=p.id, url=photo_url, type='after')
+        db.session.add(new_photo)
     
     db.session.commit()
     return jsonify({
         'status': 'ok', 
         'new_balance': cleaner.balance if cleaner_id and cleaner else 0
     })
+
+@app.route('/api/history/user/<int:user_id>', methods=['GET'])
+def get_user_history(user_id):
+    # Get all pollutions where this user was the cleaner
+    history = Pollution.query.filter_by(cleaner_id=user_id, status='cleaned').order_by(Pollution.created_at.desc()).all()
+    result = []
+    for p in history:
+        result.append({
+            'id': p.id,
+            'reward': p.reward,
+            'description': p.description,
+            'clean_comment': p.clean_comment,
+            'date': p.created_at.isoformat(),
+            'photos': [ph.url for ph in p.photos if ph.type == 'after']
+        })
+    return jsonify(result)
 
 @app.route('/api/pollutions/user/<int:user_id>', methods=['GET'])
 def get_user_pollutions(user_id):
