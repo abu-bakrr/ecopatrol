@@ -5,7 +5,7 @@ import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
-from models import db, User, Pollution, Photo
+from models import db, User, Pollution, Photo, GlobalSetting
 
 load_dotenv()
 
@@ -115,8 +115,12 @@ def create_pollution():
         level=data['level'],
         types=data['types'],
         description=data.get('description', ''),
-        reward=data['level']
     )
+    
+    # Get reward from settings or default to level
+    reward_setting = GlobalSetting.query.filter_by(key=f'reward_level_{data["level"]}').first()
+    new_p.reward = float(reward_setting.value) if reward_setting else float(data['level'])
+    
     db.session.add(new_p)
     db.session.flush() # Get ID
     
@@ -267,6 +271,7 @@ def admin_get_users():
             'last_name': u.last_name,
             'balance': u.balance,
             'phone': u.phone,
+            'age': u.age,
             'created_at': u.created_at.isoformat()
         })
     return jsonify(result)
@@ -274,7 +279,11 @@ def admin_get_users():
 @app.route('/api/admin/users/<int:user_id>/balance', methods=['POST'])
 def admin_update_balance(user_id):
     data = request.json
-    tg_id = data.get('admin_tg_id')
+    try:
+        tg_id = int(data.get('admin_tg_id'))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid admin ID format'}), 400
+        
     if tg_id not in ADMIN_IDS:
         return jsonify({'error': 'Unauthorized'}), 403
     
@@ -305,7 +314,9 @@ def admin_get_pollutions():
             'description': p.description,
             'creator_id': p.user_id,
             'cleaner_id': p.cleaner_id,
-            'photos': [ph.url for ph in p.photos]
+            'photos': [ph.url for ph in p.photos],
+            'types': p.types,
+            'reward': p.reward
         })
     return jsonify(result)
 
@@ -320,6 +331,67 @@ def admin_delete_pollution(p_id):
         # Delete related photos first
         Photo.query.filter_by(pollution_id=p.id).delete()
         db.session.delete(p)
+        db.session.commit()
+        return jsonify({'status': 'ok'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/api/admin/pollutions/<int:p_id>/reward', methods=['POST'])
+def admin_update_reward(p_id):
+    data = request.json
+    try:
+        tg_id = int(data.get('admin_tg_id'))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid admin ID format'}), 400
+        
+    if tg_id not in ADMIN_IDS:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    p = Pollution.query.get_or_404(p_id)
+    try:
+        p.reward = float(data.get('reward', p.reward))
+        db.session.commit()
+        return jsonify({'status': 'ok', 'new_reward': p.reward})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/api/admin/settings', methods=['GET'])
+def admin_get_settings():
+    tg_id = request.args.get('admin_tg_id', type=int)
+    if tg_id not in ADMIN_IDS:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    settings = GlobalSetting.query.all()
+    result = {s.key: s.value for s in settings}
+    # Ensure defaults exist in response if not in DB
+    for i in range(1, 4):
+        key = f'reward_level_{i}'
+        if key not in result:
+            result[key] = str(float(i))
+    return jsonify(result)
+
+@app.route('/api/admin/settings', methods=['POST'])
+def admin_update_settings():
+    data = request.json
+    try:
+        tg_id = int(data.get('admin_tg_id'))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid admin ID format'}), 400
+        
+    if tg_id not in ADMIN_IDS:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    try:
+        new_settings = data.get('settings', {})
+        for key, value in new_settings.items():
+            setting = GlobalSetting.query.filter_by(key=key).first()
+            if setting:
+                setting.value = str(value)
+            else:
+                setting = GlobalSetting(key=key, value=str(value))
+                db.session.add(setting)
         db.session.commit()
         return jsonify({'status': 'ok'})
     except Exception as e:

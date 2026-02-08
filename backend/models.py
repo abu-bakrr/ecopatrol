@@ -45,3 +45,8 @@ class Photo(db.Model):
     url = db.Column(db.String(512), nullable=False)
     type = db.Column(db.String(10), nullable=False)  # 'before', 'after'
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class GlobalSetting(db.Model):
+    __tablename__ = 'global_settings'
+    key = db.Column(db.String(50), primary_key=True)
+    value = db.Column(db.String(255), nullable=False)

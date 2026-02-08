@@ -4,32 +4,50 @@
 		<meta charset="UTF-8" />
 		<meta
 			name="viewport"
-			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
 		/>
 		<title>Админ-панель EcoPatrol</title>
 		<script src="https://telegram.org/js/telegram-web-app.js"></script>
 		<style>
 			:root {
-				--primary: #059669;
-				--bg: #f3f4f6;
-				--card: #ffffff;
-				--text: #1f2937;
+				--primary: #10b981;
+				--primary-dark: #059669;
+				--bg-primary: #f9fafb;
+				--bg-secondary: #ffffff;
+				--text-primary: #111827;
+				--text-secondary: #4b5563;
 				--border: #e5e7eb;
+				--card-shadow:
+					0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+				--safe-top: env(safe-area-inset-top);
 			}
 
 			[data-theme='dark'] {
-				--bg: #111827;
-				--card: #1f2937;
-				--text: #f9fafb;
+				--bg-primary: #111827;
+				--bg-secondary: #1f2937;
+				--text-primary: #f9fafb;
+				--text-secondary: #9ca3af;
 				--border: #374151;
+				--card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+			}
+
+			* {
+				box-sizing: border-box;
+				-webkit-tap-highlight-color: transparent;
 			}
 
 			body {
-				font-family: -apple-system, system-ui, sans-serif;
-				background: var(--bg);
-				color: var(--text);
+				font-family:
+					-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+					Arial, sans-serif;
+				background-color: var(--bg-primary);
+				color: var(--text-primary);
 				margin: 0;
-				padding: 16px;
+				padding: calc(var(--safe-top) + 20px) 16px 40px;
+				transition:
+					background-color 0.3s,
+					color 0.3s;
+				line-height: 1.5;
 			}
 
 			.header {
@@ -37,113 +55,301 @@
 				justify-content: space-between;
 				align-items: center;
 				margin-bottom: 24px;
+				padding: 0 4px;
 			}
 
-			.tab-buttons {
+			.header h1 {
+				font-size: 24px;
+				font-weight: 800;
+				margin: 0;
+				background: linear-gradient(135deg, var(--primary), #3b82f6);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+			}
+
+			.theme-toggle {
+				width: 40px;
+				height: 40px;
+				border-radius: 12px;
+				background: var(--bg-secondary);
+				border: 1px solid var(--border);
 				display: flex;
-				gap: 8px;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+				box-shadow: var(--card-shadow);
+			}
+
+			.tabs {
+				display: flex;
+				background: var(--bg-secondary);
+				padding: 4px;
+				border-radius: 14px;
 				margin-bottom: 20px;
+				border: 1px solid var(--border);
+				box-shadow: var(--card-shadow);
 			}
 
 			.tab-btn {
 				flex: 1;
 				padding: 10px;
 				border: none;
-				border-radius: 12px;
-				background: var(--card);
-				color: var(--text);
+				border-radius: 10px;
+				background: transparent;
+				color: var(--text-secondary);
 				font-weight: 600;
+				font-size: 13px;
+				transition: all 0.2s;
 				cursor: pointer;
-				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 			}
 
 			.tab-btn.active {
 				background: var(--primary);
 				color: white;
+				box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 			}
 
 			.section {
 				display: none;
+				animation: fadeIn 0.3s ease;
 			}
 			.section.active {
 				display: block;
 			}
 
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(10px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
 			.card {
-				background: var(--card);
-				border-radius: 16px;
-				padding: 16px;
-				margin-bottom: 12px;
-				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+				background: var(--bg-secondary);
+				border-radius: 18px;
+				padding: 18px;
+				margin-bottom: 16px;
 				border: 1px solid var(--border);
+				box-shadow: var(--card-shadow);
+				position: relative;
+				overflow: hidden;
+			}
+
+			.card::before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 4px;
+				height: 100%;
+				background: var(--primary);
+				opacity: 0.5;
 			}
 
 			.card-header {
 				display: flex;
 				justify-content: space-between;
 				align-items: flex-start;
-				margin-bottom: 8px;
+				margin-bottom: 12px;
 			}
 
-			.name {
+			.user-info .name {
 				font-weight: 700;
-				font-size: 16px;
+				font-size: 17px;
+				margin-bottom: 2px;
 			}
-			.id {
+
+			.user-info .meta {
 				font-size: 12px;
-				opacity: 0.6;
-			}
-			.balance {
-				color: var(--primary);
-				font-weight: 700;
+				color: var(--text-secondary);
+				font-weight: 500;
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
 			}
 
-			.actions {
+			.badge-balance {
+				background: rgba(16, 185, 129, 0.1);
+				color: var(--primary);
+				padding: 4px 10px;
+				border-radius: 20px;
+				font-weight: 700;
+				font-size: 14px;
+			}
+
+			.btn-group {
 				display: flex;
-				gap: 8px;
+				gap: 10px;
 				margin-top: 12px;
 			}
 
-			button.action-btn {
-				padding: 6px 12px;
+			.btn {
+				flex: 1;
+				padding: 12px;
 				border: none;
-				border-radius: 8px;
-				font-size: 12px;
-				font-weight: 600;
+				border-radius: 12px;
+				font-weight: 700;
+				font-size: 13px;
 				cursor: pointer;
+				transition:
+					transform 0.1s,
+					opacity 0.2s;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 6px;
 			}
 
-			.btn-edit {
-				background: #3b82f6;
+			.btn:active {
+				transform: scale(0.97);
+			}
+			.btn-primary {
+				background: var(--primary);
 				color: white;
 			}
-			.btn-delete {
-				background: #ef4444;
-				color: white;
+			.btn-secondary {
+				background: var(--bg-primary);
+				color: var(--text-primary);
+				border: 1px solid var(--border);
+			}
+			.btn-danger {
+				background: rgba(239, 68, 68, 0.1);
+				color: #ef4444;
+				border: 1px solid rgba(239, 68, 68, 0.2);
 			}
 
-			.loading {
-				text-align: center;
-				padding: 40px;
+			.settings-grid {
+				display: flex;
+				flex-direction: column;
+				gap: 16px;
+			}
+
+			.setting-item {
+				background: var(--bg-secondary);
+				padding: 16px;
+				border-radius: 16px;
+				border: 1px solid var(--border);
+			}
+
+			.setting-label {
+				font-size: 13px;
+				font-weight: 700;
+				color: var(--text-secondary);
+				margin-bottom: 8px;
+				display: block;
+			}
+
+			.setting-input {
+				width: 100%;
+				padding: 12px;
+				border-radius: 12px;
+				border: 1.5px solid var(--border);
+				background: var(--bg-primary);
+				color: var(--text-primary);
+				font-weight: 600;
+				font-size: 16px;
+			}
+
+			.loading-state {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				padding: 60px 20px;
+				opacity: 0.5;
+			}
+
+			.spinner {
+				width: 30px;
+				height: 30px;
+				border: 3px solid var(--border);
+				border-top-color: var(--primary);
+				border-radius: 50%;
+				animation: spin 1s linear infinite;
+				margin-bottom: 12px;
+			}
+			@keyframes spin {
+				to {
+					transform: rotate(360deg);
+				}
 			}
 		</style>
 	</head>
 	<body>
 		<div class="header">
-			<h1 style="font-size: 20px; margin: 0">Панель Шефа 🛠️</h1>
+			<h1>Админ-панель</h1>
+			<div class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙</div>
 		</div>
 
-		<div class="tab-buttons">
-			<button class="tab-btn active" onclick="showTab('users')">Люди</button>
-			<button class="tab-btn" onclick="showTab('pollutions')">Мусор</button>
+		<div class="tabs">
+			<button
+				class="tab-btn active"
+				id="tab-users"
+				onclick="switchTab('users')"
+			>
+				Люди
+			</button>
+			<button
+				class="tab-btn"
+				id="tab-pollutions"
+				onclick="switchTab('pollutions')"
+			>
+				Загрязнения
+			</button>
+			<button class="tab-btn" id="tab-settings" onclick="switchTab('settings')">
+				Настройки
+			</button>
 		</div>
 
-		<div id="users-section" class="section active">
-			<div id="users-list" class="loading">Загрузка пользователей...</div>
+		<div id="section-users" class="section active">
+			<div id="users-list"></div>
 		</div>
 
-		<div id="pollutions-section" class="section">
-			<div id="pollutions-list" class="loading">Загрузка загрязнений...</div>
+		<div id="section-pollutions" class="section">
+			<div id="pollutions-list"></div>
+		</div>
+
+		<div id="section-settings" class="section">
+			<div class="settings-grid">
+				<div class="setting-item">
+					<label class="setting-label">Награда: Уровень 1 (Низкий)</label>
+					<input
+						type="number"
+						id="setting-reward-1"
+						class="setting-input"
+						step="0.5"
+					/>
+				</div>
+				<div class="setting-item">
+					<label class="setting-label">Награда: Уровень 2 (Средний)</label>
+					<input
+						type="number"
+						id="setting-reward-2"
+						class="setting-input"
+						step="0.5"
+					/>
+				</div>
+				<div class="setting-item">
+					<label class="setting-label">Награда: Уровень 3 (Высокий)</label>
+					<input
+						type="number"
+						id="setting-reward-3"
+						class="setting-input"
+						step="0.5"
+					/>
+				</div>
+				<button
+					class="btn btn-primary"
+					style="margin-top: 10px"
+					onclick="saveSettings()"
+				>
+					💾 Сохранить настройки
+				</button>
+			</div>
 		</div>
 
 		<script>
@@ -153,96 +359,180 @@
 			const urlParams = new URLSearchParams(window.location.search)
 			const adminTgId = urlParams.get('admin_tg_id')
 
-			function showTab(tab) {
+			let currentTheme =
+				localStorage.getItem('admin-theme') || tg.colorScheme || 'light'
+			applyTheme(currentTheme)
+
+			function applyTheme(theme) {
+				document.documentElement.setAttribute('data-theme', theme)
+				localStorage.setItem('admin-theme', theme)
+				document.getElementById('theme-btn').innerHTML =
+					theme === 'dark' ? '☀️' : '🌙'
+				tg.setHeaderColor(theme === 'dark' ? '#111827' : '#f9fafb')
+			}
+
+			function toggleTheme() {
+				currentTheme = currentTheme === 'dark' ? 'light' : 'dark'
+				applyTheme(currentTheme)
+				tg.HapticFeedback.impactOccurred('light')
+			}
+
+			function switchTab(tab) {
 				document
 					.querySelectorAll('.section')
 					.forEach(s => s.classList.remove('active'))
 				document
 					.querySelectorAll('.tab-btn')
 					.forEach(b => b.classList.remove('active'))
-				document.getElementById(tab + '-section').classList.add('active')
-				event.target.classList.add('active')
-
+				document.getElementById('section-' + tab).classList.add('active')
+				document.getElementById('tab-' + tab).classList.add('active')
+				tg.HapticFeedback.impactOccurred('light')
 				if (tab === 'users') loadUsers()
 				if (tab === 'pollutions') loadPollutions()
+				if (tab === 'settings') loadSettings()
 			}
 
 			async function loadUsers() {
 				const list = document.getElementById('users-list')
+				list.innerHTML =
+					'<div class="loading-state"><div class="spinner"></div>Загрузка данных...</div>'
 				try {
 					const res = await fetch(
 						`${API_URL}/admin/users?admin_tg_id=${adminTgId}`,
 					)
 					const users = await res.json()
-
 					list.innerHTML = users
 						.map(
 							u => `
                     <div class="card">
                         <div class="card-header">
-                            <div>
+                            <div class="user-info">
                                 <div class="name">${u.first_name} ${u.last_name || ''}</div>
-                                <div class="id">@${u.username || 'no_username'} • ID: ${u.telegram_id}</div>
+                                <div class="meta">
+                                    <span>@${u.username || 'unknown'} • ID: ${u.telegram_id}</span>
+                                    <span>📱 ${u.phone || 'Нет номера'} • 🎂 Возраст: ${u.age || '?'}</span>
+                                </div>
                             </div>
-                            <div class="balance">$${u.balance}</div>
+                            <div class="badge-balance">$${u.balance.toFixed(2)}</div>
                         </div>
-                        <div class="actions">
-                            <button class="action-btn btn-edit" onclick="editBalance(${u.id}, ${u.balance})">Изменить баланс</button>
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="editBalance(${u.id}, ${u.balance}, '${u.first_name}')">💰 Баланс</button>
                         </div>
                     </div>
                 `,
 						)
 						.join('')
 				} catch (e) {
-					list.innerHTML = 'Ошибка загрузки'
+					list.innerHTML = '<div class="loading-state">❌ Ошибка</div>'
 				}
 			}
 
 			async function loadPollutions() {
 				const list = document.getElementById('pollutions-list')
+				list.innerHTML =
+					'<div class="loading-state"><div class="spinner"></div>Загрузка меток...</div>'
 				try {
 					const res = await fetch(
 						`${API_URL}/admin/pollutions?admin_tg_id=${adminTgId}`,
 					)
 					const pollutions = await res.json()
-
 					list.innerHTML = pollutions
 						.map(
 							p => `
                     <div class="card">
                         <div class="card-header">
-                            <div>
-                                <div class="name">Тип: ${p.types}</div>
-                                <div class="id">ID: ${p.id} • Уровень: ${p.level}</div>
-                                <div class="id">Статус: ${p.status}</div>
+                            <div class="user-info">
+                                <div class="name">Метка #${p.id}</div>
+                                <div class="meta">Статус: ${p.status} • Уровень: ${p.level} • <b>Награда: $${p.reward}</b></div>
                             </div>
                         </div>
-                        <p style="font-size: 13px; margin: 8px 0;">${p.description || 'Нет описания'}</p>
-                        <div class="actions">
-                            <button class="action-btn btn-delete" onclick="deletePollution(${p.id})">Удалить</button>
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" onclick="editReward(${p.id}, ${p.reward})">💎 Изм. награду</button>
+                            <button class="btn btn-danger" onclick="deletePollution(${p.id})">🗑️</button>
                         </div>
                     </div>
                 `,
 						)
 						.join('')
 				} catch (e) {
-					list.innerHTML = 'Ошибка загрузки'
+					list.innerHTML = '<div class="loading-state">❌ Ошибка</div>'
 				}
 			}
 
-			async function editBalance(userId, current) {
-				const newVal = prompt('Введите новый баланс:', current)
-				if (newVal === null) return
+			async function loadSettings() {
+				try {
+					const res = await fetch(
+						`${API_URL}/admin/settings?admin_tg_id=${adminTgId}`,
+					)
+					const settings = await res.json()
+					document.getElementById('setting-reward-1').value =
+						settings.reward_level_1 || 1
+					document.getElementById('setting-reward-2').value =
+						settings.reward_level_2 || 2
+					document.getElementById('setting-reward-3').value =
+						settings.reward_level_3 || 3
+				} catch (e) {
+					alert('Ошибка загрузки настроек')
+				}
+			}
 
+			async function saveSettings() {
+				const settings = {
+					reward_level_1: document.getElementById('setting-reward-1').value,
+					reward_level_2: document.getElementById('setting-reward-2').value,
+					reward_level_3: document.getElementById('setting-reward-3').value,
+				}
+				try {
+					const res = await fetch(`${API_URL}/admin/settings`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ admin_tg_id: adminTgId, settings }),
+					})
+					if (res.ok) {
+						tg.HapticFeedback.notificationOccurred('success')
+						tg.showAlert('Настройки сохранены!')
+					}
+				} catch (e) {
+					alert('Ошибка сохранения')
+				}
+			}
+
+			async function editReward(pId, current) {
+				const newVal = prompt('Новая награда за это загрязнение:', current)
+				if (newVal === null || isNaN(newVal)) return
+				try {
+					const res = await fetch(`${API_URL}/admin/pollutions/${pId}/reward`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							admin_tg_id: adminTgId,
+							reward: parseFloat(newVal),
+						}),
+					})
+					if (res.ok) {
+						loadPollutions()
+						tg.HapticFeedback.notificationOccurred('success')
+					}
+				} catch (e) {
+					alert('Ошибка')
+				}
+			}
+
+			async function editBalance(userId, current, name) {
+				const newVal = prompt(`Новый баланс для ${name}:`, current)
+				if (newVal === null || isNaN(newVal)) return
 				try {
 					const res = await fetch(`${API_URL}/admin/users/${userId}/balance`, {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ admin_tg_id: adminTgId, balance: newVal }),
+						body: JSON.stringify({
+							admin_tg_id: adminTgId,
+							balance: parseFloat(newVal),
+						}),
 					})
 					if (res.ok) {
-						tg.HapticFeedback.notificationOccurred('success')
 						loadUsers()
+						tg.HapticFeedback.notificationOccurred('success')
 					}
 				} catch (e) {
 					alert('Ошибка')
@@ -250,25 +540,21 @@
 			}
 
 			async function deletePollution(id) {
-				if (!confirm('Удалить это загрязнение навсегда?')) return
-
+				if (!confirm('Удалить?')) return
 				try {
 					const res = await fetch(
 						`${API_URL}/admin/pollutions/${id}?admin_tg_id=${adminTgId}`,
-						{
-							method: 'DELETE',
-						},
+						{ method: 'DELETE' },
 					)
 					if (res.ok) {
-						tg.HapticFeedback.notificationOccurred('success')
 						loadPollutions()
+						tg.HapticFeedback.notificationOccurred('success')
 					}
 				} catch (e) {
 					alert('Ошибка')
 				}
 			}
 
-			// Initial load
 			loadUsers()
 		</script>
 	</body>
