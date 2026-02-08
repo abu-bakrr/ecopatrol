@@ -549,7 +549,7 @@ function showAddForm() {
         </div>
 
         <div class="form-group">
-            <label class="form-label">Что загрязнено?</label>
+            <label class="form-label">Чем загрязнено?</label>
             <div class="tag-selector">
                 <button class="tag-btn" data-tag="plastic">Пластик</button>
                 <button class="tag-btn" data-tag="trash">Мусор</button>
@@ -567,7 +567,7 @@ function showAddForm() {
         </div>
         
         <div class="form-group">
-            <label class="form-label">Фото</label>
+            <label class="form-label">Фото (обязательно)</label>
             <div class="file-upload" id="upload-trigger">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 8px; opacity: 0.5;">
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
@@ -575,14 +575,13 @@ function showAddForm() {
                     <polyline points="21 15 16 10 5 21"/>
                 </svg>
                 <p style="color: var(--text-secondary); font-size: 14px;">Нажмите для загрузки</p>
-                <!-- Explicitly remove capture to allow choice -->
                 <input type="file" id="photo-input" accept="image/*" multiple>
             </div>
             <div id="photo-preview" class="photo-grid"></div>
         </div>
         
         <button class="btn btn-primary" style="width: 100%;" id="submit-pollution">
-            Отправить
+            Отметить
         </button>
         <!-- Spacer for safe area -->
         <div style="height: 20px;"></div>
