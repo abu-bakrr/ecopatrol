@@ -15,7 +15,9 @@ class User(db.Model):
     balance = db.Column(db.Float, default=0.0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    pollutions = db.relationship('Pollution', backref='author', lazy=True)
+    # Relationships
+    pollutions = db.relationship('Pollution', backref='author', lazy=True, foreign_keys='Pollution.user_id')
+    cleanings = db.relationship('Pollution', backref='cleaner', lazy=True, foreign_keys='Pollution.cleaner_id')
 
 
 class Pollution(db.Model):
