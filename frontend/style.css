@@ -37,11 +37,18 @@ body,
 html {
 	width: 100%;
 	height: 100%;
+	height: 100vh;
+	height: -webkit-fill-available;
 	font-family:
 		-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
 	color: var(--text-primary);
 	background: var(--bg-primary);
 	overflow: hidden;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
 	-webkit-font-smoothing: antialiased;
 	transition:
 		background 0.3s,
@@ -49,11 +56,13 @@ html {
 }
 
 #map {
-	position: absolute;
+	position: fixed;
 	top: 0;
 	left: 0;
 	width: 100%;
 	height: 100%;
+	height: 100vh;
+	height: -webkit-fill-available;
 	z-index: 1;
 	background: var(--map-bg);
 }
@@ -112,11 +121,11 @@ html {
 .profile-btn,
 .balance-btn {
 	position: absolute;
-	top: 16px;
-	z-index: 20;
+	top: max(16px, env(safe-area-inset-top) + 16px);
+	z-index: 100;
 	width: 44px;
 	height: 44px;
-	border-radius: var(--radius-full, 9999px);
+	border-radius: 9999px;
 	background: var(--bg-primary);
 	border: none;
 	box-shadow: 0 2px 8px var(--shadow);
