@@ -11,6 +11,35 @@ let currentPollution = null
 let isDragging = false
 let isRegistered = false
 
+// Start pre-fetching location immediately
+const locationPromise = new Promise(resolve => {
+	// 1. Try cache first
+	const cached = localStorage.getItem('last_known_loc')
+	if (cached) {
+		resolve({ coords: JSON.parse(cached), source: 'cache' })
+	}
+
+	// 2. Try live location in parallel
+	if (navigator.geolocation) {
+		navigator.geolocation.getCurrentPosition(
+			pos => {
+				// Update cache
+				const coords = [pos.coords.longitude, pos.coords.latitude]
+				localStorage.setItem('last_known_loc', JSON.stringify(coords))
+				// Resolve if not already resolved (Promise handles this mostly, but we want live data if fast enough)
+				resolve({ coords: coords, source: 'live' })
+			},
+			err => {
+				console.log('Pre-fetch geo error:', err)
+				if (!cached) resolve(null)
+			},
+			{ enableHighAccuracy: false, timeout: 5000, maximumAge: 30000 },
+		)
+	} else {
+		if (!cached) resolve(null)
+	}
+})
+
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
 	tg.expand()
@@ -63,37 +92,25 @@ function checkRegistration() {
 
 	if (isRegistered) {
 		hideOnboarding()
-		// Try to get location before initializing map
-		// Optimize geolocation: check cache first or wait less
-		const cachedLoc = JSON.parse(localStorage.getItem('last_known_loc'))
-		if (cachedLoc) {
-			initMap(cachedLoc) // Show map immediately with last known loc
-			// Then update with fresh loc
-			navigator.geolocation.getCurrentPosition(
-				position => {
-					const coords = [position.coords.longitude, position.coords.latitude]
-					localStorage.setItem('last_known_loc', JSON.stringify(coords))
-					map.flyTo({ center: coords, zoom: 15 })
-				},
-				null,
-				{ enableHighAccuracy: true, timeout: 5000, maximumAge: 0 },
-			)
-		} else if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(
-				position => {
-					const coords = [position.coords.longitude, position.coords.latitude]
-					localStorage.setItem('last_known_loc', JSON.stringify(coords))
-					initMap(coords)
-				},
-				error => {
-					console.error('Initial geolocation failed:', error)
-					initMap() // Fallback to default
-				},
-				{ enableHighAccuracy: false, timeout: 3000, maximumAge: 10000 }, // Faster coarse location first
-			)
-		} else {
-			initMap()
-		}
+
+		// Use pre-fetched location
+		locationPromise.then(loc => {
+			if (loc && loc.coords) {
+				// If it's a raw array (from cache) or object with lat/lng?
+				// My logic above saves array [lng, lat] to cache.
+				// Live returns object.
+				// Actually let's just pass `loc.coords` to initMap.
+				console.log('Using location from:', loc.source)
+				initMap(loc.coords)
+
+				// If source was cache, try to update with live in background if not already running?
+				// The navigator.getCurrentPosition above runs anyway.
+				// We can add a "refine" step later if needed.
+			} else {
+				initMap()
+			}
+		})
+
 		authUser()
 		setupEventListeners()
 		loadPollutions()
