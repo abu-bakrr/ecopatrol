@@ -141,6 +141,34 @@ html {
 	background: #ef4444;
 }
 
+/* Map Vignettes */
+.top-vignette,
+.bottom-vignette {
+	position: fixed;
+	left: 0;
+	right: 0;
+	width: 100%;
+	z-index: 5; /* Above map, below buttons */
+	pointer-events: none;
+	transition: background 0.4s;
+}
+
+.top-vignette {
+	top: 0;
+	height: 120px;
+	background: linear-gradient(
+		to bottom,
+		var(--bg-primary) 0%,
+		transparent 100%
+	);
+}
+
+.bottom-vignette {
+	bottom: 0;
+	height: 160px;
+	background: linear-gradient(to top, var(--bg-primary) 0%, transparent 100%);
+}
+
 /* Marker sizing based on zoom */
 .pollution-marker {
 	transition:
