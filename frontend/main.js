@@ -609,8 +609,10 @@ function showAddForm() {
 	// --- Viewer Delegation ---
 	// Handle clicks on photo items (both uploaded and loading, though loading won't have url)
 	document.getElementById('photo-preview').addEventListener('click', e => {
+		console.log('Preview clicked', e.target)
 		const item = e.target.closest('.photo-item')
 		if (item && item.dataset.url) {
+			console.log('Photo item found, URL:', item.dataset.url)
 			window.openPhotoViewer(item.dataset.url)
 		}
 	})
@@ -751,27 +753,23 @@ async function handlePhotoUpload(event) {
 			console.error('Upload error:', e)
 			tg.showAlert('Ошибка: ' + (e.message || 'Загрузка не удалась'))
 		} finally {
-			// Ensure we decrease count even on error
-			// (Note: uploadingCount logic was missed in previous replace?
-			// I need to check if uploadingCount is defined globally)
-			// It was defined in showAddForm scope, so handlePhotoUpload can't see it if it's outside!
-			// WAIT. handlePhotoUpload is defined in global scope (or module scope), showAddForm is too.
-			// If uploadingCount is local to showAddForm, handlePhotoUpload CANNOT see it.
-			// BUG FOUND: uploadCount was local variable in showAddForm, but handlePhotoUpload uses it?
-			// No, handlePhotoUpload is defined OUTSIDE showAddForm.
-			// I need to make uploadingCount global or pass it?
-			// Actually, handlePhotoUpload is attached via addEventListener in showAddForm.
-			// But handlePhotoUpload is defined separately.
-			// Solution: Move uploadingCount to global scope for simplicity.
+			// Decrement global uploading count
+			if (typeof uploadingCount !== 'undefined' && uploadingCount > 0) {
+				uploadingCount--
+			}
+			updatePhotoPreview()
 		}
 	}
+
+	// Safety reset after all uploads
 	if (typeof uploadingCount !== 'undefined') {
-		uploadingCount = 0 // Reset just in case
-		updatePhotoPreviewLocal() // This function is ALSO local to showAddForm!
-		// handlePhotoUpload calls updatePhotoPreview, which is global.
-		// My previous edit tried to make updatePhotoPreviewLocal inside handlePhotoUpload?
-		// No, I tried to rewrite handlePhotoUpload to use a local function.
-		// Let's revert to a robust global approach.
+		// Only reset if we are sure no other parallel uploads are happening?
+		// Simple approach: if files loop is done, we might be done.
+		// But the loop awaits inside.
+		// Actually, the decrement in finally block handles it per file.
+		// This is just a safety net.
+		// uploadingCount = 0;
+		updatePhotoPreview()
 	}
 }
 
