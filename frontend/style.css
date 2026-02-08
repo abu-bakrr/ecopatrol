@@ -351,10 +351,20 @@ html {
 	align-items: center;
 	justify-content: flex-start;
 	padding: 24px;
-	padding-top: 60px;
+	padding-top: calc(44px + env(safe-area-inset-top) + 20px);
 	opacity: 1;
 	visibility: visible;
 	transition: all 0.4s;
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+}
+
+[data-theme='dark'] .onboarding {
+	background: rgba(17, 24, 39, 0.85);
+}
+
+[data-theme='light'] .onboarding {
+	background: rgba(255, 255, 255, 0.85);
 }
 
 .onboarding.hidden {
@@ -364,7 +374,7 @@ html {
 }
 
 .onboarding-content {
-	background: var(--bg-primary);
+	background: transparent;
 	border-radius: 0;
 	padding: 0;
 	max-width: 100%;
@@ -373,6 +383,18 @@ html {
 	overflow-y: auto;
 	-webkit-overflow-scrolling: touch;
 	box-shadow: none;
+	animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 .onboarding-title {
@@ -465,7 +487,7 @@ html {
 
 .user-id {
 	font-size: 13px;
-	color: #4b5563; /* Darker gray for better visibility in light mode */
+	color: #374151; /* Darker gray for better visibility in light mode */
 	font-weight: 700;
 	letter-spacing: 0.5px;
 }
@@ -772,20 +794,23 @@ html {
 .form-input,
 .form-textarea {
 	width: 100%;
-	padding: 12px;
-	border: 1px solid var(--border);
-	border-radius: 12px;
+	padding: 14px 16px;
+	border: 1.5px solid var(--border);
+	border-radius: 16px;
 	font-size: 16px;
 	font-family: inherit;
 	background: var(--bg-primary);
 	color: var(--text-primary);
-	transition: border-color 0.2s;
+	transition: all 0.2s ease;
+	appearance: none;
+	-webkit-appearance: none;
 }
 
 .form-input:focus,
 .form-textarea:focus {
 	outline: none;
 	border-color: var(--primary);
+	box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.15);
 }
 
 /* Level Selector */
@@ -1073,27 +1098,17 @@ html {
 	}
 }
 
-/* Debug Console */
+/* Debug Console - Hidden by default but functional */
+#debug-toggle-btn {
+	display: none !important;
+}
+
 #debug-console {
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	height: 50vh;
-	background: rgba(0, 0, 0, 0.9);
-	color: #0f0;
-	font-family: monospace;
-	font-size: 12px;
-	padding: 10px;
-	overflow-y: auto;
-	z-index: 10002;
-	display: none;
-	pointer-events: auto;
-	border-top: 1px solid #333;
+	display: none !important;
 }
 
 #debug-console.active {
-	display: block;
+	display: flex !important;
 }
 
 #debug-toggle-btn {

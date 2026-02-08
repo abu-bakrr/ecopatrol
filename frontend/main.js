@@ -137,6 +137,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 	tg.enableClosingConfirmation()
 	tg.ready()
 
+	// 1. Initial Theme Logic (Quick)
+	loadTheme()
+
+	// Set header/bg color based on initial theme
+	const initialDark =
+		document.documentElement.getAttribute('data-theme') === 'dark'
+	const headerColor = initialDark ? '#111827' : '#ffffff'
+	tg.setHeaderColor(headerColor)
+	tg.setBackgroundColor(headerColor)
+
+	// Listen for theme changes from Telegram
+	tg.onEvent('themeChanged', () => {
+		console.log('--- THEME CHANGED EVENT ---')
+		loadTheme()
+	})
+
 	// Enable fullscreen mode
 	try {
 		tg.requestFullscreen()
@@ -144,15 +160,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 		console.log('Fullscreen not supported')
 	}
 
-	// Set header color based on theme
-	const savedTheme = localStorage.getItem('theme') || 'light'
-	const headerColor = savedTheme === 'dark' ? '#111827' : '#ffffff'
-	const bgColor = savedTheme === 'dark' ? '#242f3e' : '#fcfcfc'
-
-	tg.setHeaderColor(headerColor)
-	tg.setBackgroundColor(bgColor) // Set immediately
-
-	loadTheme()
 	initBottomSheetDrag()
 
 	// 0.5. Load Language
@@ -566,15 +573,25 @@ function applyTheme(theme) {
 }
 
 function loadTheme() {
-	let savedTheme = localStorage.getItem('theme')
-	if (!savedTheme) {
-		// Auto-detect system theme
-		const prefersDark = window.matchMedia(
-			'(prefers-color-scheme: dark)',
-		).matches
-		savedTheme = prefersDark ? 'dark' : 'light'
+	// 1. Priority: Telegram Theme
+	const tgTheme = tg.colorScheme // 'light' or 'dark'
+
+	// 2. Fallback: Saved preference or system
+	let themeToApply = tgTheme
+
+	if (!themeToApply) {
+		const savedTheme = localStorage.getItem('theme')
+		if (savedTheme) {
+			themeToApply = savedTheme
+		} else {
+			const prefersDark = window.matchMedia(
+				'(prefers-color-scheme: dark)',
+			).matches
+			themeToApply = prefersDark ? 'dark' : 'light'
+		}
 	}
-	applyTheme(savedTheme)
+
+	applyTheme(themeToApply)
 }
 
 function toggleTheme() {
@@ -1058,10 +1075,17 @@ function showAddForm() {
             <label class="form-label">${window.t('add_tags_label')}</label>
             <div class="tag-selector">
                 <button class="tag-btn" data-tag="plastic">${window.t('types.plastic')}</button>
-                <button class="tag-btn" data-tag="trash">${window.t('types.other')}</button>
                 <button class="tag-btn" data-tag="glass">${window.t('types.glass')}</button>
                 <button class="tag-btn" data-tag="paper">${window.t('types.paper')}</button>
                 <button class="tag-btn" data-tag="metal">${window.t('types.metal')}</button>
+                <button class="tag-btn" data-tag="organic">${window.t('types.organic')}</button>
+                <button class="tag-btn" data-tag="construction">${window.t('types.construction')}</button>
+                <button class="tag-btn" data-tag="electronic">${window.t('types.electronic')}</button>
+                <button class="tag-btn" data-tag="tires">${window.t('types.tires')}</button>
+                <button class="tag-btn" data-tag="hazardous">${window.t('types.hazardous')}</button>
+                <button class="tag-btn" data-tag="bulky">${window.t('types.bulky')}</button>
+                <button class="tag-btn" data-tag="chemical">${window.t('types.chemical')}</button>
+                <button class="tag-btn" data-tag="trash">${window.t('types.other')}</button>
             </div>
         </div>
         
