@@ -68,6 +68,7 @@ def init_user():
     except Exception:
         pass
 
+    print(f"--- INIT API RESPONSE --- user_id: {user.id}, lang: {user_lang}")
     return jsonify({
         'status': 'ok',
         'user': {
