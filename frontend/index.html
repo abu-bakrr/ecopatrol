@@ -216,6 +216,10 @@
 		<!-- Overlay -->
 		<div class="overlay" id="overlay"></div>
 
+		<!-- Debug Console Structure -->
+		<button id="debug-toggle-btn">🐞 LOGS</button>
+		<div id="debug-console"></div>
+
 		<!-- Error Handler for Mobile Debugging -->
 		<script>
 			// Simple on-screen logger
@@ -247,6 +251,15 @@
 				return false
 			}
 
+			// Global Click Tracker
+			document.addEventListener(
+				'click',
+				e => {
+					logToScreen(`Click: ${e.target.tagName} .${e.target.className}`)
+				},
+				true,
+			)
+
 			// Override Console
 			const originalLog = console.log
 			const originalError = console.error
@@ -268,13 +281,9 @@
 				logToScreen(args.join(' '), 'warn')
 			}
 
-			console.log('Debug console initialized')
+			console.log('Log system ready v10')
 		</script>
 
-		<!-- Debug Console Structure -->
-		<button id="debug-toggle-btn">🐞 LOGS</button>
-		<div id="debug-console"></div>
-
-		<script type="module" src="main.js?v=5"></script>
+		<script type="module" src="main.js?v=10"></script>
 	</body>
 </html>
