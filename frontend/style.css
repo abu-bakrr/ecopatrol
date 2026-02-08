@@ -452,18 +452,37 @@ html {
 	transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 	max-height: 80vh;
 	overflow-y: auto;
+	will-change: transform;
 }
 
 .bottom-sheet.active {
 	transform: translateY(0);
 }
 
+.bottom-sheet.dragging {
+	transition: none !important;
+}
+
 .sheet-handle {
+	width: 100%;
+	height: 32px; /* Increased hit area */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	touch-action: none;
+	cursor: grab;
+	position: sticky;
+	top: 0;
+	background: var(--bg-primary);
+	z-index: 10;
+}
+
+.sheet-handle::after {
+	content: '';
 	width: 36px;
 	height: 4px;
 	background: var(--border);
 	border-radius: 2px;
-	margin: 12px auto;
 }
 
 .sheet-content {

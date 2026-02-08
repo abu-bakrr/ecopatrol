@@ -94,12 +94,61 @@ document.addEventListener('DOMContentLoaded', async () => {
 	tg.setBackgroundColor(bgColor) // Set immediately
 
 	loadTheme()
+	initBottomSheetDrag()
 
 	// DELAY MAP INIT: Wait for Telegram animation to finish
 	setTimeout(() => {
 		checkRegistration()
 	}, 300) // 300ms is usually enough for transition
 })
+
+function initBottomSheetDrag() {
+	const sheet = document.getElementById('bottom-sheet')
+	const handle = sheet.querySelector('.sheet-handle')
+	if (!sheet || !handle) return
+
+	let startY = 0
+	let currentY = 0
+	let dragging = false
+
+	handle.addEventListener(
+		'touchstart',
+		e => {
+			startY = e.touches[0].clientY
+			currentY = startY // Initialize to avoid jumps
+			dragging = true
+			sheet.classList.add('dragging')
+		},
+		{ passive: true },
+	)
+
+	window.addEventListener(
+		'touchmove',
+		e => {
+			if (!dragging) return
+			currentY = e.touches[0].clientY
+			const delta = currentY - startY
+			if (delta > 0) {
+				sheet.style.transform = `translateY(${delta}px)`
+			}
+		},
+		{ passive: false },
+	)
+
+	window.addEventListener('touchend', () => {
+		if (!dragging) return
+		dragging = false
+		sheet.classList.remove('dragging')
+
+		const delta = currentY - startY
+		if (delta > 100) {
+			closeBottomSheet()
+		}
+		sheet.style.transform = ''
+		startY = 0
+		currentY = 0
+	})
+}
 
 function loadTheme() {
 	const savedTheme = localStorage.getItem('theme') || 'light'
@@ -674,66 +723,6 @@ function showAddForm() {
 		.addEventListener('change', handlePhotoUpload)
 	document.getElementById('submit-pollution').addEventListener('click', () => {
 		submitPollution(center.lat, center.lng, selectedTags)
-	})
-
-	// --- Drag & Drop Logic for Sheet ---
-	const sheet = document.getElementById('bottom-sheet')
-	// Use the whole sheet header/handle area for dragging
-	// Create a larger hit area if needed, or just use the sheet content's top padding area
-	const dragZone = document.createElement('div')
-	dragZone.style.position = 'absolute'
-	dragZone.style.top = '0'
-	dragZone.style.left = '0'
-	dragZone.style.right = '0'
-	dragZone.style.height = '20px' // Reduced height to avoid covering content
-	dragZone.style.zIndex = '10'
-	sheet.appendChild(dragZone)
-
-	let startY = 0
-	let currentY = 0
-	let isDragging = false
-
-	dragZone.addEventListener(
-		'touchstart',
-		e => {
-			startY = e.touches[0].clientY
-			isDragging = true
-			sheet.style.transition = 'none'
-			console.log('Drag start')
-		},
-		{ passive: true },
-	)
-
-	dragZone.addEventListener(
-		'touchmove',
-		e => {
-			if (!isDragging) return
-			currentY = e.touches[0].clientY
-			const delta = currentY - startY
-
-			if (delta > 0) {
-				// Only allow dragging down
-				sheet.style.transform = `translateY(${delta}px)`
-			}
-		},
-		{ passive: true },
-	)
-
-	dragZone.addEventListener('touchend', () => {
-		if (!isDragging) return
-		isDragging = false
-		sheet.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-
-		const delta = currentY - startY
-		if (delta > 100) {
-			closeBottomSheet()
-			setTimeout(() => {
-				sheet.style.transform = ''
-			}, 300)
-		} else {
-			sheet.style.transform = ''
-		}
-		console.log('Drag end')
 	})
 }
 
