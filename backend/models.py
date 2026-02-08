@@ -8,11 +8,15 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     telegram_id = db.Column(db.BigInteger, unique=True, nullable=False)
     username = db.Column(db.String(255))
+    first_name = db.Column(db.String(100))
+    last_name = db.Column(db.String(100))
+    age = db.Column(db.Integer)
     phone = db.Column(db.String(20))
     balance = db.Column(db.Float, default=0.0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     pollutions = db.relationship('Pollution', backref='author', lazy=True)
+
 
 class Pollution(db.Model):
     __tablename__ = 'pollutions'

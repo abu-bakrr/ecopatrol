@@ -21,6 +21,83 @@
 		<link rel="stylesheet" href="style.css" />
 	</head>
 	<body>
+		<!-- Onboarding Screen -->
+		<div class="onboarding" id="onboarding">
+			<div class="onboarding-content">
+				<div class="onboarding-icon">
+					<svg
+						width="48"
+						height="48"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="white"
+						stroke-width="2"
+					>
+						<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+						<circle cx="12" cy="10" r="3" />
+					</svg>
+				</div>
+				<h1 class="onboarding-title">Добро пожаловать!</h1>
+				<p class="onboarding-subtitle">Давайте познакомимся</p>
+
+				<div id="onboarding-form">
+					<div class="form-group">
+						<label class="form-label">Имя</label>
+						<input
+							type="text"
+							class="form-input"
+							id="first-name"
+							placeholder="Введите имя"
+							required
+						/>
+					</div>
+
+					<div class="form-group">
+						<label class="form-label">Фамилия</label>
+						<input
+							type="text"
+							class="form-input"
+							id="last-name"
+							placeholder="Введите фамилию"
+							required
+						/>
+					</div>
+
+					<div class="form-group">
+						<label class="form-label">Возраст</label>
+						<input
+							type="number"
+							class="form-input"
+							id="age"
+							placeholder="Введите возраст"
+							min="13"
+							max="120"
+							required
+						/>
+					</div>
+
+					<div class="form-group">
+						<label class="form-label">Телефон</label>
+						<input
+							type="tel"
+							class="form-input"
+							id="phone"
+							placeholder="+7 (___) ___-__-__"
+							required
+						/>
+					</div>
+
+					<button
+						class="btn btn-primary"
+						style="width: 100%; margin-top: 8px"
+						id="onboarding-submit"
+					>
+						Продолжить
+					</button>
+				</div>
+			</div>
+		</div>
+
 		<!-- Map -->
 		<div id="map"></div>
 
@@ -29,7 +106,7 @@
 			<svg width="32" height="40" viewBox="0 0 32 40" fill="none">
 				<path
 					d="M16 0C7.163 0 0 7.163 0 16c0 11.2 16 24 16 24s16-12.8 16-24C32 7.163 24.837 0 16 0z"
-					fill="#10b981"
+					fill="#059669"
 				/>
 				<circle cx="16" cy="16" r="6" fill="white" />
 			</svg>
@@ -80,7 +157,7 @@
 			</svg>
 		</button>
 
-		<!-- Add Pollution Button (Icon Only) -->
+		<!-- Add Pollution Button -->
 		<button class="add-btn" id="add-btn">
 			<svg
 				width="24"

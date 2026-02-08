@@ -1,4 +1,4 @@
-// EcoPatrol - Apple Style Edition
+// EcoPatrol - Onboarding Edition
 const tg = window.Telegram.WebApp
 const API_URL = window.location.origin + '/api'
 
@@ -9,25 +9,23 @@ let selectedLevel = 1
 let uploadedPhotos = []
 let currentPollution = null
 let isDragging = false
+let isRegistered = false
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
 	tg.expand()
 	tg.ready()
-	tg.setHeaderColor('#10b981')
+	tg.setHeaderColor('#059669')
 
 	loadTheme()
-	initMap()
-	await authUser()
-	setupEventListeners()
-	loadPollutions()
+	checkRegistration()
 })
 
 function loadTheme() {
 	const savedTheme = localStorage.getItem('theme') || 'light'
 	document.documentElement.setAttribute('data-theme', savedTheme)
 	if (savedTheme === 'dark') {
-		document.getElementById('theme-toggle').classList.add('active')
+		document.getElementById('theme-toggle')?.classList.add('active')
 	}
 }
 
@@ -38,6 +36,121 @@ function toggleTheme() {
 	localStorage.setItem('theme', newTheme)
 	document.getElementById('theme-toggle').classList.toggle('active')
 	tg.HapticFeedback.impactOccurred('light')
+
+	// Update map style based on theme
+	if (map) {
+		const style =
+			newTheme === 'dark' ?
+				'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+			:	'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json'
+		map.setStyle(style)
+	}
+}
+
+function checkRegistration() {
+	isRegistered = localStorage.getItem('registered') === 'true'
+
+	if (isRegistered) {
+		hideOnboarding()
+		initMap()
+		authUser()
+		setupEventListeners()
+		loadPollutions()
+	} else {
+		showOnboarding()
+	}
+}
+
+function showOnboarding() {
+	document.getElementById('onboarding').classList.remove('hidden')
+	document
+		.getElementById('onboarding-submit')
+		.addEventListener('click', handleRegistration)
+}
+
+function hideOnboarding() {
+	document.getElementById('onboarding').classList.add('hidden')
+}
+
+async function handleRegistration() {
+	const firstName = document.getElementById('first-name').value.trim()
+	const lastName = document.getElementById('last-name').value.trim()
+	const age = parseInt(document.getElementById('age').value)
+	const phone = document.getElementById('phone').value.trim()
+
+	if (!firstName || !lastName || !age || !phone) {
+		tg.showAlert('Пожалуйста, заполните все поля')
+		return
+	}
+
+	if (age < 13 || age > 120) {
+		tg.showAlert('Пожалуйста, введите корректный возраст')
+		return
+	}
+
+	// Request geolocation
+	if (!navigator.geolocation) {
+		tg.showAlert('Геолокация недоступна на вашем устройстве')
+		return
+	}
+
+	navigator.geolocation.getCurrentPosition(
+		async position => {
+			// Geolocation granted, proceed with registration
+			const initData = tg.initDataUnsafe
+			const user = initData.user || { id: Date.now(), username: 'user' }
+
+			try {
+				const response = await fetch(`${API_URL}/init`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						telegram_id: user.id,
+						username: user.username || `${firstName} ${lastName}`,
+						first_name: firstName,
+						last_name: lastName,
+						age: age,
+						phone: phone,
+						initData: tg.initData,
+					}),
+				})
+
+				const data = await response.json()
+				currentUser = data.user
+
+				localStorage.setItem('registered', 'true')
+				isRegistered = true
+
+				hideOnboarding()
+				initMap()
+				setupEventListeners()
+				loadPollutions()
+				updateProfileUI()
+
+				// Center map on user location
+				map.flyTo({
+					center: [position.coords.longitude, position.coords.latitude],
+					zoom: 15,
+					duration: 2000,
+				})
+
+				tg.HapticFeedback.notificationOccurred('success')
+			} catch (e) {
+				console.error('Registration error:', e)
+				tg.showAlert('Ошибка регистрации. Попробуйте снова.')
+			}
+		},
+		error => {
+			tg.showAlert(
+				'Для использования приложения необходимо разрешить доступ к геолокации',
+			)
+		},
+		{
+			enableHighAccuracy: true,
+			timeout: 10000,
+			maximumAge: 0,
+		},
+	)
 }
 
 function initMap() {
@@ -46,12 +159,18 @@ function initMap() {
 		return
 	}
 
+	const theme = document.documentElement.getAttribute('data-theme')
+	const style =
+		theme === 'dark' ?
+			'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+		:	'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json'
+
 	map = new maplibregl.Map({
 		container: 'map',
-		style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+		style: style,
 		center: [37.6173, 55.7558],
 		zoom: 13,
-		pitch: 0, // 2D view
+		pitch: 0,
 		antialias: true,
 	})
 
@@ -73,6 +192,8 @@ function initMap() {
 }
 
 async function authUser() {
+	if (currentUser) return // Already authenticated during registration
+
 	const initData = tg.initDataUnsafe
 	const user = initData.user || {
 		id: 12345,
@@ -101,7 +222,11 @@ async function authUser() {
 
 function updateProfileUI() {
 	if (!currentUser) return
-	document.getElementById('sidebar-username').textContent = currentUser.username
+	const fullName =
+		currentUser.first_name && currentUser.last_name ?
+			`${currentUser.first_name} ${currentUser.last_name}`
+		:	currentUser.username
+	document.getElementById('sidebar-username').textContent = fullName
 	document.getElementById('sidebar-userid').textContent =
 		`ID: ${currentUser.telegram_id}`
 	document.getElementById('sidebar-balance').textContent =
@@ -249,7 +374,6 @@ function showAddForm() {
 
 	openBottomSheet()
 
-	// Level selector
 	content.querySelectorAll('.level-btn').forEach(btn => {
 		btn.addEventListener('click', () => {
 			content
@@ -261,7 +385,6 @@ function showAddForm() {
 		})
 	})
 
-	// Photo upload
 	document.getElementById('upload-trigger').addEventListener('click', () => {
 		document.getElementById('photo-input').click()
 	})
@@ -269,8 +392,6 @@ function showAddForm() {
 	document
 		.getElementById('photo-input')
 		.addEventListener('change', handlePhotoUpload)
-
-	// Submit
 	document.getElementById('submit-pollution').addEventListener('click', () => {
 		submitPollution(center.lat, center.lng)
 	})
@@ -353,7 +474,7 @@ function showPollutionDetails(pollution) {
 	const content = document.getElementById('sheet-content')
 
 	const levelColors = {
-		1: '#10b981',
+		1: '#059669',
 		2: '#fbbf24',
 		3: '#ef4444',
 	}

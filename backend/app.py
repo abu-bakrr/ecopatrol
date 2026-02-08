@@ -32,13 +32,18 @@ def validate_telegram_data(init_data):
 @app.route('/api/init', methods=['POST'])
 def init_user():
     data = request.json
-    # In a real app, we would validate data['initData'] here
     tg_id = data.get('telegram_id')
-    username = data.get('username')
     
     user = User.query.filter_by(telegram_id=tg_id).first()
     if not user:
-        user = User(telegram_id=tg_id, username=username)
+        user = User(
+            telegram_id=tg_id,
+            username=data.get('username'),
+            first_name=data.get('first_name'),
+            last_name=data.get('last_name'),
+            age=data.get('age'),
+            phone=data.get('phone')
+        )
         db.session.add(user)
         db.session.commit()
     
@@ -48,9 +53,14 @@ def init_user():
             'id': user.id,
             'telegram_id': user.telegram_id,
             'username': user.username,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'age': user.age,
+            'phone': user.phone,
             'balance': user.balance
         }
     })
+
 
 @app.route('/api/pollutions', methods=['GET'])
 def get_pollutions():

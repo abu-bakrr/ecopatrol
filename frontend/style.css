@@ -1,32 +1,30 @@
 :root {
-	/* Light Theme - Brighter Green */
-	--primary: #10b981;
-	--primary-hover: #059669;
-	--primary-dark: #047857;
+	/* Darker Green Theme */
+	--primary: #059669;
+	--primary-hover: #047857;
+	--primary-dark: #065f46;
+	--icon-color: #059669; /* Icons always green */
 	--bg-primary: #ffffff;
 	--bg-secondary: #f9fafb;
 	--text-primary: #111827;
 	--text-secondary: #6b7280;
 	--border: #e5e7eb;
 	--shadow: rgba(0, 0, 0, 0.1);
-
-	/* Spacing - Compact */
-	--radius-sm: 8px;
-	--radius-md: 12px;
-	--radius-lg: 16px;
-	--radius-full: 9999px;
+	--map-bg: #f0f0f0;
 }
 
 [data-theme='dark'] {
-	--primary: #10b981;
-	--primary-hover: #34d399;
-	--primary-dark: #059669;
+	--primary: #059669;
+	--primary-hover: #10b981;
+	--primary-dark: #047857;
+	--icon-color: #059669; /* Icons stay green in dark mode */
 	--bg-primary: #111827;
 	--bg-secondary: #1f2937;
 	--text-primary: #f9fafb;
 	--text-secondary: #9ca3af;
 	--border: #374151;
 	--shadow: rgba(0, 0, 0, 0.3);
+	--map-bg: #1a1a1a;
 }
 
 * {
@@ -57,22 +55,23 @@ html {
 	width: 100%;
 	height: 100%;
 	z-index: 1;
+	background: var(--map-bg);
 }
 
-/* Center Marker with Animation */
+/* Center Marker - Higher position and bigger lift */
 .center-marker {
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	transform: translate(-50%, -100%);
+	transform: translate(-50%, -110%); /* Higher base position */
 	z-index: 10;
 	pointer-events: none;
-	filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
-	transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.25));
+	transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .center-marker.dragging {
-	transform: translate(-50%, -120%);
+	transform: translate(-50%, -140%); /* Much higher when dragging */
 }
 
 /* Pollution Markers */
@@ -88,7 +87,7 @@ html {
 }
 
 .pollution-marker.level-1 {
-	background: #10b981;
+	background: #059669;
 }
 .pollution-marker.level-2 {
 	background: #fbbf24;
@@ -109,7 +108,7 @@ html {
 	}
 }
 
-/* Top Buttons */
+/* Top Buttons - Icons always green */
 .profile-btn,
 .balance-btn {
 	position: absolute;
@@ -117,7 +116,7 @@ html {
 	z-index: 20;
 	width: 44px;
 	height: 44px;
-	border-radius: var(--radius-full);
+	border-radius: var(--radius-full, 9999px);
 	background: var(--bg-primary);
 	border: none;
 	box-shadow: 0 2px 8px var(--shadow);
@@ -127,6 +126,7 @@ html {
 	justify-content: center;
 	transition: all 0.2s;
 	backdrop-filter: blur(10px);
+	color: var(--icon-color);
 }
 
 .profile-btn {
@@ -141,7 +141,7 @@ html {
 	transform: scale(0.95);
 }
 
-/* Geolocation Button (Right) */
+/* Geolocation Button - Always green icon */
 .geolocate-btn {
 	position: absolute;
 	right: 16px;
@@ -150,7 +150,7 @@ html {
 	z-index: 20;
 	width: 44px;
 	height: 44px;
-	border-radius: var(--radius-full);
+	border-radius: 9999px;
 	background: var(--bg-primary);
 	border: none;
 	box-shadow: 0 2px 8px var(--shadow);
@@ -159,13 +159,14 @@ html {
 	align-items: center;
 	justify-content: center;
 	transition: all 0.2s;
+	color: var(--icon-color);
 }
 
 .geolocate-btn:active {
 	transform: translateY(-50%) scale(0.95);
 }
 
-/* Add Button - Icon Only */
+/* Add Button */
 .add-btn {
 	position: absolute;
 	bottom: 32px;
@@ -177,8 +178,8 @@ html {
 	background: var(--primary);
 	color: white;
 	border: none;
-	border-radius: var(--radius-full);
-	box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+	border-radius: 9999px;
+	box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);
 	cursor: pointer;
 	display: flex;
 	align-items: center;
@@ -188,6 +189,74 @@ html {
 
 .add-btn:active {
 	transform: translateX(-50%) scale(0.95);
+}
+
+/* Onboarding Screen */
+.onboarding {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: linear-gradient(
+		135deg,
+		var(--primary) 0%,
+		var(--primary-dark) 100%
+	);
+	z-index: 200;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 32px;
+	opacity: 1;
+	visibility: visible;
+	transition: all 0.4s;
+}
+
+.onboarding.hidden {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.onboarding-content {
+	background: var(--bg-primary);
+	border-radius: 24px;
+	padding: 32px 24px;
+	max-width: 400px;
+	width: 100%;
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.onboarding-title {
+	font-size: 28px;
+	font-weight: 700;
+	text-align: center;
+	margin-bottom: 8px;
+	color: var(--text-primary);
+}
+
+.onboarding-subtitle {
+	font-size: 15px;
+	text-align: center;
+	color: var(--text-secondary);
+	margin-bottom: 28px;
+}
+
+.onboarding-icon {
+	width: 80px;
+	height: 80px;
+	margin: 0 auto 24px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: linear-gradient(
+		135deg,
+		var(--primary) 0%,
+		var(--primary-dark) 100%
+	);
+	border-radius: 50%;
 }
 
 /* Sidebar */
@@ -227,7 +296,7 @@ html {
 	border: none;
 	width: 32px;
 	height: 32px;
-	border-radius: var(--radius-full);
+	border-radius: 9999px;
 	color: white;
 	cursor: pointer;
 	font-size: 20px;
@@ -240,7 +309,7 @@ html {
 	justify-content: space-between;
 	padding: 12px;
 	background: var(--bg-secondary);
-	border-radius: var(--radius-md);
+	border-radius: 12px;
 	margin-bottom: 16px;
 }
 
@@ -280,8 +349,8 @@ html {
 	left: 0;
 	right: 0;
 	background: var(--bg-primary);
-	border-top-left-radius: var(--radius-lg);
-	border-top-right-radius: var(--radius-lg);
+	border-top-left-radius: 16px;
+	border-top-right-radius: 16px;
 	box-shadow: 0 -2px 12px var(--shadow);
 	z-index: 50;
 	transform: translateY(100%);
@@ -345,7 +414,7 @@ html {
 	width: 100%;
 	padding: 12px;
 	border: 1px solid var(--border);
-	border-radius: var(--radius-md);
+	border-radius: 12px;
 	font-size: 16px;
 	font-family: inherit;
 	background: var(--bg-primary);
@@ -370,7 +439,7 @@ html {
 	padding: 12px;
 	border: 1px solid var(--border);
 	background: var(--bg-primary);
-	border-radius: var(--radius-md);
+	border-radius: 12px;
 	font-weight: 600;
 	font-size: 14px;
 	cursor: pointer;
@@ -379,8 +448,8 @@ html {
 }
 
 .level-btn.active.level-1 {
-	background: #10b981;
-	border-color: #10b981;
+	background: #059669;
+	border-color: #059669;
 	color: white;
 }
 
@@ -400,7 +469,7 @@ html {
 .btn {
 	padding: 12px 20px;
 	border: none;
-	border-radius: var(--radius-md);
+	border-radius: 12px;
 	font-weight: 600;
 	font-size: 15px;
 	cursor: pointer;
@@ -428,7 +497,7 @@ html {
 /* Photo Upload */
 .file-upload {
 	border: 2px dashed var(--border);
-	border-radius: var(--radius-md);
+	border-radius: 12px;
 	padding: 24px;
 	text-align: center;
 	cursor: pointer;
@@ -454,7 +523,7 @@ html {
 
 .photo-item {
 	aspect-ratio: 1;
-	border-radius: var(--radius-md);
+	border-radius: 12px;
 	overflow: hidden;
 	background: var(--bg-secondary);
 }
@@ -469,7 +538,7 @@ html {
 .stat-card {
 	background: var(--bg-secondary);
 	padding: 16px;
-	border-radius: var(--radius-md);
+	border-radius: 12px;
 	margin-bottom: 12px;
 }
 
@@ -498,5 +567,5 @@ html {
 
 .user-id {
 	font-size: 14px;
-	color: var(--text-secondary);
+	color: rgba(255, 255, 255, 0.8);
 }
