@@ -7,15 +7,23 @@ echo "🌍 ========================================"
 echo "🌍   Установка Экопатруль на VPS (Ubuntu)  "
 echo "🌍 ========================================"
 
-# 1. Интервю с пользователем
-read -p "🔹 Введите токен Telegram бота: " BOT_TOKEN
-read -p "🔹 Введите CLOUDINARY_URL (например, cloudinary://123:abc@name): " CLOUDINARY_URL
-read -p "🔹 Введите ваш домен (например, eco.mysite.com): " DOMAIN_NAME
-read -p "🔹 Введите email для SSL-сертификата: " SSL_EMAIL
+# 1. Загрузка переменных (Интерактивно или из .env)
+echo "🔹 Настройка конфигурации..."
+
+# Если есть .env в корневой папке скрипта, берем данные оттуда
+if [ -f .env ]; then
+    echo "✅ Найден файл .env, загружаю данные..."
+    source .env
+else
+    read -p "🔹 Введите токен Telegram бота: " BOT_TOKEN
+    read -p "🔹 Введите CLOUDINARY_URL: " CLOUDINARY_URL
+    read -p "🔹 Введите ваш домен (например, eco.mysite.com): " DOMAIN_NAME
+    read -p "🔹 Введите email для SSL-сертификата: " SSL_EMAIL
+fi
 
 # 2. Обновление и установка системных пакетов
 echo "🔹 Обновление системы и установка пакетов..."
-sudo apt update && sudo apt upgrade -y
+sudo apt update
 sudo apt install -y python3-pip python3-venv git curl postgresql postgresql-contrib nginx certbot python3-certbot-nginx
 
 # 3. Настройка PostgreSQL
@@ -26,26 +34,26 @@ sudo systemctl stop postgresql || true
 sudo pkill -9 -u postgres || true
 sudo fuser -k 5432/tcp || true
 
-# 2. Удаление старых заблокированных файлов
+# 2. Удаление старых заблокированных файлов и директорий ДАННЫХ
 sudo rm -rf /var/run/postgresql/*
 sudo rm -rf /var/lib/postgresql/14/main
 sudo rm -rf /etc/postgresql/14/main
 
-# 3. Полная переустановка пакетов, если они повреждены (на всякий случай)
-# sudo apt-get purge -y postgresql-14 postgresql-contrib || true
-# sudo apt-get install -y postgresql-14 postgresql-contrib
-
-# 4. Создание кластера с чистого листа
+# 3. Создание кластера с чистого листа
 echo "🔹 Создание нового кластера PostgreSQL 14..."
+# Выполняем из /tmp, чтобы не было ошибок "Permission denied" при попытке зайти в /root/ecopatrol пользователем postgres
+cd /tmp
 sudo pg_createcluster 14 main --start || {
     echo "⚠️ Ошибка pg_createcluster. Пробую пересоздать директории вручную..."
+    sudo rm -rf /var/lib/postgresql/14/main
     sudo mkdir -p /var/lib/postgresql/14/main
     sudo chown postgres:postgres /var/lib/postgresql/14/main
     sudo -u postgres /usr/lib/postgresql/14/bin/initdb -D /var/lib/postgresql/14/main
     sudo systemctl start postgresql
 }
+cd - > /dev/null
 
-# 5. ФИКC: Отключаем IPv6, чтобы не было конфликтов на VPS
+# 5. ФИКC: Отключаем IPv6 для стабильности
 POSTGRES_CONF="/etc/postgresql/14/main/postgresql.conf"
 if [ -f "$POSTGRES_CONF" ]; then
     sudo sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '127.0.0.1'/" $POSTGRES_CONF
@@ -80,7 +88,7 @@ fi
 source venv/bin/activate
 pip install -r requirements.txt gunicorn
 
-# Создание или обновление .env
+# Создание или обновление .env в папке backend
 cat <<EOF > .env
 BOT_TOKEN=$BOT_TOKEN
 DATABASE_URL=$DATABASE_URL
@@ -91,7 +99,7 @@ EOF
 deactivate
 cd ..
 
-# 5. Настройка Nginx и SSL
+# 5. Настройка Nginx и SSL (далее без изменений)
 echo "🔹 Настройка Nginx для домена $DOMAIN_NAME..."
 
 NGINX_CONF="/etc/nginx/sites-available/ecopatrol"
