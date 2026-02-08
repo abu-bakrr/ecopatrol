@@ -75,7 +75,8 @@ cd ..
 echo "🔹 Настройка Nginx для домена $DOMAIN_NAME..."
 
 NGINX_CONF="/etc/nginx/sites-available/ecopatrol"
-sudo bash -c "cat <<EOF > $NGINX_CONF
+# Используем tee для записи файла с правильным экранированием
+sudo tee $NGINX_CONF > /dev/null <<EOF
 server {
     listen 80;
     server_name $DOMAIN_NAME;
@@ -94,7 +95,7 @@ server {
         try_files \$uri \$uri/ /index.html;
     }
 }
-EOF"
+EOF
 
 sudo ln -sf $NGINX_CONF /etc/nginx/sites-enabled/
 sudo rm -f /etc/nginx/sites-enabled/default
