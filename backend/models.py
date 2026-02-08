@@ -12,6 +12,7 @@ class User(db.Model):
     last_name = db.Column(db.String(100))
     age = db.Column(db.Integer)
     phone = db.Column(db.String(20))
+    language = db.Column(db.String(10), default='ru')
     balance = db.Column(db.Float, default=0.0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 

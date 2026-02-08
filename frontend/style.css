@@ -572,6 +572,31 @@ html {
 .stat-info {
 	display: flex;
 	flex-direction: column;
+	gap: 12px;
+}
+
+.language-switcher {
+	display: flex;
+	justify-content: space-around;
+	background: var(--bg-secondary);
+	padding: 10px;
+	border-radius: 12px;
+	margin-bottom: 20px;
+}
+
+.lang-option {
+	padding: 8px 12px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 14px;
+	font-weight: 600;
+	transition: all 0.2s;
+	color: var(--text-secondary);
+}
+
+.lang-option.active {
+	background: var(--primary);
+	color: white;
 }
 
 .stat-value {

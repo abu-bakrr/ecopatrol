@@ -33,6 +33,62 @@ let currentPollution = null
 let isDragging = false
 let isRegistered = false
 let uploadingCount = 0 // Global state for optimistic UI
+let currentLang = 'ru' // Default
+
+// Translation Helper
+window.t = function (key) {
+	const keys = key.split('.')
+	let result = translations[currentLang]
+	for (const k of keys) {
+		if (result && result[k]) {
+			result = result[k]
+		} else {
+			return key // Fallback to key name
+		}
+	}
+	return result
+}
+
+window.setLanguage = async function (lang) {
+	if (!['uz', 'ru', 'en'].includes(lang)) return
+	console.log('--- SETTING LANGUAGE ---', lang)
+	currentLang = lang
+	localStorage.setItem('language', lang)
+
+	// Mark active in UI
+	document.querySelectorAll('.lang-option').forEach(opt => {
+		opt.classList.remove('active')
+		if (opt.textContent.toLowerCase().includes(lang)) {
+			opt.classList.add('active')
+		}
+	})
+
+	// Translate static elements
+	document.querySelectorAll('[data-t]').forEach(el => {
+		const key = el.getAttribute('data-t')
+		el.innerHTML = window.t(key)
+	})
+
+	document.querySelectorAll('[data-t-placeholder]').forEach(el => {
+		const key = el.getAttribute('data-t-placeholder')
+		el.placeholder = window.t(key)
+	})
+
+	// Update Backend if logged in
+	if (currentUser && currentUser.telegram_id) {
+		try {
+			await fetch(`${API_URL}/profile/${currentUser.telegram_id}/language`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ language: lang }),
+			})
+		} catch (e) {
+			console.error('Failed to sync language to backend', e)
+		}
+	}
+
+	tg.HapticFeedback.impactOccurred('light')
+}
 
 // Start pre-fetching location immediately
 const locationPromise = new Promise(resolve => {
@@ -97,6 +153,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	loadTheme()
 	initBottomSheetDrag()
+
+	// 0.5. Load Language
+	const savedLang = localStorage.getItem('language') || 'ru'
+	window.setLanguage(savedLang)
 
 	// DELAY MAP INIT: Wait for Telegram animation to finish
 	setTimeout(() => {
@@ -193,8 +253,20 @@ function showOnboarding() {
 	})
 }
 
-function hideOnboarding() {
-	document.getElementById('onboarding').classList.add('hidden')
+function hideOnboarding(data = null) {
+	const onboarding = document.getElementById('onboarding')
+	onboarding.classList.add('hidden')
+
+	if (data) {
+		currentUser = data
+		isRegistered = true
+		updateSidebarProfile()
+
+		// Sync language from profile
+		if (data.language) {
+			window.setLanguage(data.language)
+		}
+	}
 }
 
 async function handleRegistration() {
@@ -291,7 +363,7 @@ async function handleRegistration() {
 				updateProfileUI()
 
 				tg.HapticFeedback.notificationOccurred('success')
-				tg.showAlert('Регистрация успешна!')
+				tg.showAlert(window.t('reg_success') || 'Регистрация успешна!')
 			} catch (e) {
 				console.error('Registration error:', e)
 				tg.showAlert(`Ошибка регистрации: ${e.message}`)
@@ -300,7 +372,8 @@ async function handleRegistration() {
 		error => {
 			console.error('Geolocation error:', error)
 			tg.showAlert(
-				'Для использования приложения необходимо разрешить доступ к геолокации',
+				window.t('geo_required') ||
+					'Для использования приложения необходимо разрешить доступ к геолокации',
 			)
 		},
 		{
@@ -754,8 +827,8 @@ async function showExchange() {
 			content.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-icon">🌟</div>
-                    <div class="empty-title">Город чист!</div>
-                    <div class="empty-text">На данный момент нет активных заявок. Спасибо за ваш вклад в чистоту! Вы можете отметить новое загрязнение на карте.</div>
+                    <div class="empty-title">${window.t('city_clean_title')}</div>
+                    <div class="empty-text">${window.t('city_clean_text')}</div>
                 </div>
             `
 			return
@@ -763,14 +836,17 @@ async function showExchange() {
 
 		let html = '<div class="exchange-list">'
 		activePollutions.forEach(p => {
-			const typesStr = Array.isArray(p.types) ? p.types.join(', ') : 'Мусор'
+			const typesStr =
+				Array.isArray(p.types) ?
+					p.types.map(t => window.t(`types.${t}`)).join(', ')
+				:	window.t('types.other')
 			html += `
                 <div class="exchange-card" onclick="flyToReport(${p.lng}, ${p.lat})">
                     <div class="exchange-info">
                         <div class="exchange-types">${typesStr}</div>
-                        <div class="exchange-desc">${p.description || 'Без описания'}</div>
+                        <div class="exchange-desc">${p.description || ''}</div>
                         <div class="exchange-meta">
-                            <span>📍 Уровень ${p.level || 1}</span>
+                            <span>📍 ${window.t('reward')} ${p.level || 1}</span>
                         </div>
                     </div>
                     <div class="exchange-reward-badge">+$${p.level || 1}</div>
@@ -791,51 +867,51 @@ async function showAboutInfo() {
 	const content = document.getElementById('sheet-content')
 	content.innerHTML = `
         <div class="info-sheet">
-            <div class="info-header-img">�️</div>
+            <div class="info-header-img">🏛️</div>
             
             <div class="info-card">
-                <div class="info-tag">Официальный статус</div>
-                <div class="info-title">Социально-образовательная инициатива</div>
+                <div class="info-tag">${window.t('about_official_status')}</div>
+                <div class="info-title">${window.t('about_initiative_title')}</div>
                 <div class="info-text">
-                    Информационная система <b>«Экопатруль»</b> является официальным социально-ориентированным проектом, инициированным государственным общеобразовательным учреждением <b>Школа №242 Алмазарского района</b> города Ташкента.
+                    ${window.t('about_initiative_text')}
                 </div>
                 <div class="info-text">
-                    Данная платформа создана в целях реализации государственной программы по экологическому просвещению молодежи, формирования ответственного отношения к окружающей среде и внедрения инновационных цифровых решений в сферу благоустройства.
+                    ${window.t('about_mission_text')}
                 </div>
                 <div class="info-text" style="font-weight: 600; color: var(--text-primary); margin-top: 12px; border-left: 3px solid #10b981; padding-left: 12px;">
-                    Разработка и техническое сопровождение:<br>
-                    <span style="color: #10b981; font-size: 18px;">Творческое объединение «Виктория»</span>
+                    ${window.t('about_dev_team')}<br>
+                    <span style="color: #10b981; font-size: 18px;">${window.t('about_dev_name')}</span>
                 </div>
             </div>
 
             <div class="info-card">
-                <div class="info-tag">Принципы работы</div>
+                <div class="info-tag">${window.t('about_principles')}</div>
                 <div class="info-list">
                     <div class="info-list-item">
                         <div class="info-list-icon">1</div>
-                        <div class="info-text" style="margin-bottom: 0;"><b>Мониторинг</b>: Граждане фиксируют факты нарушения экологических норм через фото-фиксацию и геолокацию.</div>
+                        <div class="info-text" style="margin-bottom: 0;">${window.t('about_step_1')}</div>
                     </div>
                     <div class="info-list-item">
                         <div class="info-list-icon">2</div>
-                        <div class="info-text" style="margin-bottom: 0;"><b>Санация</b>: Активные участники системы осуществляют очистку территорий, подтверждая результат вторичной съемкой.</div>
+                        <div class="info-text" style="margin-bottom: 0;">${window.t('about_step_2')}</div>
                     </div>
                     <div class="info-list-item">
                         <div class="info-list-icon">3</div>
-                        <div class="info-text" style="margin-bottom: 0;"><b>Стимулирование</b>: Система начисляет поощрительные баллы за каждый подтвержденный вклад в чистоту города.</div>
+                        <div class="info-text" style="margin-bottom: 0;">${window.t('about_step_3')}</div>
                     </div>
                 </div>
             </div>
 
             <div class="info-card" style="margin-bottom: 0;">
-                <div class="info-tag">Связь с администрацией</div>
-                <div class="info-text">По всем вопросам институционального сотрудничества, предложениям по улучшению функционала или технической поддержке, просим обращаться к руководителю проекта:</div>
+                <div class="info-tag">${window.t('about_contact_title')}</div>
+                <div class="info-text">${window.t('about_contact_text')}</div>
                 <a href="https://t.me/gayupov_a" target="_blank" class="info-contact-btn">
-                    <span>Связаться с @gayupov_a</span>
+                    <span>${window.t('about_contact_btn')}</span>
                 </a>
             </div>
             
             <div style="text-align: center; margin-top: 24px; opacity: 0.4; font-size: 12px; font-weight: 500;">
-                EcoPatrol Institutional Edition v35.0<br>
+                EcoPatrol Institutional Edition v36.0<br>
                 Алмазарский район, г. Ташкент
             </div>
         </div>
@@ -953,57 +1029,49 @@ function showAddForm() {
 
 	const content = document.getElementById('sheet-content')
 	content.innerHTML = `
-        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">Новое загрязнение</h2>
+        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">${window.t('add_pollution_title')}</h2>
         
         <div class="form-group">
-            <label class="form-label">Уровень опасности</label>
+            <label class="form-label">${window.t('add_level_label')}</label>
             <div class="level-selector">
-                <button class="level-btn active level-1" data-level="1">Низкий</button>
-                <button class="level-btn level-2" data-level="2">Средний</button>
-                <button class="level-btn level-3" data-level="3">Высокий</button>
+                <button class="level-btn active level-1" data-level="1">${window.t('level_low')}</button>
+                <button class="level-btn level-2" data-level="2">${window.t('level_medium')}</button>
+                <button class="level-btn level-3" data-level="3">${window.t('level_high')}</button>
             </div>
         </div>
 
         <div class="form-group">
-            <label class="form-label">Чем загрязнено?</label>
+            <label class="form-label">${window.t('add_tags_label')}</label>
             <div class="tag-selector">
-                <button class="tag-btn" data-tag="plastic">Пластик</button>
-                <button class="tag-btn" data-tag="trash">Мусор</button>
-                <button class="tag-btn" data-tag="glass">Стекло</button>
-                <button class="tag-btn" data-tag="paper">Бумага</button>
-                <button class="tag-btn" data-tag="metal">Металл</button>
-                <button class="tag-btn" data-tag="food">Еда</button>
-                <button class="tag-btn" data-tag="construction">Стройка</button>
-                <button class="tag-btn" data-tag="electronics">Техника</button>
-                <button class="tag-btn" data-tag="chemicals">Химия</button>
-                <button class="tag-btn" data-tag="tires">Шины</button>
-                <button class="tag-btn" data-tag="bio">Биоотходы</button>
-                <button class="tag-btn" data-tag="fire">Огонь</button>
-                <button class="tag-btn" data-tag="other">Другое</button>
+                <button class="tag-btn" data-tag="plastic">${window.t('types.plastic')}</button>
+                <button class="tag-btn" data-tag="trash">${window.t('types.other')}</button>
+                <button class="tag-btn" data-tag="glass">${window.t('types.glass')}</button>
+                <button class="tag-btn" data-tag="paper">${window.t('types.paper')}</button>
+                <button class="tag-btn" data-tag="metal">${window.t('types.metal')}</button>
             </div>
         </div>
         
         <div class="form-group">
-            <label class="form-label">Описание</label>
-            <textarea class="form-textarea" id="pollution-desc" rows="3" placeholder="Опишите проблему..."></textarea>
+            <label class="form-label" data-t="add_pollution_desc">${window.t('add_pollution_desc')}</label>
+            <textarea class="form-textarea" id="pollution-desc" rows="3" placeholder="${window.t('add_pollution_desc')}"></textarea>
         </div>
         
         <div class="form-group">
-            <label class="form-label">Фото (обязательно)</label>
+            <label class="form-label">${window.t('add_pollution_photo')}</label>
             <div class="file-upload" id="upload-trigger">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 8px; opacity: 0.5;">
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
                     <circle cx="8.5" cy="8.5" r="1.5"/>
                     <polyline points="21 15 16 10 5 21"/>
                 </svg>
-                <p style="color: var(--text-secondary); font-size: 14px;">Нажмите для загрузки</p>
+                <p style="color: var(--text-secondary); font-size: 14px;">${window.t('add_photo_click')}</p>
                 <input type="file" id="photo-input" accept="image/*" multiple>
             </div>
             <div id="photo-preview" class="photo-grid"></div>
         </div>
         
         <button class="btn btn-primary" style="width: 100%;" id="submit-pollution">
-            Отметить
+            ${window.t('add_pollution_submit')}
         </button>
         <!-- Spacer for safe area -->
         <div style="height: 20px;"></div>
@@ -1150,14 +1218,14 @@ async function submitPollution(lat, lng, tags = []) {
 
 	// VALIDATION: Photos are mandatory
 	if (uploadedPhotos.length === 0) {
-		tg.showAlert('Пожалуйста, загрузите хотя бы одно фото (обязательно)')
+		tg.showAlert(window.t('photo_required'))
 		tg.HapticFeedback.notificationOccurred('error')
 		return
 	}
 
 	// VALIDATION: At least one tag OR description recommended
 	if (tags.length === 0 && !desc.trim()) {
-		tg.showAlert('Выберите тип загрязнения или добавьте описание')
+		tg.showAlert(window.t('tag_required'))
 		tg.HapticFeedback.notificationOccurred('error')
 		return
 	}
@@ -1165,7 +1233,7 @@ async function submitPollution(lat, lng, tags = []) {
 	try {
 		const btn = document.getElementById('submit-pollution')
 		if (btn) {
-			btn.textContent = 'Отправка...'
+			btn.textContent = window.t('submit_loading')
 			btn.disabled = true
 		}
 
@@ -1187,10 +1255,10 @@ async function submitPollution(lat, lng, tags = []) {
 			closeBottomSheet()
 			loadPollutions()
 			tg.HapticFeedback.notificationOccurred('success')
-			tg.showAlert('Загрязнение отмечено!')
+			tg.showAlert(window.t('submit_success'))
 		}
 	} catch (e) {
-		tg.showAlert('Ошибка при отправке')
+		tg.showAlert(window.t('submit_error'))
 	}
 }
 
@@ -1205,19 +1273,19 @@ function showPollutionDetails(pollution) {
 	}
 
 	const levelNames = {
-		1: 'Низкий',
-		2: 'Средний',
-		3: 'Высокий',
+		1: window.t('level_low'),
+		2: window.t('level_medium'),
+		3: window.t('level_high'),
 	}
 
 	const reward = pollution.level
 
 	content.innerHTML = `
-        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 16px;">Детали загрязнения</h2>
+        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 16px;">${window.t('detail_view_title')}</h2>
         
         <div style="background: ${levelColors[pollution.level]}20; padding: 10px 14px; border-radius: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
             <span style="color: ${levelColors[pollution.level]}; font-weight: 600; font-size: 14px;">
-                ${levelNames[pollution.level]} уровень
+                ${levelNames[pollution.level]} ${window.t('level_label')}
             </span>
         </div>
 
@@ -1227,22 +1295,8 @@ function showPollutionDetails(pollution) {
             <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px;">
                 ${pollution.types
 									.map(tag => {
-										const tagNames = {
-											plastic: 'Пластик',
-											trash: 'Мусор',
-											glass: 'Стекло',
-											paper: 'Бумага',
-											metal: 'Металл',
-											food: 'Еда',
-											construction: 'Стройка',
-											electronics: 'Техника',
-											chemicals: 'Химия',
-											tires: 'Шины',
-											bio: 'Биоотходы',
-											fire: 'Огонь',
-											other: 'Другое',
-										}
-										return `<span style="background: var(--bg-secondary); color: var(--text-secondary); padding: 4px 10px; border-radius: 20px; font-size: 12px; border: 1px solid var(--border);">${tagNames[tag] || tag}</span>`
+										const tagKey = `types.${tag}`
+										return `<span style="background: var(--bg-secondary); color: var(--text-secondary); padding: 4px 10px; border-radius: 20px; font-size: 12px; border: 1px solid var(--border);">${window.t(tagKey)}</span>`
 									})
 									.join('')}
             </div>
@@ -1272,12 +1326,12 @@ function showPollutionDetails(pollution) {
 				}
         
         <div style="background: var(--bg-secondary); padding: 14px; border-radius: 12px; margin-bottom: 16px;">
-            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">Вознаграждение</p>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">${window.t('reward_label')}</p>
             <p style="font-size: 24px; font-weight: 700; color: var(--primary);">$${reward}</p>
         </div>
         
         <button class="btn btn-primary" style="width: 100%;" id="clean-btn">
-            Я убрал этот мусор
+            ${window.t('clean_confirm_btn')}
         </button>
     `
 
@@ -1291,29 +1345,29 @@ function showCleanForm() {
 	const content = document.getElementById('sheet-content')
 
 	content.innerHTML = `
-        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">Подтверждение очистки</h2>
+        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">${window.t('clean_form_title')}</h2>
         
         <div class="form-group">
-            <label class="form-label">Фото после очистки (обязательно)</label>
+            <label class="form-label">${window.t('clean_photo_label')}</label>
             <div class="file-upload" id="upload-after-trigger">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 8px; opacity: 0.5;">
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
                     <circle cx="8.5" cy="8.5" r="1.5"/>
                     <polyline points="21 15 16 10 5 21"/>
                 </svg>
-                <p style="color: var(--text-secondary); font-size: 14px;">Загрузите фото чистого места</p>
+                <p style="color: var(--text-secondary); font-size: 14px;">${window.t('clean_photo_desc')}</p>
                 <input type="file" id="photo-input-after" accept="image/*" multiple>
             </div>
             <div id="photo-preview-after" class="photo-grid"></div>
         </div>
         
         <div class="form-group">
-            <label class="form-label">Комментарий (необязательно)</label>
-            <textarea class="form-textarea" id="clean-comment" rows="2" placeholder="Добавьте комментарий..."></textarea>
+            <label class="form-label">${window.t('clean_comment_label')}</label>
+            <textarea class="form-textarea" id="clean-comment" rows="2" placeholder="${window.t('clean_comment_placeholder')}"></textarea>
         </div>
         
         <button class="btn btn-primary" style="width: 100%;" id="submit-clean">
-            Подтвердить очистку
+            ${window.t('clean_submit_btn')}
         </button>
     `
 

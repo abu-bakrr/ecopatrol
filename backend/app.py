@@ -172,8 +172,21 @@ def get_profile(user_id):
     return jsonify({
         'username': user.username,
         'balance': user.balance,
-        'cleaned_count': cleaned_count
+        'cleaned_count': cleaned_count,
+        'language': user.language
     })
+
+@app.route('/api/profile/<int:user_id>/language', methods=['POST'])
+def update_language(user_id):
+    data = request.json
+    lang = data.get('language')
+    if lang not in ['uz', 'ru', 'en']:
+        return jsonify({'error': 'Invalid language'}), 400
+    
+    user = User.query.get_or_404(user_id)
+    user.language = lang
+    db.session.commit()
+    return jsonify({'status': 'ok', 'language': user.language})
 
 if __name__ == '__main__':
     with app.app_context():
