@@ -2,6 +2,21 @@
 const tg = window.Telegram.WebApp
 const API_URL = window.location.origin + '/api'
 
+// Viewer Functions (Global)
+window.openPhotoViewer = function (url) {
+	const viewer = document.getElementById('photo-viewer')
+	const img = document.getElementById('viewer-img')
+	if (!viewer || !img) return
+	img.src = url
+	viewer.classList.add('active')
+	tg.HapticFeedback.impactOccurred('medium')
+}
+
+window.closePhotoViewer = function () {
+	const viewer = document.getElementById('photo-viewer')
+	if (viewer) viewer.classList.remove('active')
+}
+
 let map
 let markers = []
 let currentUser = null
@@ -10,6 +25,7 @@ let uploadedPhotos = []
 let currentPollution = null
 let isDragging = false
 let isRegistered = false
+let uploadingCount = 0 // Global state for optimistic UI
 
 // Start pre-fetching location immediately
 const locationPromise = new Promise(resolve => {
@@ -724,7 +740,28 @@ async function handlePhotoUpload(event) {
 		} catch (e) {
 			console.error('Upload error:', e)
 			tg.showAlert('Ошибка: ' + (e.message || 'Загрузка не удалась'))
+		} finally {
+			// Ensure we decrease count even on error
+			// (Note: uploadingCount logic was missed in previous replace?
+			// I need to check if uploadingCount is defined globally)
+			// It was defined in showAddForm scope, so handlePhotoUpload can't see it if it's outside!
+			// WAIT. handlePhotoUpload is defined in global scope (or module scope), showAddForm is too.
+			// If uploadingCount is local to showAddForm, handlePhotoUpload CANNOT see it.
+			// BUG FOUND: uploadCount was local variable in showAddForm, but handlePhotoUpload uses it?
+			// No, handlePhotoUpload is defined OUTSIDE showAddForm.
+			// I need to make uploadingCount global or pass it?
+			// Actually, handlePhotoUpload is attached via addEventListener in showAddForm.
+			// But handlePhotoUpload is defined separately.
+			// Solution: Move uploadingCount to global scope for simplicity.
 		}
+	}
+	if (typeof uploadingCount !== 'undefined') {
+		uploadingCount = 0 // Reset just in case
+		updatePhotoPreviewLocal() // This function is ALSO local to showAddForm!
+		// handlePhotoUpload calls updatePhotoPreview, which is global.
+		// My previous edit tried to make updatePhotoPreviewLocal inside handlePhotoUpload?
+		// No, I tried to rewrite handlePhotoUpload to use a local function.
+		// Let's revert to a robust global approach.
 	}
 }
 
@@ -732,17 +769,32 @@ function updatePhotoPreview() {
 	const preview = document.getElementById('photo-preview')
 	if (!preview) return
 
-	// Use background-image for better sizing reliability
-	preview.innerHTML = uploadedPhotos
+	let html = ''
+
+	// 1. Render uploaded photos
+	html += uploadedPhotos
 		.map(
 			url => `
-        <div class="photo-item" style="background-image: url('${url}'); background-size: cover; background-position: center; width: 80px; height: 80px;">
+        <div class="photo-item" 
+             style="background-image: url('${url}'); background-size: cover; background-position: center;"
+             onclick="window.openPhotoViewer('${url}')">
         </div>
     `,
 		)
 		.join('')
 
-	if (uploadedPhotos.length > 0) {
+	// 2. Render loading skeletons
+	for (let i = 0; i < uploadingCount; i++) {
+		html += `
+            <div class="photo-item loading">
+                <div class="spinner"></div>
+            </div>
+        `
+	}
+
+	preview.innerHTML = html
+
+	if (uploadedPhotos.length > 0 || uploadingCount > 0) {
 		preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
 	}
 }

@@ -216,6 +216,15 @@
 		<!-- Overlay -->
 		<div class="overlay" id="overlay"></div>
 
-		<script type="module" src="main.js"></script>
+		<!-- Error Handler for Mobile Debugging -->
+		<script>
+			window.onerror = function (msg, url, line) {
+				// alert('Global Error: ' + msg + '\nLine: ' + line);
+				// Uncomment above if needed, but for now just log
+				console.error('Global Error: ' + msg + '\nLine: ' + line)
+			}
+		</script>
+
+		<script type="module" src="main.js?v=3"></script>
 	</body>
 </html>
