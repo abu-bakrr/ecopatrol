@@ -518,6 +518,9 @@ function setupEventListeners() {
 	document.getElementById('geolocate-btn').addEventListener('click', geolocate)
 
 	// Menu Item Listeners
+	document.getElementById('menu-exchange').addEventListener('click', () => {
+		showExchange()
+	})
 	document.getElementById('menu-reports').addEventListener('click', () => {
 		showMyReports()
 	})
@@ -725,53 +728,115 @@ async function showMyHistory() {
 	}
 }
 
+async function showExchange() {
+	closeSidebar()
+	const content = document.getElementById('sheet-content')
+	content.innerHTML = `
+        <div class="sheet-loading">
+            <div class="skeleton" style="height: 100px; border-radius: 20px; margin-bottom: 12px;"></div>
+            <div class="skeleton" style="height: 100px; border-radius: 20px; margin-bottom: 12px;"></div>
+            <div class="skeleton" style="height: 100px; border-radius: 20px;"></div>
+        </div>
+    `
+	openBottomSheet()
+
+	try {
+		const response = await fetch(`${API_URL}/pollutions`)
+		if (!response.ok) throw new Error('Fetch failed')
+		const pollutions = await response.json()
+
+		// Filter active and sort by reward (higher first)
+		const activePollutions = pollutions
+			.filter(p => p.status === 'active')
+			.sort((a, b) => (b.level || 0) - (a.level || 0))
+
+		if (activePollutions.length === 0) {
+			content.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🌟</div>
+                    <div class="empty-title">Город чист!</div>
+                    <div class="empty-text">На данный момент нет активных заявок. Вы можете отметить новое загрязнение на карте.</div>
+                </div>
+            `
+			return
+		}
+
+		let html = '<div class="exchange-list">'
+		activePollutions.forEach(p => {
+			const typesStr = Array.isArray(p.types) ? p.types.join(', ') : 'Мусор'
+			html += `
+                <div class="exchange-card" onclick="flyToReport(${p.lng}, ${p.lat})">
+                    <div class="exchange-info">
+                        <div class="exchange-types">${typesStr}</div>
+                        <div class="exchange-desc">${p.description || 'Без описания'}</div>
+                        <div class="exchange-meta">
+                            <span>📍 Уровень ${p.level || 1}</span>
+                        </div>
+                    </div>
+                    <div class="exchange-reward-badge">+$${p.level || 1}</div>
+                </div>
+            `
+		})
+		html += '</div><div style="height: 20px;"></div>'
+		content.innerHTML = html
+	} catch (e) {
+		console.error('Exchange error:', e)
+		content.innerHTML =
+			'<div class="error-msg">Не удалось загрузить биржу задач</div>'
+	}
+}
+
 async function showAboutInfo() {
 	closeSidebar()
 	const content = document.getElementById('sheet-content')
 	content.innerHTML = `
         <div class="info-sheet">
-            <div class="info-header-img">🌿</div>
+            <div class="info-header-img">�️</div>
             
             <div class="info-card">
-                <div class="info-tag">О проекте</div>
-                <div class="info-title">Экопатруль Школы №242</div>
+                <div class="info-tag">Официальный статус</div>
+                <div class="info-title">Социально-образовательная инициатива</div>
                 <div class="info-text">
-                    Этот проект разработан школой №242 Алмазарского района города Ташкента. 
-                    Мы стремимся научить детей заботе об экологии и внедрить современную систему «Эко Патруль» в нашу повседневную жизнь.
+                    Информационная система <b>«Экопатруль»</b> является официальным социально-ориентированным проектом, инициированным государственным общеобразовательным учреждением <b>Школа №242 Алмазарского района</b> города Ташкента.
                 </div>
-                <div class="info-text" style="font-weight: 600; color: var(--text-primary);">
-                    Команда создателей: <span style="color: #10b981;">Виктория</span>
+                <div class="info-text">
+                    Данная платформа создана в целях реализации государственной программы по экологическому просвещению молодежи, формирования ответственного отношения к окружающей среде и внедрения инновационных цифровых решений в сферу благоустройства.
+                </div>
+                <div class="info-text" style="font-weight: 600; color: var(--text-primary); margin-top: 12px; border-left: 3px solid #10b981; padding-left: 12px;">
+                    Разработка и техническое сопровождение:<br>
+                    <span style="color: #10b981; font-size: 18px;">Творческое объединение «Виктория»</span>
                 </div>
             </div>
 
             <div class="info-card">
-                <div class="info-tag">Как пользоваться</div>
+                <div class="info-tag">Принципы работы</div>
                 <div class="info-list">
                     <div class="info-list-item">
-                        <div class="info-list-icon">📍</div>
-                        <div class="info-text" style="margin-bottom: 0;"><b>Отмечайте</b>: Найдите мусор, сделайте фото и поставьте метку на карте.</div>
+                        <div class="info-list-icon">1</div>
+                        <div class="info-text" style="margin-bottom: 0;"><b>Мониторинг</b>: Граждане фиксируют факты нарушения экологических норм через фото-фиксацию и геолокацию.</div>
                     </div>
                     <div class="info-list-item">
-                        <div class="info-list-icon">✨</div>
-                        <div class="info-text" style="margin-bottom: 0;"><b>Очищайте</b>: Придите на место, уберите мусор и получите вознаграждение.</div>
+                        <div class="info-list-icon">2</div>
+                        <div class="info-text" style="margin-bottom: 0;"><b>Санация</b>: Активные участники системы осуществляют очистку территорий, подтверждая результат вторичной съемкой.</div>
                     </div>
                     <div class="info-list-item">
-                        <div class="info-list-icon">💰</div>
-                        <div class="info-text" style="margin-bottom: 0;"><b>Зарабатывайте</b>: Накапливайте баланс за каждую успешную уборку.</div>
+                        <div class="info-list-icon">3</div>
+                        <div class="info-text" style="margin-bottom: 0;"><b>Стимулирование</b>: Система начисляет поощрительные баллы за каждый подтвержденный вклад в чистоту города.</div>
                     </div>
                 </div>
             </div>
 
             <div class="info-card" style="margin-bottom: 0;">
-                <div class="info-tag">Поддержка</div>
-                <div class="info-text">Есть вопросы или предложения? Напишите создателю проекта напрямую!</div>
+                <div class="info-tag">Связь с администрацией</div>
+                <div class="info-text">По всем вопросам институционального сотрудничества, предложениям по улучшению функционала или технической поддержке, просим обращаться к руководителю проекта:</div>
                 <a href="https://t.me/gayupov_a" target="_blank" class="info-contact-btn">
-                    <span>Написать @gayupov_a</span>
+                    <span>Связаться с @gayupov_a</span>
                 </a>
             </div>
             
             <div style="text-align: center; margin-top: 24px; opacity: 0.4; font-size: 12px; font-weight: 500;">
-                EcoPatrol v30.0 • Made with ❤️ for Nature
+                EcoPatrol Institutional Edition v31.0<br>
+                Алмазарский район, г. Ташкент
             </div>
         </div>
         <div style="height: 20px;"></div>
