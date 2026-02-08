@@ -90,7 +90,7 @@ def create_pollution():
         level=data['level'],
         types=data['types'],
         description=data.get('description', ''),
-        reward=data['level'] * 10  # Simple reward logic
+        reward=data['level']
     )
     db.session.add(new_p)
     db.session.flush() # Get ID
