@@ -18,7 +18,10 @@ CORS(app)
 db.init_app(app)
 
 BOT_TOKEN = os.getenv('BOT_TOKEN', 'YOUR_BOT_TOKEN')
-ADMIN_IDS = [5644397480] # The user's ID
+ADMIN_IDS = [5644397480]
+import telebot
+bot = telebot.TeleBot(os.getenv('BOT_TOKEN'))
+ # The user's ID
 
 def validate_telegram_data(init_data):
     """Validates data received from Telegram Mini App."""
@@ -396,6 +399,49 @@ def admin_update_settings():
         return jsonify({'status': 'ok'})
     except Exception as e:
         db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/api/admin/stats', methods=['GET'])
+def admin_get_stats():
+    tg_id = request.args.get('admin_tg_id', type=int)
+    if tg_id not in ADMIN_IDS:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    total_users = User.query.count()
+    active_pollutions = Pollution.query.filter_by(status='active').count()
+    cleaned_pollutions = Pollution.query.filter_by(status='cleaned').count()
+    total_rewards = db.session.query(db.func.sum(Pollution.reward)).filter_by(status='cleaned').scalar() or 0
+    total_balance = db.session.query(db.func.sum(User.balance)).scalar() or 0
+    
+    return jsonify({
+        'total_users': total_users,
+        'active_pollutions': active_pollutions,
+        'cleaned_pollutions': cleaned_pollutions,
+        'total_rewards': float(total_rewards),
+        'total_balance': float(total_balance)
+    })
+
+@app.route('/api/admin/notify', methods=['POST'])
+def admin_notify_user():
+    data = request.json
+    try:
+        tg_id = int(data.get('admin_tg_id'))
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Invalid admin ID format'}), 400
+        
+    if tg_id not in ADMIN_IDS:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    target_tg_id = data.get('target_tg_id')
+    message = data.get('message')
+    
+    if not target_tg_id or not message:
+        return jsonify({'error': 'Missing target ID or message'}), 400
+    
+    try:
+        bot.send_message(target_tg_id, f"🔔 Сообщение от администрации:\n\n{message}")
+        return jsonify({'status': 'ok'})
+    except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 if __name__ == '__main__':

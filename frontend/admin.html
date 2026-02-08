@@ -12,13 +12,11 @@
 			:root {
 				--primary: #10b981;
 				--primary-dark: #059669;
-				--bg-primary: #f9fafb;
+				--bg-primary: #f3f4f6;
 				--bg-secondary: #ffffff;
 				--text-primary: #111827;
 				--text-secondary: #4b5563;
 				--border: #e5e7eb;
-				--card-shadow:
-					0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 				--safe-top: env(safe-area-inset-top);
 			}
 
@@ -28,7 +26,6 @@
 				--text-primary: #f9fafb;
 				--text-secondary: #9ca3af;
 				--border: #374151;
-				--card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
 			}
 
 			* {
@@ -44,169 +41,164 @@
 				color: var(--text-primary);
 				margin: 0;
 				padding: calc(var(--safe-top) + 20px) 16px 40px;
-				transition:
-					background-color 0.3s,
-					color 0.3s;
-				line-height: 1.5;
+				transition: background-color 0.2s;
+				line-height: 1.4;
 			}
 
 			.header {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				margin-bottom: 24px;
-				padding: 0 4px;
+				margin-bottom: 20px;
 			}
 
 			.header h1 {
-				font-size: 24px;
-				font-weight: 800;
+				font-size: 22px;
+				font-weight: 700;
 				margin: 0;
-				background: linear-gradient(135deg, var(--primary), #3b82f6);
-				-webkit-background-clip: text;
-				-webkit-text-fill-color: transparent;
+				color: var(--primary);
 			}
 
 			.theme-toggle {
-				width: 40px;
-				height: 40px;
-				border-radius: 12px;
+				width: 38px;
+				height: 38px;
+				border-radius: 10px;
 				background: var(--bg-secondary);
 				border: 1px solid var(--border);
 				display: flex;
 				align-items: center;
 				justify-content: center;
 				cursor: pointer;
-				box-shadow: var(--card-shadow);
 			}
 
 			.tabs {
 				display: flex;
 				background: var(--bg-secondary);
 				padding: 4px;
-				border-radius: 14px;
+				border-radius: 12px;
 				margin-bottom: 20px;
 				border: 1px solid var(--border);
-				box-shadow: var(--card-shadow);
 			}
 
 			.tab-btn {
 				flex: 1;
-				padding: 10px;
+				padding: 8px;
 				border: none;
-				border-radius: 10px;
+				border-radius: 8px;
 				background: transparent;
 				color: var(--text-secondary);
 				font-weight: 600;
 				font-size: 13px;
-				transition: all 0.2s;
 				cursor: pointer;
 			}
 
 			.tab-btn.active {
 				background: var(--primary);
 				color: white;
-				box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 			}
 
 			.section {
 				display: none;
-				animation: fadeIn 0.3s ease;
 			}
 			.section.active {
 				display: block;
 			}
 
-			@keyframes fadeIn {
-				from {
-					opacity: 0;
-					transform: translateY(10px);
-				}
-				to {
-					opacity: 1;
-					transform: translateY(0);
-				}
+			.stats-grid {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 12px;
+				margin-bottom: 20px;
+			}
+
+			.stat-card {
+				background: var(--bg-secondary);
+				padding: 16px;
+				border-radius: 14px;
+				border: 1px solid var(--border);
+			}
+
+			.stat-val {
+				font-size: 20px;
+				font-weight: 800;
+				display: block;
+				margin-bottom: 4px;
+			}
+
+			.stat-label {
+				font-size: 11px;
+				color: var(--text-secondary);
+				text-transform: uppercase;
+				font-weight: 600;
+				letter-spacing: 0.5px;
 			}
 
 			.card {
 				background: var(--bg-secondary);
-				border-radius: 18px;
-				padding: 18px;
-				margin-bottom: 16px;
+				border-radius: 16px;
+				padding: 16px;
+				margin-bottom: 12px;
 				border: 1px solid var(--border);
-				box-shadow: var(--card-shadow);
-				position: relative;
-				overflow: hidden;
-			}
-
-			.card::before {
-				content: '';
-				position: absolute;
-				top: 0;
-				left: 0;
-				width: 4px;
-				height: 100%;
-				background: var(--primary);
-				opacity: 0.5;
 			}
 
 			.card-header {
 				display: flex;
 				justify-content: space-between;
-				align-items: flex-start;
-				margin-bottom: 12px;
+				margin-bottom: 10px;
 			}
 
-			.user-info .name {
+			.name {
 				font-weight: 700;
-				font-size: 17px;
-				margin-bottom: 2px;
+				font-size: 16px;
 			}
-
-			.user-info .meta {
+			.meta {
 				font-size: 12px;
 				color: var(--text-secondary);
-				font-weight: 500;
-				display: flex;
-				flex-direction: column;
-				gap: 2px;
+				margin-top: 2px;
 			}
 
-			.badge-balance {
-				background: rgba(16, 185, 129, 0.1);
-				color: var(--primary);
-				padding: 4px 10px;
-				border-radius: 20px;
-				font-weight: 700;
-				font-size: 14px;
+			.gallery {
+				display: flex;
+				gap: 8px;
+				overflow-x: auto;
+				margin: 10px 0;
+				padding-bottom: 4px;
+				scrollbar-width: none;
+			}
+
+			.gallery::-webkit-scrollbar {
+				display: none;
+			}
+
+			.photo {
+				width: 80px;
+				height: 80px;
+				border-radius: 8px;
+				object-fit: cover;
+				flex-shrink: 0;
+				border: 1px solid var(--border);
 			}
 
 			.btn-group {
 				display: flex;
-				gap: 10px;
+				gap: 8px;
 				margin-top: 12px;
 			}
 
 			.btn {
 				flex: 1;
-				padding: 12px;
+				padding: 10px;
 				border: none;
-				border-radius: 12px;
+				border-radius: 10px;
 				font-weight: 700;
-				font-size: 13px;
+				font-size: 12px;
 				cursor: pointer;
-				transition:
-					transform 0.1s,
-					opacity 0.2s;
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				gap: 6px;
+				gap: 4px;
 			}
 
-			.btn:active {
-				transform: scale(0.97);
-			}
 			.btn-primary {
 				background: var(--primary);
 				color: white;
@@ -217,139 +209,111 @@
 				border: 1px solid var(--border);
 			}
 			.btn-danger {
-				background: rgba(239, 68, 68, 0.1);
+				background: #fee2e2;
 				color: #ef4444;
-				border: 1px solid rgba(239, 68, 68, 0.2);
 			}
 
-			.settings-grid {
-				display: flex;
-				flex-direction: column;
-				gap: 16px;
-			}
-
-			.setting-item {
+			.settings-item {
 				background: var(--bg-secondary);
-				padding: 16px;
-				border-radius: 16px;
-				border: 1px solid var(--border);
-			}
-
-			.setting-label {
-				font-size: 13px;
-				font-weight: 700;
-				color: var(--text-secondary);
-				margin-bottom: 8px;
-				display: block;
-			}
-
-			.setting-input {
-				width: 100%;
-				padding: 12px;
+				padding: 14px;
 				border-radius: 12px;
-				border: 1.5px solid var(--border);
+				border: 1px solid var(--border);
+				margin-bottom: 10px;
+			}
+
+			.label {
+				display: block;
+				font-size: 12px;
+				font-weight: 700;
+				margin-bottom: 6px;
+				color: var(--text-secondary);
+			}
+			.input {
+				width: 100%;
+				padding: 10px;
+				border-radius: 8px;
+				border: 1px solid var(--border);
 				background: var(--bg-primary);
 				color: var(--text-primary);
-				font-weight: 600;
-				font-size: 16px;
+				font-size: 14px;
+				outline: none;
 			}
 
-			.loading-state {
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-				justify-content: center;
-				padding: 60px 20px;
+			.loading {
+				text-align: center;
+				padding: 40px;
 				opacity: 0.5;
-			}
-
-			.spinner {
-				width: 30px;
-				height: 30px;
-				border: 3px solid var(--border);
-				border-top-color: var(--primary);
-				border-radius: 50%;
-				animation: spin 1s linear infinite;
-				margin-bottom: 12px;
-			}
-			@keyframes spin {
-				to {
-					transform: rotate(360deg);
-				}
+				font-size: 14px;
 			}
 		</style>
 	</head>
 	<body>
 		<div class="header">
-			<h1>Админ-панель</h1>
+			<h1>Eco Admin</h1>
 			<div class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙</div>
 		</div>
 
 		<div class="tabs">
-			<button
-				class="tab-btn active"
-				id="tab-users"
-				onclick="switchTab('users')"
-			>
-				Люди
+			<button class="tab-btn active" onclick="switchTab('dashboard', this)">
+				Обзор
 			</button>
-			<button
-				class="tab-btn"
-				id="tab-pollutions"
-				onclick="switchTab('pollutions')"
-			>
-				Загрязнения
+			<button class="tab-btn" onclick="switchTab('users', this)">Люди</button>
+			<button class="tab-btn" onclick="switchTab('pollutions', this)">
+				Карта
 			</button>
-			<button class="tab-btn" id="tab-settings" onclick="switchTab('settings')">
-				Настройки
-			</button>
+			<button class="tab-btn" onclick="switchTab('settings', this)">⚙️</button>
 		</div>
 
-		<div id="section-users" class="section active">
+		<!-- DASHBOARD -->
+		<div id="section-dashboard" class="section active">
+			<div id="stats-container" class="stats-grid">
+				<div class="stat-card">
+					<span class="stat-val">—</span><span class="stat-label">Люди</span>
+				</div>
+				<div class="stat-card">
+					<span class="stat-val">—</span
+					><span class="stat-label">На карте</span>
+				</div>
+				<div class="stat-card">
+					<span class="stat-val">—</span><span class="stat-label">Очищено</span>
+				</div>
+				<div class="stat-card">
+					<span class="stat-val">—</span><span class="stat-label">Выплаты</span>
+				</div>
+			</div>
+		</div>
+
+		<!-- USERS -->
+		<div id="section-users" class="section">
 			<div id="users-list"></div>
 		</div>
 
+		<!-- POLLUTIONS -->
 		<div id="section-pollutions" class="section">
 			<div id="pollutions-list"></div>
 		</div>
 
+		<!-- SETTINGS -->
 		<div id="section-settings" class="section">
-			<div class="settings-grid">
-				<div class="setting-item">
-					<label class="setting-label">Награда: Уровень 1 (Низкий)</label>
-					<input
-						type="number"
-						id="setting-reward-1"
-						class="setting-input"
-						step="0.5"
-					/>
-				</div>
-				<div class="setting-item">
-					<label class="setting-label">Награда: Уровень 2 (Средний)</label>
-					<input
-						type="number"
-						id="setting-reward-2"
-						class="setting-input"
-						step="0.5"
-					/>
-				</div>
-				<div class="setting-item">
-					<label class="setting-label">Награда: Уровень 3 (Высокий)</label>
-					<input
-						type="number"
-						id="setting-reward-3"
-						class="setting-input"
-						step="0.5"
-					/>
-				</div>
-				<button
-					class="btn btn-primary"
-					style="margin-top: 10px"
-					onclick="saveSettings()"
-				>
-					💾 Сохранить настройки
-				</button>
+			<div class="settings-item">
+				<label class="label">Награда Уровень 1</label>
+				<input type="number" id="set-reward-1" class="input" />
 			</div>
+			<div class="settings-item">
+				<label class="label">Награда Уровень 2</label>
+				<input type="number" id="set-reward-2" class="input" />
+			</div>
+			<div class="settings-item">
+				<label class="label">Награда Уровень 3</label>
+				<input type="number" id="set-reward-3" class="input" />
+			</div>
+			<button
+				class="btn btn-primary"
+				style="width: 100%"
+				onclick="saveSettings()"
+			>
+				💾 Сохранить награды
+			</button>
 		</div>
 
 		<script>
@@ -363,12 +327,12 @@
 				localStorage.getItem('admin-theme') || tg.colorScheme || 'light'
 			applyTheme(currentTheme)
 
-			function applyTheme(theme) {
-				document.documentElement.setAttribute('data-theme', theme)
-				localStorage.setItem('admin-theme', theme)
-				document.getElementById('theme-btn').innerHTML =
-					theme === 'dark' ? '☀️' : '🌙'
-				tg.setHeaderColor(theme === 'dark' ? '#111827' : '#f9fafb')
+			function applyTheme(t) {
+				document.documentElement.setAttribute('data-theme', t)
+				localStorage.setItem('admin-theme', t)
+				document.getElementById('theme-btn').innerText =
+					t === 'dark' ? '☀️' : '🌙'
+				tg.setHeaderColor(t === 'dark' ? '#111827' : '#f3f4f6')
 			}
 
 			function toggleTheme() {
@@ -377,7 +341,7 @@
 				tg.HapticFeedback.impactOccurred('light')
 			}
 
-			function switchTab(tab) {
+			function switchTab(tab, btn) {
 				document
 					.querySelectorAll('.section')
 					.forEach(s => s.classList.remove('active'))
@@ -385,177 +349,159 @@
 					.querySelectorAll('.tab-btn')
 					.forEach(b => b.classList.remove('active'))
 				document.getElementById('section-' + tab).classList.add('active')
-				document.getElementById('tab-' + tab).classList.add('active')
+				btn.classList.add('active')
 				tg.HapticFeedback.impactOccurred('light')
+
+				if (tab === 'dashboard') loadStats()
 				if (tab === 'users') loadUsers()
 				if (tab === 'pollutions') loadPollutions()
 				if (tab === 'settings') loadSettings()
 			}
 
-			async function loadUsers() {
-				const list = document.getElementById('users-list')
-				list.innerHTML =
-					'<div class="loading-state"><div class="spinner"></div>Загрузка данных...</div>'
+			async function loadStats() {
+				const container = document.getElementById('stats-container')
 				try {
 					const res = await fetch(
-						`${API_URL}/admin/users?admin_tg_id=${adminTgId}`,
+						`${API_URL}/admin/stats?admin_tg_id=${adminTgId}`,
 					)
-					const users = await res.json()
-					list.innerHTML = users
-						.map(
-							u => `
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="user-info">
-                                <div class="name">${u.first_name} ${u.last_name || ''}</div>
-                                <div class="meta">
-                                    <span>@${u.username || 'unknown'} • ID: ${u.telegram_id}</span>
-                                    <span>📱 ${u.phone || 'Нет номера'} • 🎂 Возраст: ${u.age || '?'}</span>
-                                </div>
-                            </div>
-                            <div class="badge-balance">$${u.balance.toFixed(2)}</div>
-                        </div>
-                        <div class="btn-group">
-                            <button class="btn btn-primary" onclick="editBalance(${u.id}, ${u.balance}, '${u.first_name}')">💰 Баланс</button>
-                        </div>
+					const s = await res.json()
+					container.innerHTML = `
+                    <div class="stat-card"><span class="stat-val">${s.total_users}</span><span class="stat-label">Люди</span></div>
+                    <div class="stat-card"><span class="stat-val">${s.active_pollutions}</span><span class="stat-label">На карте</span></div>
+                    <div class="stat-card"><span class="stat-val">${s.cleaned_pollutions}</span><span class="stat-label">Очищено</span></div>
+                    <div class="stat-card"><span class="stat-val">$${s.total_rewards.toFixed(1)}</span><span class="stat-label">Выплаты</span></div>
+                `
+				} catch (e) {}
+			}
+
+			async function loadUsers() {
+				const list = document.getElementById('users-list')
+				list.innerHTML = '<div class="loading">Загрузка...</div>'
+				const res = await fetch(
+					`${API_URL}/admin/users?admin_tg_id=${adminTgId}`,
+				)
+				const users = await res.json()
+				list.innerHTML = users
+					.map(
+						u => `
+                <div class="card">
+                    <div class="card-header">
+                        <div><div class="name">${u.first_name}</div><div class="meta">@${u.username || '—'} • ${u.phone || 'Нет номера'}</div></div>
+                        <div style="font-weight:800; color:var(--primary)">$${u.balance.toFixed(1)}</div>
                     </div>
-                `,
-						)
-						.join('')
-				} catch (e) {
-					list.innerHTML = '<div class="loading-state">❌ Ошибка</div>'
-				}
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="notifyUser(${u.telegram_id})">✉️ Сообщение</button>
+                        <button class="btn btn-secondary" onclick="editBalance(${u.id}, ${u.balance})">💰 Баланс</button>
+                    </div>
+                </div>
+            `,
+					)
+					.join('')
 			}
 
 			async function loadPollutions() {
 				const list = document.getElementById('pollutions-list')
-				list.innerHTML =
-					'<div class="loading-state"><div class="spinner"></div>Загрузка меток...</div>'
-				try {
-					const res = await fetch(
-						`${API_URL}/admin/pollutions?admin_tg_id=${adminTgId}`,
-					)
-					const pollutions = await res.json()
-					list.innerHTML = pollutions
-						.map(
-							p => `
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="user-info">
-                                <div class="name">Метка #${p.id}</div>
-                                <div class="meta">Статус: ${p.status} • Уровень: ${p.level} • <b>Награда: $${p.reward}</b></div>
-                            </div>
-                        </div>
-                        <div class="btn-group">
-                            <button class="btn btn-secondary" onclick="editReward(${p.id}, ${p.reward})">💎 Изм. награду</button>
-                            <button class="btn btn-danger" onclick="deletePollution(${p.id})">🗑️</button>
-                        </div>
+				list.innerHTML = '<div class="loading">Загрузка...</div>'
+				const res = await fetch(
+					`${API_URL}/admin/pollutions?admin_tg_id=${adminTgId}`,
+				)
+				const pollutions = await res.json()
+				list.innerHTML = pollutions
+					.map(
+						p => `
+                <div class="card">
+                    <div class="name">Метка #${p.id} • Уровень ${p.level}</div>
+                    <div class="meta">${p.description || 'Нет описания'}</div>
+                    <div class="gallery">
+                        ${p.photos.map(url => `<img src="${url}" class="photo" onclick="window.open('${url}')">`).join('')}
                     </div>
-                `,
-						)
-						.join('')
-				} catch (e) {
-					list.innerHTML = '<div class="loading-state">❌ Ошибка</div>'
-				}
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="editReward(${p.id}, ${p.reward})">💎 $${p.reward}</button>
+                        <button class="btn btn-danger" onclick="deletePollution(${p.id})">Удалить</button>
+                    </div>
+                </div>
+            `,
+					)
+					.join('')
 			}
 
 			async function loadSettings() {
-				try {
-					const res = await fetch(
-						`${API_URL}/admin/settings?admin_tg_id=${adminTgId}`,
-					)
-					const settings = await res.json()
-					document.getElementById('setting-reward-1').value =
-						settings.reward_level_1 || 1
-					document.getElementById('setting-reward-2').value =
-						settings.reward_level_2 || 2
-					document.getElementById('setting-reward-3').value =
-						settings.reward_level_3 || 3
-				} catch (e) {
-					alert('Ошибка загрузки настроек')
-				}
+				const res = await fetch(
+					`${API_URL}/admin/settings?admin_tg_id=${adminTgId}`,
+				)
+				const s = await res.json()
+				document.getElementById('set-reward-1').value = s.reward_level_1
+				document.getElementById('set-reward-2').value = s.reward_level_2
+				document.getElementById('set-reward-3').value = s.reward_level_3
 			}
 
 			async function saveSettings() {
 				const settings = {
-					reward_level_1: document.getElementById('setting-reward-1').value,
-					reward_level_2: document.getElementById('setting-reward-2').value,
-					reward_level_3: document.getElementById('setting-reward-3').value,
+					reward_level_1: document.getElementById('set-reward-1').value,
+					reward_level_2: document.getElementById('set-reward-2').value,
+					reward_level_3: document.getElementById('set-reward-3').value,
 				}
-				try {
-					const res = await fetch(`${API_URL}/admin/settings`, {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ admin_tg_id: adminTgId, settings }),
-					})
-					if (res.ok) {
-						tg.HapticFeedback.notificationOccurred('success')
-						tg.showAlert('Настройки сохранены!')
-					}
-				} catch (e) {
-					alert('Ошибка сохранения')
-				}
+				await fetch(`${API_URL}/admin/settings`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ admin_tg_id: adminTgId, settings }),
+				})
+				tg.showAlert('Сохранено!')
 			}
 
-			async function editReward(pId, current) {
-				const newVal = prompt('Новая награда за это загрязнение:', current)
-				if (newVal === null || isNaN(newVal)) return
-				try {
-					const res = await fetch(`${API_URL}/admin/pollutions/${pId}/reward`, {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({
-							admin_tg_id: adminTgId,
-							reward: parseFloat(newVal),
-						}),
-					})
-					if (res.ok) {
-						loadPollutions()
-						tg.HapticFeedback.notificationOccurred('success')
-					}
-				} catch (e) {
-					alert('Ошибка')
-				}
+			async function notifyUser(userId) {
+				const msg = prompt('Введите сообщение пользователю:')
+				if (!msg) return
+				const res = await fetch(`${API_URL}/admin/notify`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						admin_tg_id: adminTgId,
+						target_tg_id: userId,
+						message: msg,
+					}),
+				})
+				if (res.ok) tg.showAlert('Отправлено!')
 			}
 
-			async function editBalance(userId, current, name) {
-				const newVal = prompt(`Новый баланс для ${name}:`, current)
-				if (newVal === null || isNaN(newVal)) return
-				try {
-					const res = await fetch(`${API_URL}/admin/users/${userId}/balance`, {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({
-							admin_tg_id: adminTgId,
-							balance: parseFloat(newVal),
-						}),
-					})
-					if (res.ok) {
-						loadUsers()
-						tg.HapticFeedback.notificationOccurred('success')
-					}
-				} catch (e) {
-					alert('Ошибка')
-				}
+			async function editBalance(id, curr) {
+				const v = prompt('Новый баланс:', curr)
+				if (v === null) return
+				await fetch(`${API_URL}/admin/users/${id}/balance`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						admin_tg_id: adminTgId,
+						balance: parseFloat(v),
+					}),
+				})
+				loadUsers()
+			}
+
+			async function editReward(id, curr) {
+				const v = prompt('Новая награда:', curr)
+				if (v === null) return
+				await fetch(`${API_URL}/admin/pollutions/${id}/reward`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						admin_tg_id: adminTgId,
+						reward: parseFloat(v),
+					}),
+				})
+				loadPollutions()
 			}
 
 			async function deletePollution(id) {
 				if (!confirm('Удалить?')) return
-				try {
-					const res = await fetch(
-						`${API_URL}/admin/pollutions/${id}?admin_tg_id=${adminTgId}`,
-						{ method: 'DELETE' },
-					)
-					if (res.ok) {
-						loadPollutions()
-						tg.HapticFeedback.notificationOccurred('success')
-					}
-				} catch (e) {
-					alert('Ошибка')
-				}
+				await fetch(
+					`${API_URL}/admin/pollutions/${id}?admin_tg_id=${adminTgId}`,
+					{ method: 'DELETE' },
+				)
+				loadPollutions()
 			}
 
-			loadUsers()
+			loadStats()
 		</script>
 	</body>
 </html>
