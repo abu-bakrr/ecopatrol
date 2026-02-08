@@ -160,28 +160,6 @@ function loadTheme() {
 	}
 }
 
-function toggleTheme() {
-	const current = document.documentElement.getAttribute('data-theme')
-	const newTheme = current === 'dark' ? 'light' : 'dark'
-	document.documentElement.setAttribute('data-theme', newTheme)
-	localStorage.setItem('theme', newTheme)
-	document.getElementById('theme-toggle').classList.toggle('active')
-	tg.HapticFeedback.impactOccurred('light')
-
-	// Update header color based on theme
-	const headerColor = newTheme === 'dark' ? '#111827' : '#ffffff'
-	tg.setHeaderColor(headerColor)
-
-	// Update map style based on theme
-	if (map) {
-		const style =
-			newTheme === 'dark' ?
-				'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
-			:	'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json'
-		map.setStyle(style)
-	}
-}
-
 function checkRegistration() {
 	isRegistered = localStorage.getItem('registered') === 'true'
 
@@ -469,8 +447,12 @@ function updateProfileUI() {
 function toggleTheme() {
 	const body = document.body
 	const icon = document.getElementById('theme-icon')
-	if (body.getAttribute('data-theme') === 'dark') {
+	const currentTheme = body.getAttribute('data-theme')
+	const isDark = currentTheme === 'dark'
+
+	if (isDark) {
 		body.removeAttribute('data-theme')
+		localStorage.setItem('theme', 'light')
 		tg.setHeaderColor('#ffffff')
 		tg.setBackgroundColor('#ffffff')
 		// Sun icon for Light Mode
@@ -485,14 +467,23 @@ function toggleTheme() {
             <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
             <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
         `
+		if (map)
+			map.setStyle(
+				'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+			)
 	} else {
 		body.setAttribute('data-theme', 'dark')
+		localStorage.setItem('theme', 'dark')
 		tg.setHeaderColor('#121212')
 		tg.setBackgroundColor('#121212')
 		// Moon icon for Dark Mode
 		icon.innerHTML = `
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
         `
+		if (map)
+			map.setStyle(
+				'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+			)
 	}
 	tg.HapticFeedback.impactOccurred('light')
 }
