@@ -446,11 +446,19 @@ async function loadPollutions() {
 		markers = []
 
 		pollutions.forEach(p => {
+			const lat = parseFloat(p.lat)
+			const lng = parseFloat(p.lng)
+
+			if (isNaN(lat) || isNaN(lng)) {
+				console.warn('Invalid pollution coordinates:', p)
+				return
+			}
+
 			const el = document.createElement('div')
 			el.className = `pollution-marker level-${p.level || 1}`
 
 			const marker = new maplibregl.Marker({ element: el })
-				.setLngLat([p.lng, p.lat])
+				.setLngLat([lng, lat])
 				.addTo(map)
 
 			el.addEventListener('click', e => {
