@@ -63,7 +63,21 @@ function checkRegistration() {
 
 	if (isRegistered) {
 		hideOnboarding()
-		initMap()
+		// Try to get location before initializing map
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(
+				position => {
+					initMap([position.coords.longitude, position.coords.latitude])
+				},
+				error => {
+					console.error('Initial geolocation failed:', error)
+					initMap() // Fallback to default
+				},
+				{ enableHighAccuracy: true, timeout: 5000, maximumAge: 0 },
+			)
+		} else {
+			initMap()
+		}
 		authUser()
 		setupEventListeners()
 		loadPollutions()
@@ -167,21 +181,16 @@ async function handleRegistration() {
 				isRegistered = true
 
 				hideOnboarding()
-				initMap()
+				// Initialize map with user location
+				if (position && position.coords) {
+					initMap([position.coords.longitude, position.coords.latitude])
+				} else {
+					initMap()
+				}
+
 				setupEventListeners()
 				loadPollutions()
 				updateProfileUI()
-
-				// Center map on user location
-				setTimeout(() => {
-					if (map) {
-						map.flyTo({
-							center: [position.coords.longitude, position.coords.latitude],
-							zoom: 15,
-							duration: 2000,
-						})
-					}
-				}, 500)
 
 				tg.HapticFeedback.notificationOccurred('success')
 				tg.showAlert('Регистрация успешна!')
@@ -204,7 +213,7 @@ async function handleRegistration() {
 	)
 }
 
-function initMap() {
+function initMap(initialCenter = null) {
 	if (typeof maplibregl === 'undefined') {
 		setTimeout(initMap, 500)
 		return
@@ -219,10 +228,11 @@ function initMap() {
 	map = new maplibregl.Map({
 		container: 'map',
 		style: style,
-		center: [37.6173, 55.7558],
-		zoom: 13,
+		center: initialCenter || [37.6173, 55.7558],
+		zoom: 15, // Closer zoom for better experience
 		pitch: 0,
 		antialias: true,
+		attributionControl: false, // Cleaner look
 	})
 
 	// Add Geolocate Control
