@@ -6,25 +6,25 @@
 			name="viewport"
 			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
 		/>
-		<title>Админ-панель EcoPatrol</title>
+		<title>Eco Admin</title>
 		<script src="https://telegram.org/js/telegram-web-app.js"></script>
 		<style>
 			:root {
 				--primary: #10b981;
 				--primary-dark: #059669;
-				--bg-primary: #f3f4f6;
-				--bg-secondary: #ffffff;
-				--text-primary: #111827;
-				--text-secondary: #4b5563;
+				--bg-page: #f9fafb;
+				--bg-card: #ffffff;
+				--text-main: #111827;
+				--text-muted: #6b7280;
 				--border: #e5e7eb;
 				--safe-top: env(safe-area-inset-top);
 			}
 
 			[data-theme='dark'] {
-				--bg-primary: #111827;
-				--bg-secondary: #1f2937;
-				--text-primary: #f9fafb;
-				--text-secondary: #9ca3af;
+				--bg-page: #111827;
+				--bg-card: #1f2937;
+				--text-main: #f9fafb;
+				--text-muted: #9ca3af;
 				--border: #374151;
 			}
 
@@ -32,69 +32,79 @@
 				box-sizing: border-box;
 				-webkit-tap-highlight-color: transparent;
 			}
-
 			body {
 				font-family:
-					-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
-					Arial, sans-serif;
-				background-color: var(--bg-primary);
-				color: var(--text-primary);
+					-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+				background-color: var(--bg-page);
+				color: var(--text-main);
 				margin: 0;
-				padding: calc(var(--safe-top) + 20px) 16px 40px;
+				padding: calc(var(--safe-top) + 16px) 16px 40px;
 				transition: background-color 0.2s;
-				line-height: 1.4;
+				line-height: 1.5;
 			}
 
 			.header {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				margin-bottom: 20px;
+				margin-bottom: 24px;
 			}
 
 			.header h1 {
-				font-size: 22px;
-				font-weight: 700;
+				font-size: 20px;
+				font-weight: 800;
 				margin: 0;
-				color: var(--primary);
+				display: flex;
+				align-items: center;
+				gap: 8px;
 			}
 
-			.theme-toggle {
-				width: 38px;
-				height: 38px;
-				border-radius: 10px;
-				background: var(--bg-secondary);
+			.btn-icon {
+				width: 40px;
+				height: 40px;
+				border-radius: 12px;
+				background: var(--bg-card);
 				border: 1px solid var(--border);
 				display: flex;
 				align-items: center;
 				justify-content: center;
 				cursor: pointer;
+				color: var(--text-main);
 			}
 
 			.tabs {
 				display: flex;
-				background: var(--bg-secondary);
+				background: var(--bg-card);
 				padding: 4px;
-				border-radius: 12px;
-				margin-bottom: 20px;
+				border-radius: 14px;
+				margin-bottom: 24px;
 				border: 1px solid var(--border);
 			}
 
 			.tab-btn {
 				flex: 1;
-				padding: 8px;
+				padding: 10px;
 				border: none;
-				border-radius: 8px;
+				border-radius: 10px;
 				background: transparent;
-				color: var(--text-secondary);
-				font-weight: 600;
+				color: var(--text-muted);
+				font-weight: 700;
 				font-size: 13px;
 				cursor: pointer;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 4px;
 			}
 
 			.tab-btn.active {
 				background: var(--primary);
 				color: white;
+			}
+
+			.tab-btn svg {
+				width: 20px;
+				height: 20px;
 			}
 
 			.section {
@@ -104,216 +114,336 @@
 				display: block;
 			}
 
+			/* Stats */
 			.stats-grid {
 				display: grid;
 				grid-template-columns: 1fr 1fr;
 				gap: 12px;
-				margin-bottom: 20px;
+				margin-bottom: 24px;
 			}
-
 			.stat-card {
-				background: var(--bg-secondary);
-				padding: 16px;
-				border-radius: 14px;
+				background: var(--bg-card);
+				padding: 20px;
+				border-radius: 16px;
 				border: 1px solid var(--border);
 			}
-
-			.stat-val {
-				font-size: 20px;
-				font-weight: 800;
-				display: block;
-				margin-bottom: 4px;
-			}
-
 			.stat-label {
 				font-size: 11px;
-				color: var(--text-secondary);
+				font-weight: 700;
+				color: var(--text-muted);
 				text-transform: uppercase;
-				font-weight: 600;
-				letter-spacing: 0.5px;
+				letter-spacing: 0.05em;
+				margin-bottom: 4px;
+				display: block;
+			}
+			.stat-value {
+				font-size: 24px;
+				font-weight: 800;
 			}
 
+			/* Card list */
 			.card {
-				background: var(--bg-secondary);
-				border-radius: 16px;
+				background: var(--bg-card);
+				border-radius: 20px;
 				padding: 16px;
-				margin-bottom: 12px;
+				margin-bottom: 16px;
 				border: 1px solid var(--border);
 			}
-
-			.card-header {
-				display: flex;
-				justify-content: space-between;
-				margin-bottom: 10px;
-			}
-
-			.name {
-				font-weight: 700;
+			.card-title {
+				font-weight: 800;
 				font-size: 16px;
+				margin-bottom: 4px;
 			}
-			.meta {
-				font-size: 12px;
-				color: var(--text-secondary);
-				margin-top: 2px;
+			.card-meta {
+				font-size: 13px;
+				color: var(--text-muted);
+				font-weight: 500;
+				margin-bottom: 12px;
 			}
 
 			.gallery {
 				display: flex;
 				gap: 8px;
 				overflow-x: auto;
-				margin: 10px 0;
+				margin: 12px 0;
 				padding-bottom: 4px;
 				scrollbar-width: none;
 			}
-
 			.gallery::-webkit-scrollbar {
 				display: none;
 			}
-
-			.photo {
-				width: 80px;
-				height: 80px;
-				border-radius: 8px;
+			.photo-thumb {
+				width: 90px;
+				height: 90px;
+				border-radius: 12px;
 				object-fit: cover;
-				flex-shrink: 0;
 				border: 1px solid var(--border);
+				background: var(--bg-page);
 			}
 
-			.btn-group {
+			.btn-row {
 				display: flex;
 				gap: 8px;
-				margin-top: 12px;
+				margin-top: 16px;
 			}
-
 			.btn {
 				flex: 1;
-				padding: 10px;
+				padding: 12px;
 				border: none;
-				border-radius: 10px;
+				border-radius: 12px;
 				font-weight: 700;
-				font-size: 12px;
+				font-size: 13px;
 				cursor: pointer;
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				gap: 4px;
+				gap: 6px;
 			}
-
-			.btn-primary {
+			.btn-solid {
 				background: var(--primary);
 				color: white;
 			}
-			.btn-secondary {
-				background: var(--bg-primary);
-				color: var(--text-primary);
+			.btn-outline {
+				background: var(--bg-card);
+				color: var(--text-main);
 				border: 1px solid var(--border);
 			}
 			.btn-danger {
 				background: #fee2e2;
 				color: #ef4444;
+				border: 1px solid #fecaca;
+			}
+			[data-theme='dark'] .btn-danger {
+				background: rgba(220, 38, 38, 0.2);
+				border-color: rgba(220, 38, 38, 0.3);
 			}
 
-			.settings-item {
-				background: var(--bg-secondary);
-				padding: 14px;
-				border-radius: 12px;
+			.settings-card {
+				background: var(--bg-card);
+				border-radius: 20px;
+				padding: 20px;
 				border: 1px solid var(--border);
-				margin-bottom: 10px;
 			}
-
-			.label {
+			.input-group {
+				margin-bottom: 16px;
+			}
+			.input-label {
 				display: block;
 				font-size: 12px;
 				font-weight: 700;
+				color: var(--text-muted);
 				margin-bottom: 6px;
-				color: var(--text-secondary);
 			}
-			.input {
+			.input-field {
 				width: 100%;
-				padding: 10px;
-				border-radius: 8px;
-				border: 1px solid var(--border);
-				background: var(--bg-primary);
-				color: var(--text-primary);
-				font-size: 14px;
+				background: var(--bg-page);
+				border: 1.5px solid var(--border);
+				border-radius: 12px;
+				padding: 12px;
+				color: var(--text-main);
+				font-weight: 600;
+				font-size: 15px;
 				outline: none;
+			}
+			.input-field:focus {
+				border-color: var(--primary);
 			}
 
 			.loading {
 				text-align: center;
-				padding: 40px;
-				opacity: 0.5;
-				font-size: 14px;
+				padding: 60px 0;
+				color: var(--text-muted);
+				font-weight: 600;
+			}
+			.status-badge {
+				display: inline-block;
+				padding: 2px 8px;
+				border-radius: 6px;
+				font-size: 10px;
+				font-weight: 800;
+				text-transform: uppercase;
+				margin-left: 8px;
+			}
+			.status-active {
+				background: rgba(16, 185, 129, 0.1);
+				color: var(--primary);
+			}
+			.status-cleaned {
+				background: rgba(59, 130, 246, 0.1);
+				color: #3b82f6;
 			}
 		</style>
 	</head>
 	<body>
 		<div class="header">
-			<h1>Eco Admin</h1>
-			<div class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙</div>
+			<h1>
+				<svg
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2.5"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+				</svg>
+				Eco Admin
+			</h1>
+			<div class="btn-icon" onclick="toggleTheme()" id="theme-btn">
+				<svg
+					id="sun-icon"
+					style="display: none"
+					width="20"
+					height="20"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<circle cx="12" cy="12" r="5" />
+					<line x1="12" y1="1" x2="12" y2="3" />
+					<line x1="12" y1="21" x2="12" y2="23" />
+					<line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+					<line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+					<line x1="1" y1="12" x2="3" y2="12" />
+					<line x1="21" y1="12" x2="23" y2="12" />
+					<line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+					<line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+				</svg>
+				<svg
+					id="moon-icon"
+					width="20"
+					height="20"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+				</svg>
+			</div>
 		</div>
 
 		<div class="tabs">
 			<button class="tab-btn active" onclick="switchTab('dashboard', this)">
-				Обзор
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<rect x="3" y="3" width="7" height="7" />
+					<rect x="14" y="3" width="7" height="7" />
+					<rect x="14" y="14" width="7" height="7" />
+					<rect x="3" y="14" width="7" height="7" />
+				</svg>
+				<span>Обзор</span>
 			</button>
-			<button class="tab-btn" onclick="switchTab('users', this)">Люди</button>
+			<button class="tab-btn" onclick="switchTab('users', this)">
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+					<circle cx="9" cy="7" r="4" />
+					<path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+					<path d="M16 3.13a4 4 0 0 1 0 7.75" />
+				</svg>
+				<span>Люди</span>
+			</button>
 			<button class="tab-btn" onclick="switchTab('pollutions', this)">
-				Карта
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+					<circle cx="12" cy="10" r="3" />
+				</svg>
+				<span>Карта</span>
 			</button>
-			<button class="tab-btn" onclick="switchTab('settings', this)">⚙️</button>
+			<button class="tab-btn" onclick="switchTab('settings', this)">
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<circle cx="12" cy="12" r="3" />
+					<path
+						d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+					/>
+				</svg>
+				<span>⚙️</span>
+			</button>
 		</div>
 
-		<!-- DASHBOARD -->
+		<!-- SECTIONS -->
 		<div id="section-dashboard" class="section active">
-			<div id="stats-container" class="stats-grid">
+			<div id="stats-loader" class="loading">Загрузка статистики...</div>
+			<div id="stats-content" class="stats-grid" style="display: none">
 				<div class="stat-card">
-					<span class="stat-val">—</span><span class="stat-label">Люди</span>
+					<span class="stat-label">Люди</span
+					><span class="stat-value" id="st-users">0</span>
 				</div>
 				<div class="stat-card">
-					<span class="stat-val">—</span
-					><span class="stat-label">На карте</span>
+					<span class="stat-label">На карте</span
+					><span class="stat-value" id="st-active">0</span>
 				</div>
 				<div class="stat-card">
-					<span class="stat-val">—</span><span class="stat-label">Очищено</span>
+					<span class="stat-label">Очищено</span
+					><span class="stat-value" id="st-cleaned">0</span>
 				</div>
 				<div class="stat-card">
-					<span class="stat-val">—</span><span class="stat-label">Выплаты</span>
+					<span class="stat-label">Выплаты</span
+					><span class="stat-value" id="st-rewards">$0</span>
 				</div>
 			</div>
 		</div>
 
-		<!-- USERS -->
 		<div id="section-users" class="section">
 			<div id="users-list"></div>
 		</div>
 
-		<!-- POLLUTIONS -->
 		<div id="section-pollutions" class="section">
 			<div id="pollutions-list"></div>
 		</div>
 
-		<!-- SETTINGS -->
 		<div id="section-settings" class="section">
-			<div class="settings-item">
-				<label class="label">Награда Уровень 1</label>
-				<input type="number" id="set-reward-1" class="input" />
+			<div class="settings-card">
+				<div class="input-group">
+					<label class="input-label">Награда Уровень 1</label>
+					<input type="number" id="set-1" class="input-field" />
+				</div>
+				<div class="input-group">
+					<label class="input-label">Награда Уровень 2</label>
+					<input type="number" id="set-2" class="input-field" />
+				</div>
+				<div class="input-group">
+					<label class="input-label">Награда Уровень 3</label>
+					<input type="number" id="set-3" class="input-field" />
+				</div>
+				<button class="btn btn-solid" onclick="saveSettings()">
+					Сохранить настройки
+				</button>
 			</div>
-			<div class="settings-item">
-				<label class="label">Награда Уровень 2</label>
-				<input type="number" id="set-reward-2" class="input" />
-			</div>
-			<div class="settings-item">
-				<label class="label">Награда Уровень 3</label>
-				<input type="number" id="set-reward-3" class="input" />
-			</div>
-			<button
-				class="btn btn-primary"
-				style="width: 100%"
-				onclick="saveSettings()"
-			>
-				💾 Сохранить награды
-			</button>
 		</div>
 
 		<script>
@@ -330,9 +460,11 @@
 			function applyTheme(t) {
 				document.documentElement.setAttribute('data-theme', t)
 				localStorage.setItem('admin-theme', t)
-				document.getElementById('theme-btn').innerText =
-					t === 'dark' ? '☀️' : '🌙'
-				tg.setHeaderColor(t === 'dark' ? '#111827' : '#f3f4f6')
+				document.getElementById('sun-icon').style.display =
+					t === 'dark' ? 'block' : 'none'
+				document.getElementById('moon-icon').style.display =
+					t === 'dark' ? 'none' : 'block'
+				tg.setHeaderColor(t === 'dark' ? '#111827' : '#f9fafb')
 			}
 
 			function toggleTheme() {
@@ -358,40 +490,60 @@
 				if (tab === 'settings') loadSettings()
 			}
 
-			async function loadStats() {
-				const container = document.getElementById('stats-container')
+			async function apiFetch(path, options = {}) {
 				try {
 					const res = await fetch(
-						`${API_URL}/admin/stats?admin_tg_id=${adminTgId}`,
+						API_URL +
+							path +
+							(path.includes('?') ? '&' : '?') +
+							`admin_tg_id=${adminTgId}`,
+						options,
 					)
-					const s = await res.json()
-					container.innerHTML = `
-                    <div class="stat-card"><span class="stat-val">${s.total_users}</span><span class="stat-label">Люди</span></div>
-                    <div class="stat-card"><span class="stat-val">${s.active_pollutions}</span><span class="stat-label">На карте</span></div>
-                    <div class="stat-card"><span class="stat-val">${s.cleaned_pollutions}</span><span class="stat-label">Очищено</span></div>
-                    <div class="stat-card"><span class="stat-val">$${s.total_rewards.toFixed(1)}</span><span class="stat-label">Выплаты</span></div>
-                `
-				} catch (e) {}
+					if (!res.ok) throw new Error('API Error')
+					return await res.json()
+				} catch (e) {
+					console.error(e)
+					tg.showAlert('Ошибка загрузки данных')
+					return null
+				}
+			}
+
+			async function loadStats() {
+				const data = await apiFetch('/admin/stats')
+				if (!data) return
+				document.getElementById('stats-loader').style.display = 'none'
+				document.getElementById('stats-content').style.display = 'grid'
+				document.getElementById('st-users').innerText = data.total_users
+				document.getElementById('st-active').innerText = data.active_pollutions
+				document.getElementById('st-cleaned').innerText =
+					data.cleaned_pollutions
+				document.getElementById('st-rewards').innerText =
+					'$' + data.total_rewards.toFixed(1)
 			}
 
 			async function loadUsers() {
 				const list = document.getElementById('users-list')
 				list.innerHTML = '<div class="loading">Загрузка...</div>'
-				const res = await fetch(
-					`${API_URL}/admin/users?admin_tg_id=${adminTgId}`,
-				)
-				const users = await res.json()
+				const users = await apiFetch('/admin/users')
+				if (!users) return
+
 				list.innerHTML = users
 					.map(
 						u => `
                 <div class="card">
                     <div class="card-header">
-                        <div><div class="name">${u.first_name}</div><div class="meta">@${u.username || '—'} • ${u.phone || 'Нет номера'}</div></div>
-                        <div style="font-weight:800; color:var(--primary)">$${u.balance.toFixed(1)}</div>
+                        <div>
+                            <div class="name">${u.first_name || 'Hero'}</div>
+                            <div class="card-meta">@${u.username || '—'} • ${u.phone || 'Нет номера'}</div>
+                        </div>
+                        <div style="font-weight:900; color:var(--primary); font-size:18px">$${u.balance.toFixed(1)}</div>
                     </div>
-                    <div class="btn-group">
-                        <button class="btn btn-primary" onclick="notifyUser(${u.telegram_id})">✉️ Сообщение</button>
-                        <button class="btn btn-secondary" onclick="editBalance(${u.id}, ${u.balance})">💰 Баланс</button>
+                    <div class="btn-row">
+                        <button class="btn btn-solid" onclick="notifyUser(${u.telegram_id})">
+                             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                             Написать
+                        </button>
+                        <button class="btn btn-outline" onclick="editBalance(${u.id}, ${u.balance})">Баланс</button>
                     </div>
                 </div>
             `,
@@ -402,105 +554,101 @@
 			async function loadPollutions() {
 				const list = document.getElementById('pollutions-list')
 				list.innerHTML = '<div class="loading">Загрузка...</div>'
-				const res = await fetch(
-					`${API_URL}/admin/pollutions?admin_tg_id=${adminTgId}`,
-				)
-				const pollutions = await res.json()
-				list.innerHTML = pollutions
-					.map(
-						p => `
+				const pollutions = await apiFetch('/admin/pollutions')
+				if (!pollutions) {
+					list.innerHTML =
+						'<div class="loading">Ошибка загрузки или нет данных</div>'
+					return
+				}
+
+				list.innerHTML =
+					pollutions
+						.map(
+							p => `
                 <div class="card">
-                    <div class="name">Метка #${p.id} • Уровень ${p.level}</div>
-                    <div class="meta">${p.description || 'Нет описания'}</div>
-                    <div class="gallery">
-                        ${p.photos.map(url => `<img src="${url}" class="photo" onclick="window.open('${url}')">`).join('')}
+                    <div class="card-title">
+                        Метка #${p.id}
+                        <span class="status-badge ${p.status === 'active' ? 'status-active' : 'status-cleaned'}">${p.status}</span>
                     </div>
-                    <div class="btn-group">
-                        <button class="btn btn-secondary" onclick="editReward(${p.id}, ${p.reward})">💎 $${p.reward}</button>
+                    <div class="card-meta">Уровень ${p.level} • Reward: $${p.reward}</div>
+                    <div style="font-size:14px; margin-bottom:8px">${p.description || '<i>Нет описания</i>'}</div>
+                    <div class="gallery">
+                        ${(p.photos || []).map(url => `<img src="${url}" class="photo-thumb" onclick="window.open('${url}')">`).join('')}
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-outline" onclick="editReward(${p.id}, ${p.reward})">Награда</button>
                         <button class="btn btn-danger" onclick="deletePollution(${p.id})">Удалить</button>
                     </div>
                 </div>
             `,
-					)
-					.join('')
+						)
+						.join('') || '<div class="loading">Нет загрязнений</div>'
 			}
 
 			async function loadSettings() {
-				const res = await fetch(
-					`${API_URL}/admin/settings?admin_tg_id=${adminTgId}`,
-				)
-				const s = await res.json()
-				document.getElementById('set-reward-1').value = s.reward_level_1
-				document.getElementById('set-reward-2').value = s.reward_level_2
-				document.getElementById('set-reward-3').value = s.reward_level_3
+				const s = await apiFetch('/admin/settings')
+				if (!s) return
+				document.getElementById('set-1').value = s.reward_level_1
+				document.getElementById('set-2').value = s.reward_level_2
+				document.getElementById('set-3').value = s.reward_level_3
 			}
 
 			async function saveSettings() {
 				const settings = {
-					reward_level_1: document.getElementById('set-reward-1').value,
-					reward_level_2: document.getElementById('set-reward-2').value,
-					reward_level_3: document.getElementById('set-reward-3').value,
+					reward_level_1: document.getElementById('set-1').value,
+					reward_level_2: document.getElementById('set-2').value,
+					reward_level_3: document.getElementById('set-3').value,
 				}
-				await fetch(`${API_URL}/admin/settings`, {
+				const res = await apiFetch('/admin/settings', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ admin_tg_id: adminTgId, settings }),
+					body: JSON.stringify({ settings }),
 				})
-				tg.showAlert('Сохранено!')
+				if (res) tg.showAlert('Настройки сохранены')
 			}
 
 			async function notifyUser(userId) {
-				const msg = prompt('Введите сообщение пользователю:')
+				const msg = prompt('Текст сообщения:')
 				if (!msg) return
-				const res = await fetch(`${API_URL}/admin/notify`, {
+				const res = await apiFetch('/admin/notify', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						admin_tg_id: adminTgId,
-						target_tg_id: userId,
-						message: msg,
-					}),
+					body: JSON.stringify({ target_tg_id: userId, message: msg }),
 				})
-				if (res.ok) tg.showAlert('Отправлено!')
+				if (res) tg.showAlert('Отправлено')
 			}
 
 			async function editBalance(id, curr) {
 				const v = prompt('Новый баланс:', curr)
-				if (v === null) return
-				await fetch(`${API_URL}/admin/users/${id}/balance`, {
+				if (v === null || isNaN(v)) return
+				const res = await apiFetch(`/admin/users/${id}/balance`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						admin_tg_id: adminTgId,
-						balance: parseFloat(v),
-					}),
+					body: JSON.stringify({ balance: parseFloat(v) }),
 				})
-				loadUsers()
+				if (res) loadUsers()
 			}
 
 			async function editReward(id, curr) {
 				const v = prompt('Новая награда:', curr)
-				if (v === null) return
-				await fetch(`${API_URL}/admin/pollutions/${id}/reward`, {
+				if (v === null || isNaN(v)) return
+				const res = await apiFetch(`/admin/pollutions/${id}/reward`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						admin_tg_id: adminTgId,
-						reward: parseFloat(v),
-					}),
+					body: JSON.stringify({ reward: parseFloat(v) }),
 				})
-				loadPollutions()
+				if (res) loadPollutions()
 			}
 
 			async function deletePollution(id) {
-				if (!confirm('Удалить?')) return
-				await fetch(
-					`${API_URL}/admin/pollutions/${id}?admin_tg_id=${adminTgId}`,
-					{ method: 'DELETE' },
-				)
-				loadPollutions()
+				if (!confirm('Удалить метку навсегда?')) return
+				const res = await apiFetch(`/admin/pollutions/${id}`, {
+					method: 'DELETE',
+				})
+				if (res) loadPollutions()
 			}
 
+			// Init
 			loadStats()
 		</script>
 	</body>
