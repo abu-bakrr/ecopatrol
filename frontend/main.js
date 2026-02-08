@@ -259,41 +259,39 @@ async function handleRegistration() {
 	)
 }
 
-function initMap(initialCenter = null) {
-	if (typeof maplibregl === 'undefined') {
-		setTimeout(initMap, 500)
-		return
-	}
-
-	const theme = document.documentElement.getAttribute('data-theme')
-	const style =
-		theme === 'dark' ?
-			'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
-		:	'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json'
+	// Determine background color for map container and MapLibre canvas
+    const bgColor = theme === 'dark' ? '#242f3e' : '#fcfcfc';
 
 	map = new maplibregl.Map({
 		container: 'map',
 		style: style,
 		center: initialCenter || [37.6173, 55.7558],
 		zoom: 15,
-		minZoom: 10, // Prevent zooming out to world view
-		maxZoom: 18, // Prevent getting too close
+		minZoom: 10,
+		maxZoom: 18,
 		pitch: 0,
 		antialias: true,
-		attributionControl: false, // Cleaner look
-		dragRotate: false, // Disable rotation by mouse drag
-		touchPitch: false, // Disable pitch by touch
+		attributionControl: false,
+		dragRotate: false,
+		touchPitch: false,
 		maxBounds: [
-			[55.0, 36.0], // Southwest coordinates (approx)
-			[74.0, 46.0], // Northeast coordinates (approx)
+			[55.0, 36.0], 
+			[74.0, 46.0], 
 		],
+        // CRITICAL: Set renderWorldCopies to false to avoid gray areas outside bounds
+        renderWorldCopies: false,
+        // Set background color of the GL context to match theme
+        // (Note: MapLibre doesn't have direct bg color option, but we handle it via CSS and container)
 	})
+
+    // Force map container background immediately
+    document.getElementById('map').style.backgroundColor = bgColor;
 
 	// Disable rotation by touch (keep zoom)
 	map.touchZoomRotate.disableRotation()
 
 	// Set background color to match map to avoid gray flashes
-	tg.setBackgroundColor(theme === 'dark' ? '#242f3e' : '#fcfcfc') // Approximate map colors
+	tg.setBackgroundColor(bgColor)
 
 	// Add Geolocate Control
 	const geolocate = new maplibregl.GeolocateControl({
