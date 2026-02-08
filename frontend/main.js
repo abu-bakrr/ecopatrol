@@ -100,126 +100,42 @@ function toggleTheme() {
 	}
 }
 
-async function checkRegistration() {
-    // 1. Check if we have Telegram user data
-    const tgUser = tg.initDataUnsafe?.user;
-    if (!tgUser) {
-        // Fallback for dev/testing without Telegram
-        isRegistered = localStorage.getItem('registered') === 'true'
-        if (isRegistered) {
-            hideOnboarding()
-            initMap()
-            authUser() // Try to refresh data
-            setupEventListeners()
-            loadPollutions()
-        } else {
-            showOnboarding()
-        }
-        return;
-    }
+function checkRegistration() {
+	isRegistered = localStorage.getItem('registered') === 'true'
 
-    try {
-        // 2. Try to get user profile from backend
-        // We use the ID to check if user exists. 
-        // Assuming GET /profile/:id returns 200 if exists, 404 if not.
-        const response = await fetch(`${API_URL}/profile/${tgUser.id}`)
-        
-        console.log('Auto-login check status:', response.status);
+	if (isRegistered) {
+		hideOnboarding()
 
-        if (response.ok) {
-            const data = await response.json()
-            console.log('User found, auto-login:', data)
-            
-            // Uncomment for debugging if needed:
-            // tg.showAlert(`Авто-вход успешен: ${data.user.first_name}`);
+		// Use pre-fetched location
+		locationPromise.then(loc => {
+			if (loc && loc.coords) {
+				// If it's a raw array (from cache) or object with lat/lng?
+				// My logic above saves array [lng, lat] to cache.
+				// Live returns object.
+				// Actually let's just pass `loc.coords` to initMap.
+				console.log('Using location from:', loc.source)
+				initMap(loc.coords)
 
-            currentUser = data.user || data; 
-            
-            // Allow silent background update of auth data if needed
-            // await attemptAutoLogin(tgUser); // Optional: refresh token/data
-
-            isRegistered = true
-            localStorage.setItem('registered', 'true')
-            
-            hideOnboarding()
-            initMap()
-            updateProfileUI()
-            setupEventListeners()
-            loadPollutions()
-            
-        } else {
-            console.log('User not found (404), showing onboarding');
-            // tg.showAlert('Аккаунт не найден, пожалуйста, зарегистрируйтесь');
-            throw new Error('User not found')
-        }
-    } catch (e) {
-        console.error('Auto-login error:', e);
-        
-        if (localStorage.getItem('registered') === 'true' && e.message !== 'User not found') {
-             console.log('Network error, falling back to local storage')
-             tg.showAlert('Ошибка сети, вход офлайн');
-             hideOnboarding()
-             initMap()
-             setupEventListeners()
-             loadPollutions()
-        } else {
-            // Only show onboarding if we are sure user is not found or it's a critical error
-            showOnboarding()
-        }
-    }
-}
-
-async function attemptAutoLogin(tgUser) {
-    // Re-use authUser logic but handle success/fail explicitly
-	try {
-		const response = await fetch(`${API_URL}/init`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				telegram_id: tgUser.id,
-				username: tgUser.username || `${tgUser.first_name || ''} ${tgUser.last_name || ''}`.trim(),
-				initData: tg.initData,
-			}),
+				// If source was cache, try to update with live in background if not already running?
+				// The navigator.getCurrentPosition above runs anyway.
+				// We can add a "refine" step later if needed.
+			} else {
+				initMap()
+			}
 		})
-		
-        if (!response.ok) {
-            throw new Error('Auto-login failed')
-        }
 
-		const data = await response.json()
-        console.log('Auto-login success:', data)
-		currentUser = data.user
-        
-        isRegistered = true
-        localStorage.setItem('registered', 'true')
-        
-        hideOnboarding()
-        
-        // Use cached location or wait for live?
-        // Let's just init map. 
-        initMap()
-        
-        updateProfileUI()
-        setupEventListeners()
-        loadPollutions()
-	} catch (e) {
-        console.error('Auto-login error:', e)
-        throw e
+		authUser()
+		setupEventListeners()
+		loadPollutions()
+	} else {
+		showOnboarding()
 	}
 }
 
 function showOnboarding() {
 	document.getElementById('onboarding').classList.remove('hidden')
 	const form = document.getElementById('onboarding-form')
-    // Remove old listeners to avoid duplicates if called multiple times?
-    // Better to clone or check. For now, simple standard way.
-    // Use "onclick" on button or just simple addEventListener (might stack if not careful)
-    // But checkRegistration is usually called once.
-    // To be safe against multiple listeners:
-    const newForm = form.cloneNode(true);
-    form.parentNode.replaceChild(newForm, form);
-    
-	newForm.addEventListener('submit', e => {
+	form.addEventListener('submit', e => {
 		e.preventDefault()
 		handleRegistration()
 	})
@@ -230,135 +146,104 @@ function hideOnboarding() {
 }
 
 async function handleRegistration() {
-	try {
-        const firstNameInput = document.getElementById('first-name');
-        const lastNameInput = document.getElementById('last-name');
-        const ageInput = document.getElementById('age');
-        const phoneInput = document.getElementById('phone');
+	const firstName = document.getElementById('first-name').value.trim()
+	const lastName = document.getElementById('last-name').value.trim()
+	const age = parseInt(document.getElementById('age').value)
+	const phone = document.getElementById('phone').value.trim()
 
-        if (!firstNameInput || !lastNameInput || !ageInput || !phoneInput) {
-            console.error('Missing form elements');
-            tg.showAlert('Ошибка: форма регистрации повреждена. Попробуйте перезагрузить приложение.');
-            return;
-        }
+	console.log('Registration attempt:', { firstName, lastName, age, phone })
 
-        const firstName = firstNameInput.value.trim()
-        const lastName = lastNameInput.value.trim()
-        const age = parseInt(ageInput.value)
-        const phone = phoneInput.value.trim()
+	// Validation
+	if (!firstName || !lastName || !age || !phone) {
+		tg.showAlert('Пожалуйста, заполните все поля')
+		return
+	}
 
-        console.log('Registration attempt:', { firstName, lastName, age, phone })
+	if (age < 13 || age > 120) {
+		tg.showAlert('Пожалуйста, введите корректный возраст (13-120)')
+		return
+	}
 
-        // Validation
-        if (!firstName || !lastName || !age || !phone) {
-            tg.showAlert('Пожалуйста, заполните все поля')
-            return
-        }
+	// Validate phone starts with +998
+	if (!phone.startsWith('+998')) {
+		tg.showAlert('Номер телефона должен начинаться с +998')
+		return
+	}
 
-        if (isNaN(age) || age < 13 || age > 120) {
-            tg.showAlert('Пожалуйста, введите корректный возраст (13-120)')
-            return
-        }
+	// Request geolocation
+	if (!navigator.geolocation) {
+		tg.showAlert('Геолокация недоступна на вашем устройстве')
+		return
+	}
 
-        // Validate phone starts with +998
-        if (!phone.startsWith('+998')) {
-            tg.showAlert('Номер телефона должен начинаться с +998')
-            return
-        }
+	tg.HapticFeedback.impactOccurred('medium')
 
-        // Request geolocation
-        if (!navigator.geolocation) {
-            tg.showAlert('Геолокация недоступна на вашем устройстве')
-            return
-        }
+	navigator.geolocation.getCurrentPosition(
+		async position => {
+			console.log('Geolocation granted:', position.coords)
 
-        tg.HapticFeedback.impactOccurred('medium')
+			// Geolocation granted, proceed with registration
+			const initData = tg.initDataUnsafe
+			const user = initData.user || {
+				id: Date.now(),
+				username: `${firstName}_${lastName}`.toLowerCase(),
+			}
 
-        navigator.geolocation.getCurrentPosition(
-            async position => {
-                console.log('Geolocation granted:', position.coords)
+			console.log('Telegram user:', user)
 
-                // Geolocation granted, proceed with registration
-                const initData = tg.initDataUnsafe
-                const user = initData.user || {
-                    id: Date.now(),
-                    username: `${firstName}_${lastName}`.toLowerCase(),
-                }
+			try {
+				const requestBody = {
+					telegram_id: user.id,
+					username: user.username || `${firstName} ${lastName}`,
+					first_name: firstName,
+					last_name: lastName,
+					age: age,
+					phone: phone,
+					initData: tg.initData || '',
+				}
 
-                console.log('Telegram user:', user)
+				console.log('Sending registration request:', requestBody)
 
-                try {
-                    const requestBody = {
-                        telegram_id: user.id,
-                        username: user.username || `${firstName} ${lastName}`,
-                        first_name: firstName,
-                        last_name: lastName,
-                        age: age,
-                        phone: phone,
-                        initData: tg.initData || '',
-                    }
+				const response = await fetch(`${API_URL}/init`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(requestBody),
+				})
 
-                    console.log('Sending registration request:', requestBody)
+				console.log('Response status:', response.status)
 
-                    const response = await fetch(`${API_URL}/init`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(requestBody),
-                    })
+				if (!response.ok) {
+					const errorText = await response.text()
+					console.error('Registration failed:', errorText)
+					throw new Error(`Registration failed: ${response.status}`)
+				}
 
-                    console.log('Response status:', response.status)
+				const data = await response.json()
+				console.log('Registration successful:', data)
 
-                    if (!response.ok) {
-                        const errorText = await response.text()
-                        console.error('Registration failed:', errorText)
-                        // Show specific error from server if available and safe, or generic
-                        tg.showAlert(`Ошибка регистрации (${response.status}): ${errorText.substring(0, 100)}`)
-                        throw new Error(`Registration failed: ${response.status} ${errorText}`)
-                    }
+				currentUser = data.user
 
-                    const data = await response.json()
-                    console.log('Registration successful:', data)
+				localStorage.setItem('registered', 'true')
+				isRegistered = true
 
-                    currentUser = data.user
+				hideOnboarding()
+				// Initialize map with user location
+				if (position && position.coords) {
+					initMap([position.coords.longitude, position.coords.latitude])
+				} else {
+					initMap()
+				}
 
-                    localStorage.setItem('registered', 'true')
-                    isRegistered = true
+				setupEventListeners()
+				loadPollutions()
+				updateProfileUI()
 
-                    hideOnboarding()
-                    // Initialize map with user location
-                    if (position && position.coords) {
-                        initMap([position.coords.longitude, position.coords.latitude])
-                    } else {
-                        initMap()
-                    }
-
-                    setupEventListeners()
-                    loadPollutions()
-                    updateProfileUI()
-
-                    tg.HapticFeedback.notificationOccurred('success')
-                    tg.showAlert('Регистрация успешна!')
-                } catch (e) {
-                    console.error('Registration network/server error:', e)
-                    tg.showAlert(`Ошибка соединения: ${e.message}`)
-                }
-            },
-            error => {
-                console.error('Geolocation error:', error)
-                tg.showAlert(
-                    'Для регистрации необходим доступ к геолокации. Пожалуйста, разрешите доступ.',
-                )
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0,
-            },
-        )
-    } catch (outerError) {
-        console.error('Critical registration error:', outerError);
-        tg.showAlert('Критическая ошибка формы: ' + outerError.message);
-    }
+				tg.HapticFeedback.notificationOccurred('success')
+				tg.showAlert('Регистрация успешна!')
+			} catch (e) {
+				console.error('Registration error:', e)
+				tg.showAlert(`Ошибка регистрации: ${e.message}`)
+			}
 		},
 		error => {
 			console.error('Geolocation error:', error)
@@ -374,39 +259,41 @@ async function handleRegistration() {
 	)
 }
 
-	// Determine background color for map container and MapLibre canvas
-    const bgColor = theme === 'dark' ? '#242f3e' : '#fcfcfc';
+function initMap(initialCenter = null) {
+	if (typeof maplibregl === 'undefined') {
+		setTimeout(initMap, 500)
+		return
+	}
+
+	const theme = document.documentElement.getAttribute('data-theme')
+	const style =
+		theme === 'dark' ?
+			'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+		:	'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json'
 
 	map = new maplibregl.Map({
 		container: 'map',
 		style: style,
 		center: initialCenter || [37.6173, 55.7558],
 		zoom: 15,
-		minZoom: 10,
-		maxZoom: 18,
+		minZoom: 10, // Prevent zooming out to world view
+		maxZoom: 18, // Prevent getting too close
 		pitch: 0,
 		antialias: true,
-		attributionControl: false,
-		dragRotate: false,
-		touchPitch: false,
+		attributionControl: false, // Cleaner look
+		dragRotate: false, // Disable rotation by mouse drag
+		touchPitch: false, // Disable pitch by touch
 		maxBounds: [
-			[55.0, 36.0], 
-			[74.0, 46.0], 
+			[55.0, 36.0], // Southwest coordinates (approx)
+			[74.0, 46.0], // Northeast coordinates (approx)
 		],
-        // CRITICAL: Set renderWorldCopies to false to avoid gray areas outside bounds
-        renderWorldCopies: false,
-        // Set background color of the GL context to match theme
-        // (Note: MapLibre doesn't have direct bg color option, but we handle it via CSS and container)
 	})
-
-    // Force map container background immediately
-    document.getElementById('map').style.backgroundColor = bgColor;
 
 	// Disable rotation by touch (keep zoom)
 	map.touchZoomRotate.disableRotation()
 
 	// Set background color to match map to avoid gray flashes
-	tg.setBackgroundColor(bgColor)
+	tg.setBackgroundColor(theme === 'dark' ? '#242f3e' : '#fcfcfc') // Approximate map colors
 
 	// Add Geolocate Control
 	const geolocate = new maplibregl.GeolocateControl({

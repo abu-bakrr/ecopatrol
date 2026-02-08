@@ -130,64 +130,10 @@ def clean_pollution(p_id):
     })
 
 @app.route('/api/profile/<int:user_id>', methods=['GET'])
-def get_profile_details(user_id):
-    # This endpoint seems to conflict with the one I added (get_profile with telegram_id)
-    # The one I added uses telegram_id lookup. This one uses primary key ID?
-    # Or maybe they are the same?
-    # Wait, the previous one was: @app.route('/api/profile/<int:telegram_id>')
-    # This one is: @app.route('/api/profile/<int:user_id>')
-    # They are identical route signatures! Flask will use the FIRST one defined.
-    # The first one I added searches by telegram_id.
-    # This one searches by PK (User.query.get_or_404).
-    # Since frontend sends tgUser.id (which is telegram_id), the FIRST one is correct.
-    # I should likely REMOVE this one or rename it if it's used elsewhere.
-    # But wait, looking at the file... I SEE TWO get_profile functions in the file content possibly?
-    # No, I see lines 132-140 in the previous `view_file`.
-    # AND I see I added a `get_profile` via `replace_file_content` earlier.
-    # If I added it at line 63, and there is another at line 132...
-    # FLASK WILL OVERWRITE OR IGNORE.
-    # The one at line 132 expects `user_id` (PK) and returns stats.
-    # The one I added at line 63 expects `telegram_id` and returns user object.
-    # Frontend sends `tgUser.id` (Telegram ID).
-    # So we need the one that searches by Telegram ID.
-    # The one at line 132 `User.query.get_or_404(user_id)` treats the input as Primary Key.
-    # Telegram ID is NOT Primary Key (usually).
-    # THIS IS THE BUG.
-    # I will comment out this conflicting function or merge them.
-    
-    # Actually, let's keep it but rename route to avoid conflict, 
-    # OR better: make the main /profile/<id> smart to check both? 
-    # No, stick to telegram_id for auth check.
-    
-    # I will rename this route to avoiding conflict, although if frontend uses it...
-    # Does frontend use /api/profile/PK ?? 
-    # updateProfileUI -> loadProfileStats ? 
-    # I don't see loadProfileStats doing fetch in the snippets I saw.
-    # Wait, I saw `loadProfileStats` mentions in my thought process but not in view_file 
-    # (I might have missed it or it was in a different part).
-    
-    # Let's just make sure the function I added (searching by telegram_id) takes precedence 
-    # OR works correctly.
-    # IF I use `replace_file_content` on this block to change it to use `telegram_id` lookup, that fixes it.
-    
-    user = User.query.filter_by(telegram_id=user_id).first()
-    if not user:
-        # Try by ID just in case? No, chaos.
-        # Fallback to 404
-        return jsonify({'error': 'User not found'}), 404
-        
-    cleaned_count = Pollution.query.filter_by(user_id=user.id, status='cleaned').count()
+def get_profile(user_id):
+    user = User.query.get_or_404(user_id)
+    cleaned_count = Pollution.query.filter_by(user_id=user_id, status='cleaned').count()
     return jsonify({
-        'user': {
-            'id': user.id,
-            'telegram_id': user.telegram_id,
-            'username': user.username,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'age': user.age,
-            'phone': user.phone,
-            'balance': user.balance
-        },
         'username': user.username,
         'balance': user.balance,
         'cleaned_count': cleaned_count
