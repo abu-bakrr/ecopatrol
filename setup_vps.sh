@@ -20,13 +20,20 @@ sudo apt install -y python3-pip python3-venv git curl postgresql postgresql-cont
 
 # 3. Настройка PostgreSQL
 echo "🔹 Настройка базы данных PostgreSQL..."
+# Убедимся, что сервис запущен и включен
+sudo systemctl enable postgresql
+sudo systemctl start postgresql
+
 DB_NAME="ecopatrol"
 DB_USER="eco_user"
 DB_PASS=$(openssl rand -base64 12)
 
+# Выполняем из /tmp, чтобы у пользователя postgres был доступ (в /root доступа нет)
+cd /tmp
 sudo -u postgres psql -c "CREATE DATABASE $DB_NAME;" || true
 sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASS';" || true
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;"
+cd - > /dev/null
 
 DATABASE_URL="postgresql://$DB_USER:$DB_PASS@localhost/$DB_NAME"
 
