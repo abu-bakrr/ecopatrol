@@ -17,13 +17,18 @@ cd backend
 source venv/bin/activate
 pip install -r requirements.txt
 
-# 3. Применение изменений в БД (если были новые модели)
+# 3. Фикс localhost -> 127.0.0.1 в .env (если он там остался)
+if [ -f .env ]; then
+    sed -i "s/localhost/127.0.0.1/g" .env
+fi
+
+# 4. Применение изменений в БД (если были новые модели)
 echo "🔹 Обновление таблиц в базе данных..."
 python3 -c "from app import app, db; ctx=app.app_context(); ctx.push(); db.create_all(); ctx.pop()"
 deactivate
 cd ..
 
-# 4. Перезапуск служб
+# 5. Перезапуск служб
 echo "🔹 Перезапуск фоновых сервисов..."
 sudo systemctl restart eco-api eco-bot
 sudo systemctl restart nginx
