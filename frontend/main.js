@@ -124,57 +124,46 @@ async function checkRegistration() {
         // Assuming GET /profile/:id returns 200 if exists, 404 if not.
         const response = await fetch(`${API_URL}/profile/${tgUser.id}`)
         
+        console.log('Auto-login check status:', response.status);
+
         if (response.ok) {
             const data = await response.json()
             console.log('User found, auto-login:', data)
             
-            // User exists! Login.
-            currentUser = data; // Profile endpoint returns user data directly?
-            // "loadProfileStats" expects { cleaned_count: ... } but profile endpoint might return full user?
-            // "authUser" uses /init and gets { user: ... }
-            // Let's assume /profile/:id returns the user object or something we can use.
-            // Actually, let's use /init with just ID to be safe if /profile structure is unknown?
-            // But /init is POST.
-            // Let's stick to /profile check. If it works, we know user exists.
-            // Then we can call authUser() to ensure we have full "currentUser" structure as expected by app.
+            // Uncomment for debugging if needed:
+            // tg.showAlert(`Авто-вход успешен: ${data.user.first_name}`);
+
+            currentUser = data.user || data; 
             
-            // Wait, "loadProfileStats" response: "document.getElementById('sidebar-cleaned').textContent = data.cleaned_count"
-            // So /profile/:id returns stats? Or user?
-            // Let's check "loadProfileStats" implementation... 
-            // It says: const response = await fetch(`${API_URL}/profile/${currentUser.id}`)
-            // const data = await response.json()
-            // And uses data.cleaned_count.
+            // Allow silent background update of auth data if needed
+            // await attemptAutoLogin(tgUser); // Optional: refresh token/data
+
+            isRegistered = true
+            localStorage.setItem('registered', 'true')
             
-            // If /profile/:id returns full user + stats, we are good. 
-            // If it only returns stats, we might miss "balance" etc.
-            
-            // Better approach: Try to call /init (authUser logic) to "login".
-            // If /init with just ID returns user, great.
-            // If it fails because of missing fields, then we know we need registration.
-            
-            // Let's try authUser's logic here directly.
-            await attemptAutoLogin(tgUser);
+            hideOnboarding()
+            initMap()
+            updateProfileUI()
+            setupEventListeners()
+            loadPollutions()
             
         } else {
-            // 404 or other error -> Not registered
-            console.log('User not found (or error), showing onboarding')
+            console.log('User not found (404), showing onboarding');
+            // tg.showAlert('Аккаунт не найден, пожалуйста, зарегистрируйтесь');
             throw new Error('User not found')
         }
     } catch (e) {
-        // Fallback or show onboarding
-        // If local storage says registered but server says no -> Server is truth. Show onboarding.
-        // If server error -> Check local storage as backup?
-        // Let's assume if network works and user not found -> Onboarding.
-        // If network fails -> Try local storage.
+        console.error('Auto-login error:', e);
         
         if (localStorage.getItem('registered') === 'true' && e.message !== 'User not found') {
              console.log('Network error, falling back to local storage')
+             tg.showAlert('Ошибка сети, вход офлайн');
              hideOnboarding()
              initMap()
              setupEventListeners()
              loadPollutions()
-             // Try to auth in background?
         } else {
+            // Only show onboarding if we are sure user is not found or it's a critical error
             showOnboarding()
         }
     }
