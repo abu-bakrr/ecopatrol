@@ -308,6 +308,9 @@ def admin_get_pollutions():
     pollutions = Pollution.query.all()
     result = []
     for p in pollutions:
+        creator = User.query.get(p.user_id)
+        cleaner = User.query.get(p.cleaner_id) if p.cleaner_id else None
+        
         result.append({
             'id': p.id,
             'lat': p.lat,
@@ -316,9 +319,12 @@ def admin_get_pollutions():
             'status': p.status,
             'description': p.description,
             'creator_id': p.user_id,
+            'creator_name': creator.first_name if creator else 'Eco Hero',
+            'creator_tg_id': creator.telegram_id if creator else None,
             'cleaner_id': p.cleaner_id,
+            'cleaner_name': cleaner.first_name if cleaner else None,
+            'cleaner_tg_id': cleaner.telegram_id if cleaner else None,
             'photos': [ph.url for ph in p.photos],
-            'types': p.types,
             'reward': p.reward
         })
     return jsonify(result)

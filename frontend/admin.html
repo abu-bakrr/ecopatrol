@@ -149,16 +149,36 @@
 				margin-bottom: 16px;
 				border: 1px solid var(--border);
 			}
+			.card-header {
+				display: flex;
+				justify-content: space-between;
+				margin-bottom: 12px;
+			}
 			.card-title {
 				font-weight: 800;
 				font-size: 16px;
-				margin-bottom: 4px;
 			}
 			.card-meta {
 				font-size: 13px;
 				color: var(--text-muted);
 				font-weight: 500;
 				margin-bottom: 12px;
+			}
+
+			.user-link {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				margin-bottom: 6px;
+				font-size: 14px;
+				font-weight: 600;
+			}
+			.user-link .tg-link {
+				color: var(--primary);
+				text-decoration: none;
+				display: flex;
+				align-items: center;
+				gap: 4px;
 			}
 
 			.gallery {
@@ -173,12 +193,13 @@
 				display: none;
 			}
 			.photo-thumb {
-				width: 90px;
-				height: 90px;
+				width: 100px;
+				height: 100px;
 				border-radius: 12px;
 				object-fit: cover;
 				border: 1px solid var(--border);
 				background: var(--bg-page);
+				cursor: pointer;
 			}
 
 			.btn-row {
@@ -199,6 +220,11 @@
 				justify-content: center;
 				gap: 6px;
 			}
+			.btn-min {
+				flex: none;
+				width: 44px;
+				padding: 10px;
+			}
 			.btn-solid {
 				background: var(--primary);
 				color: white;
@@ -216,6 +242,48 @@
 			[data-theme='dark'] .btn-danger {
 				background: rgba(220, 38, 38, 0.2);
 				border-color: rgba(220, 38, 38, 0.3);
+			}
+
+			/* Photo Viewer - Implementation Plan: Modal style like index.html */
+			.photo-viewer {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.9);
+				z-index: 1000;
+				display: none;
+				align-items: center;
+				justify-content: center;
+				opacity: 0;
+				transition: opacity 0.3s ease;
+			}
+			.photo-viewer.active {
+				display: flex;
+				opacity: 1;
+			}
+			.viewer-img {
+				max-width: 95%;
+				max-height: 95%;
+				border-radius: 8px;
+				object-fit: contain;
+			}
+			.close-viewer {
+				position: absolute;
+				top: calc(env(safe-area-inset-top) + 16px);
+				right: 16px;
+				width: 44px;
+				height: 44px;
+				background: white;
+				color: black;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 24px;
+				font-weight: bold;
+				cursor: pointer;
 			}
 
 			.settings-card {
@@ -262,7 +330,6 @@
 				font-size: 10px;
 				font-weight: 800;
 				text-transform: uppercase;
-				margin-left: 8px;
 			}
 			.status-active {
 				background: rgba(16, 185, 129, 0.1);
@@ -375,7 +442,7 @@
 					<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
 					<circle cx="12" cy="10" r="3" />
 				</svg>
-				<span>Карта</span>
+				<span>Список</span>
 			</button>
 			<button class="tab-btn" onclick="switchTab('settings', this)">
 				<svg
@@ -391,7 +458,7 @@
 						d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
 					/>
 				</svg>
-				<span>⚙️</span>
+				<span>Настройки</span>
 			</button>
 		</div>
 
@@ -446,6 +513,17 @@
 			</div>
 		</div>
 
+		<!-- PHOTO VIEWER LIGHTBOX -->
+		<div id="photo-viewer" class="photo-viewer" onclick="closePhotoViewer()">
+			<div class="close-viewer" onclick="closePhotoViewer()">×</div>
+			<img
+				src=""
+				id="viewer-img"
+				class="viewer-img"
+				onclick="event.stopPropagation()"
+			/>
+		</div>
+
 		<script>
 			const tg = window.Telegram.WebApp
 			tg.expand()
@@ -473,6 +551,18 @@
 				tg.HapticFeedback.impactOccurred('light')
 			}
 
+			function openPhotoViewer(url) {
+				const viewer = document.getElementById('photo-viewer')
+				const img = document.getElementById('viewer-img')
+				img.src = url
+				viewer.classList.add('active')
+				tg.HapticFeedback.impactOccurred('medium')
+			}
+
+			function closePhotoViewer() {
+				document.getElementById('photo-viewer').classList.remove('active')
+			}
+
 			function switchTab(tab, btn) {
 				document
 					.querySelectorAll('.section')
@@ -492,18 +582,20 @@
 
 			async function apiFetch(path, options = {}) {
 				try {
+					// Ensure options.body is handled if present
+					const fetchOptions = { ...options }
 					const res = await fetch(
 						API_URL +
 							path +
 							(path.includes('?') ? '&' : '?') +
 							`admin_tg_id=${adminTgId}`,
-						options,
+						fetchOptions,
 					)
 					if (!res.ok) throw new Error('API Error')
 					return await res.json()
 				} catch (e) {
 					console.error(e)
-					tg.showAlert('Ошибка загрузки данных')
+					tg.showAlert('Ошибка: проверьте консоль')
 					return null
 				}
 			}
@@ -533,14 +625,14 @@
                 <div class="card">
                     <div class="card-header">
                         <div>
-                            <div class="name">${u.first_name || 'Hero'}</div>
+                            <div class="card-title">${u.first_name || 'Hero'}</div>
                             <div class="card-meta">@${u.username || '—'} • ${u.phone || 'Нет номера'}</div>
                         </div>
                         <div style="font-weight:900; color:var(--primary); font-size:18px">$${u.balance.toFixed(1)}</div>
                     </div>
                     <div class="btn-row">
                         <button class="btn btn-solid" onclick="notifyUser(${u.telegram_id})">
-                             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                              Написать
                         </button>
                         <button class="btn btn-outline" onclick="editBalance(${u.id}, ${u.balance})">Баланс</button>
@@ -556,8 +648,7 @@
 				list.innerHTML = '<div class="loading">Загрузка...</div>'
 				const pollutions = await apiFetch('/admin/pollutions')
 				if (!pollutions) {
-					list.innerHTML =
-						'<div class="loading">Ошибка загрузки или нет данных</div>'
+					list.innerHTML = '<div class="loading">Нет данных</div>'
 					return
 				}
 
@@ -566,31 +657,54 @@
 						.map(
 							p => `
                 <div class="card">
-                    <div class="card-title">
-                        Метка #${p.id}
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px">
+                        <span style="font-weight:800; font-size:13px; color:var(--text-muted)">МЕТКА #${p.id}</span>
                         <span class="status-badge ${p.status === 'active' ? 'status-active' : 'status-cleaned'}">${p.status}</span>
                     </div>
+                    
+                    <div class="user-link">
+                        <span>Автор:</span>
+                        <span class="tg-link" onclick="notifyUser(${p.creator_tg_id})">
+                            ${p.creator_name} <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        </span>
+                    </div>
+                    
+                    ${
+											p.cleaner_name ?
+												`
+                    <div class="user-link">
+                        <span>Убрал:</span>
+                        <span class="tg-link" onclick="notifyUser(${p.cleaner_tg_id})">
+                            ${p.cleaner_name} <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        </span>
+                    </div>`
+											:	''
+										}
+
                     <div class="card-meta">Уровень ${p.level} • Reward: $${p.reward}</div>
                     <div style="font-size:14px; margin-bottom:8px">${p.description || '<i>Нет описания</i>'}</div>
                     <div class="gallery">
-                        ${(p.photos || []).map(url => `<img src="${url}" class="photo-thumb" onclick="window.open('${url}')">`).join('')}
+                        ${(p.photos || []).map(url => `<img src="${url}" class="photo-thumb" onclick="openPhotoViewer('${url}')">`).join('')}
                     </div>
                     <div class="btn-row">
                         <button class="btn btn-outline" onclick="editReward(${p.id}, ${p.reward})">Награда</button>
-                        <button class="btn btn-danger" onclick="deletePollution(${p.id})">Удалить</button>
+                        <button class="btn btn-danger btn-min" onclick="deletePollution(${p.id})">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
                     </div>
                 </div>
             `,
 						)
-						.join('') || '<div class="loading">Нет загрязнений</div>'
+						.join('') || '<div class="loading">Пусто</div>'
 			}
 
 			async function loadSettings() {
 				const s = await apiFetch('/admin/settings')
-				if (!s) return
-				document.getElementById('set-1').value = s.reward_level_1
-				document.getElementById('set-2').value = s.reward_level_2
-				document.getElementById('set-3').value = s.reward_level_3
+				if (s) {
+					document.getElementById('set-1').value = s.reward_level_1
+					document.getElementById('set-2').value = s.reward_level_2
+					document.getElementById('set-3').value = s.reward_level_3
+				}
 			}
 
 			async function saveSettings() {
@@ -608,6 +722,10 @@
 			}
 
 			async function notifyUser(userId) {
+				if (!userId) {
+					tg.showAlert('ID юзера не найден')
+					return
+				}
 				const msg = prompt('Текст сообщения:')
 				if (!msg) return
 				const res = await apiFetch('/admin/notify', {
@@ -615,7 +733,8 @@
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ target_tg_id: userId, message: msg }),
 				})
-				if (res) tg.showAlert('Отправлено')
+				if (res && res.status === 'ok') tg.showAlert('Отправлено')
+				else if (res) tg.showAlert('Ошибка: ' + res.message)
 			}
 
 			async function editBalance(id, curr) {
@@ -648,7 +767,6 @@
 				if (res) loadPollutions()
 			}
 
-			// Init
 			loadStats()
 		</script>
 	</body>
