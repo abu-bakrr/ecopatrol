@@ -457,6 +457,10 @@ async function loadPollutions() {
 			const el = document.createElement('div')
 			el.className = `pollution-marker level-${p.level || 1}`
 
+			const inner = document.createElement('div')
+			inner.className = 'pollution-marker-inner'
+			el.appendChild(inner)
+
 			const marker = new maplibregl.Marker({ element: el })
 				.setLngLat([lng, lat])
 				.addTo(map)
