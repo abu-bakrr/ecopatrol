@@ -64,16 +64,32 @@ function checkRegistration() {
 	if (isRegistered) {
 		hideOnboarding()
 		// Try to get location before initializing map
-		if (navigator.geolocation) {
+		// Optimize geolocation: check cache first or wait less
+		const cachedLoc = JSON.parse(localStorage.getItem('last_known_loc'))
+		if (cachedLoc) {
+			initMap(cachedLoc) // Show map immediately with last known loc
+			// Then update with fresh loc
 			navigator.geolocation.getCurrentPosition(
 				position => {
-					initMap([position.coords.longitude, position.coords.latitude])
+					const coords = [position.coords.longitude, position.coords.latitude]
+					localStorage.setItem('last_known_loc', JSON.stringify(coords))
+					map.flyTo({ center: coords, zoom: 15 })
+				},
+				null,
+				{ enableHighAccuracy: true, timeout: 5000, maximumAge: 0 },
+			)
+		} else if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(
+				position => {
+					const coords = [position.coords.longitude, position.coords.latitude]
+					localStorage.setItem('last_known_loc', JSON.stringify(coords))
+					initMap(coords)
 				},
 				error => {
 					console.error('Initial geolocation failed:', error)
 					initMap() // Fallback to default
 				},
-				{ enableHighAccuracy: true, timeout: 5000, maximumAge: 0 },
+				{ enableHighAccuracy: false, timeout: 3000, maximumAge: 10000 }, // Faster coarse location first
 			)
 		} else {
 			initMap()
