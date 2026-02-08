@@ -533,6 +533,7 @@ async function loadPollutions() {
 function showAddForm() {
 	const center = map.getCenter()
 	uploadedPhotos = []
+	let selectedTags = []
 
 	const content = document.getElementById('sheet-content')
 	content.innerHTML = `
@@ -544,6 +545,19 @@ function showAddForm() {
                 <button class="level-btn active level-1" data-level="1">Низкий</button>
                 <button class="level-btn level-2" data-level="2">Средний</button>
                 <button class="level-btn level-3" data-level="3">Высокий</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Что загрязнено?</label>
+            <div class="tag-selector">
+                <button class="tag-btn" data-tag="plastic">Пластик</button>
+                <button class="tag-btn" data-tag="trash">Мусор</button>
+                <button class="tag-btn" data-tag="glass">Стекло</button>
+                <button class="tag-btn" data-tag="food">Еда</button>
+                <button class="tag-btn" data-tag="construction">Стройка</button>
+                <button class="tag-btn" data-tag="fire">Огонь</button>
+                <button class="tag-btn" data-tag="other">Другое</button>
             </div>
         </div>
         
@@ -561,7 +575,8 @@ function showAddForm() {
                     <polyline points="21 15 16 10 5 21"/>
                 </svg>
                 <p style="color: var(--text-secondary); font-size: 14px;">Нажмите для загрузки</p>
-                <input type="file" id="photo-input" accept="image/*" multiple capture="environment">
+                <!-- Explicitly remove capture to allow choice -->
+                <input type="file" id="photo-input" accept="image/*" multiple>
             </div>
             <div id="photo-preview" class="photo-grid"></div>
         </div>
@@ -569,10 +584,13 @@ function showAddForm() {
         <button class="btn btn-primary" style="width: 100%;" id="submit-pollution">
             Отправить
         </button>
+        <!-- Spacer for safe area -->
+        <div style="height: 20px;"></div>
     `
 
 	openBottomSheet()
 
+	// --- Logic for Levels ---
 	content.querySelectorAll('.level-btn').forEach(btn => {
 		btn.addEventListener('click', () => {
 			content
@@ -584,6 +602,29 @@ function showAddForm() {
 		})
 	})
 
+	// --- Logic for Tags ---
+	content.querySelectorAll('.tag-btn').forEach(btn => {
+		btn.addEventListener('click', () => {
+			btn.classList.toggle('active')
+			const tag = btn.dataset.tag
+			if (btn.classList.contains('active')) {
+				selectedTags.push(tag)
+			} else {
+				selectedTags = selectedTags.filter(t => t !== tag)
+			}
+			tg.HapticFeedback.impactOccurred('light')
+		})
+	})
+
+	// --- Layout Fix: input focus ---
+	// When textarea is focused, ensure sheet is scrolled to it and doesn't get covered
+	const descInput = document.getElementById('pollution-desc')
+	descInput.addEventListener('focus', () => {
+		setTimeout(() => {
+			descInput.scrollIntoView({ behavior: 'smooth', block: 'center' })
+		}, 300)
+	})
+
 	document.getElementById('upload-trigger').addEventListener('click', () => {
 		document.getElementById('photo-input').click()
 	})
@@ -592,7 +633,67 @@ function showAddForm() {
 		.getElementById('photo-input')
 		.addEventListener('change', handlePhotoUpload)
 	document.getElementById('submit-pollution').addEventListener('click', () => {
-		submitPollution(center.lat, center.lng)
+		submitPollution(center.lat, center.lng, selectedTags)
+	})
+
+	// --- Drag & Drop Logic for Sheet ---
+	const sheet = document.getElementById('bottom-sheet')
+	// Use the whole sheet header/handle area for dragging
+	// Create a larger hit area if needed, or just use the sheet content's top padding area
+	const dragZone = document.createElement('div')
+	dragZone.style.position = 'absolute'
+	dragZone.style.top = '0'
+	dragZone.style.left = '0'
+	dragZone.style.right = '0'
+	dragZone.style.height = '40px' // Larger hit area
+	dragZone.style.zIndex = '10'
+	sheet.appendChild(dragZone)
+
+	let startY = 0
+	let currentY = 0
+	let isDragging = false
+
+	dragZone.addEventListener(
+		'touchstart',
+		e => {
+			startY = e.touches[0].clientY
+			isDragging = true
+			sheet.style.transition = 'none'
+			console.log('Drag start')
+		},
+		{ passive: true },
+	)
+
+	dragZone.addEventListener(
+		'touchmove',
+		e => {
+			if (!isDragging) return
+			currentY = e.touches[0].clientY
+			const delta = currentY - startY
+
+			if (delta > 0) {
+				// Only allow dragging down
+				sheet.style.transform = `translateY(${delta}px)`
+			}
+		},
+		{ passive: true },
+	)
+
+	dragZone.addEventListener('touchend', () => {
+		if (!isDragging) return
+		isDragging = false
+		sheet.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+
+		const delta = currentY - startY
+		if (delta > 100) {
+			closeBottomSheet()
+			setTimeout(() => {
+				sheet.style.transform = ''
+			}, 300)
+		} else {
+			sheet.style.transform = ''
+		}
+		console.log('Drag end')
 	})
 }
 
