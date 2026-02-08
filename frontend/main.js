@@ -56,7 +56,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 	tg.ready()
 
 	// Enable fullscreen mode
-	tg.requestFullscreen()
+	try {
+		tg.requestFullscreen()
+	} catch (e) {
+		console.log('Fullscreen not supported')
+	}
 
 	// Set header color based on theme
 	const savedTheme = localStorage.getItem('theme') || 'light'
@@ -67,7 +71,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 	tg.setBackgroundColor(bgColor) // Set immediately
 
 	loadTheme()
-	checkRegistration()
+
+	// DELAY MAP INIT: Wait for Telegram animation to finish
+	setTimeout(() => {
+		checkRegistration()
+	}, 300) // 300ms is usually enough for transition
 })
 
 function loadTheme() {
@@ -287,6 +295,12 @@ function initMap(initialCenter = null) {
 			[55.0, 36.0], // Southwest coordinates (approx)
 			[74.0, 46.0], // Northeast coordinates (approx)
 		],
+	})
+
+	// Force resize to fix gray blocks if map was initialized before full expansion
+	map.on('load', () => {
+		map.resize()
+		console.log('Map resized and loaded')
 	})
 
 	// Disable rotation by touch (keep zoom)
