@@ -512,7 +512,7 @@ function setProfileAvatar(name) {
 function setupEventListeners() {
 	document.getElementById('profile-btn').addEventListener('click', openSidebar)
 	document.getElementById('balance-btn').addEventListener('click', () => {
-		tg.showAlert('Биржа в разработке')
+		showExchange()
 	})
 	document.getElementById('theme-toggle').addEventListener('click', toggleTheme)
 	document.getElementById('geolocate-btn').addEventListener('click', geolocate)
