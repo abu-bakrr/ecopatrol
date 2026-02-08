@@ -1088,7 +1088,7 @@ function showAddForm() {
                 <button class="tag-btn" data-tag="hazardous">${window.t('types.hazardous')}</button>
                 <button class="tag-btn" data-tag="bulky">${window.t('types.bulky')}</button>
                 <button class="tag-btn" data-tag="chemical">${window.t('types.chemical')}</button>
-                <button class="tag-btn" data-tag="trash">${window.t('types.other')}</button>
+                <button class="tag-btn" data-tag="other">${window.t('types.other')}</button>
             </div>
         </div>
         

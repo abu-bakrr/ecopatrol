@@ -260,6 +260,9 @@ def get_leaderboard():
 @app.route('/api/admin/users', methods=['GET'])
 def admin_get_users():
     tg_id = request.args.get('admin_tg_id', type=int)
+    if not tg_id and request.is_json:
+        tg_id = request.json.get('admin_tg_id')
+    
     if tg_id not in ADMIN_IDS:
         return jsonify({'error': 'Unauthorized'}), 403
     
@@ -281,12 +284,9 @@ def admin_get_users():
 
 @app.route('/api/admin/users/<int:user_id>/balance', methods=['POST'])
 def admin_update_balance(user_id):
-    data = request.json
-    try:
-        tg_id = int(data.get('admin_tg_id'))
-    except (TypeError, ValueError):
-        return jsonify({'error': 'Invalid admin ID format'}), 400
-        
+    data = request.json or {}
+    tg_id = data.get('admin_tg_id') or request.args.get('admin_tg_id', type=int)
+    
     if tg_id not in ADMIN_IDS:
         return jsonify({'error': 'Unauthorized'}), 403
     
@@ -302,6 +302,9 @@ def admin_update_balance(user_id):
 @app.route('/api/admin/pollutions', methods=['GET'])
 def admin_get_pollutions():
     tg_id = request.args.get('admin_tg_id', type=int)
+    if not tg_id and request.is_json:
+        tg_id = request.json.get('admin_tg_id')
+        
     if tg_id not in ADMIN_IDS:
         return jsonify({'error': 'Unauthorized'}), 403
     
@@ -333,6 +336,9 @@ def admin_get_pollutions():
 @app.route('/api/admin/pollutions/<int:p_id>', methods=['DELETE'])
 def admin_delete_pollution(p_id):
     tg_id = request.args.get('admin_tg_id', type=int)
+    if not tg_id and request.is_json:
+        tg_id = request.json.get('admin_tg_id')
+        
     if tg_id not in ADMIN_IDS:
         return jsonify({'error': 'Unauthorized'}), 403
     
@@ -349,12 +355,9 @@ def admin_delete_pollution(p_id):
 
 @app.route('/api/admin/pollutions/<int:p_id>/reward', methods=['POST'])
 def admin_update_reward(p_id):
-    data = request.json
-    try:
-        tg_id = int(data.get('admin_tg_id'))
-    except (TypeError, ValueError):
-        return jsonify({'error': 'Invalid admin ID format'}), 400
-        
+    data = request.json or {}
+    tg_id = data.get('admin_tg_id') or request.args.get('admin_tg_id', type=int)
+    
     if tg_id not in ADMIN_IDS:
         return jsonify({'error': 'Unauthorized'}), 403
     
@@ -370,6 +373,9 @@ def admin_update_reward(p_id):
 @app.route('/api/admin/settings', methods=['GET'])
 def admin_get_settings():
     tg_id = request.args.get('admin_tg_id', type=int)
+    if not tg_id and request.is_json:
+        tg_id = request.json.get('admin_tg_id')
+        
     if tg_id not in ADMIN_IDS:
         return jsonify({'error': 'Unauthorized'}), 403
     
@@ -384,12 +390,9 @@ def admin_get_settings():
 
 @app.route('/api/admin/settings', methods=['POST'])
 def admin_update_settings():
-    data = request.json
-    try:
-        tg_id = int(data.get('admin_tg_id'))
-    except (TypeError, ValueError):
-        return jsonify({'error': 'Invalid admin ID format'}), 400
-        
+    data = request.json or {}
+    tg_id = data.get('admin_tg_id') or request.args.get('admin_tg_id', type=int)
+    
     if tg_id not in ADMIN_IDS:
         return jsonify({'error': 'Unauthorized'}), 403
     
@@ -411,6 +414,9 @@ def admin_update_settings():
 @app.route('/api/admin/stats', methods=['GET'])
 def admin_get_stats():
     tg_id = request.args.get('admin_tg_id', type=int)
+    if not tg_id and request.is_json:
+        tg_id = request.json.get('admin_tg_id')
+        
     if tg_id not in ADMIN_IDS:
         return jsonify({'error': 'Unauthorized'}), 403
     
@@ -430,12 +436,9 @@ def admin_get_stats():
 
 @app.route('/api/admin/notify', methods=['POST'])
 def admin_notify_user():
-    data = request.json
-    try:
-        tg_id = int(data.get('admin_tg_id'))
-    except (TypeError, ValueError):
-        return jsonify({'error': 'Invalid admin ID format'}), 400
-        
+    data = request.json or {}
+    tg_id = data.get('admin_tg_id') or request.args.get('admin_tg_id', type=int)
+    
     if tg_id not in ADMIN_IDS:
         return jsonify({'error': 'Unauthorized'}), 403
     
