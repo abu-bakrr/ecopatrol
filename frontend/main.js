@@ -74,6 +74,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 	fixHeight()
 
 	tg.expand()
+	tg.isVerticalSwipesEnabled = false
+	tg.enableClosingConfirmation()
 	tg.ready()
 
 	// Enable fullscreen mode
