@@ -217,7 +217,11 @@
 		<div class="overlay" id="overlay"></div>
 
 		<!-- Photo Viewer (Lightbox) -->
-		<div id="photo-viewer" class="photo-viewer">
+		<div
+			id="photo-viewer"
+			class="photo-viewer"
+			onclick="window.closePhotoViewer()"
+		>
 			<div class="close-viewer" onclick="window.closePhotoViewer()">×</div>
 			<img
 				src=""
@@ -295,6 +299,6 @@
 			console.log('Log system ready v10')
 		</script>
 
-		<script type="module" src="main.js?v=12"></script>
+		<script type="module" src="main.js?v=13"></script>
 	</body>
 </html>
