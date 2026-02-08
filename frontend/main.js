@@ -550,6 +550,7 @@ function showAddForm() {
 	const center = map.getCenter()
 	uploadedPhotos = []
 	let selectedTags = []
+	uploadingCount = 0 // Reset global uploading count logic
 
 	const content = document.getElementById('sheet-content')
 	content.innerHTML = `
@@ -604,6 +605,15 @@ function showAddForm() {
     `
 
 	openBottomSheet()
+
+	// --- Viewer Delegation ---
+	// Handle clicks on photo items (both uploaded and loading, though loading won't have url)
+	document.getElementById('photo-preview').addEventListener('click', e => {
+		const item = e.target.closest('.photo-item')
+		if (item && item.dataset.url) {
+			window.openPhotoViewer(item.dataset.url)
+		}
+	})
 
 	// --- Logic for Levels ---
 	content.querySelectorAll('.level-btn').forEach(btn => {
@@ -777,7 +787,7 @@ function updatePhotoPreview() {
 			url => `
         <div class="photo-item" 
              style="background-image: url('${url}'); background-size: cover; background-position: center;"
-             onclick="window.openPhotoViewer('${url}')">
+             data-url="${url}">
         </div>
     `,
 		)
@@ -795,7 +805,10 @@ function updatePhotoPreview() {
 	preview.innerHTML = html
 
 	if (uploadedPhotos.length > 0 || uploadingCount > 0) {
-		preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+		// Use setTimeout to ensure DOM render
+		setTimeout(() => {
+			preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+		}, 50)
 	}
 }
 
