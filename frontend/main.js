@@ -262,11 +262,21 @@ function initMap(initialCenter = null) {
 		container: 'map',
 		style: style,
 		center: initialCenter || [37.6173, 55.7558],
-		zoom: 15, // Closer zoom for better experience
+		zoom: 15,
+		minZoom: 10, // Prevent zooming out to world view
+		maxZoom: 18, // Prevent getting too close
 		pitch: 0,
 		antialias: true,
 		attributionControl: false, // Cleaner look
+		dragRotate: false, // Disable rotation by mouse drag
+		touchPitch: false, // Disable pitch by touch
 	})
+
+	// Disable rotation by touch (keep zoom)
+	map.touchZoomRotate.disableRotation()
+
+	// Set background color to match map to avoid gray flashes
+	tg.setBackgroundColor(theme === 'dark' ? '#242f3e' : '#fcfcfc') // Approximate map colors
 
 	// Add Geolocate Control
 	const geolocate = new maplibregl.GeolocateControl({
@@ -290,6 +300,17 @@ function initMap(initialCenter = null) {
 	map.on('moveend', () => {
 		isDragging = false
 		document.getElementById('center-marker').classList.remove('dragging')
+	})
+
+	// Handle zoom for marker sizing
+	map.on('zoom', () => {
+		const zoom = map.getZoom()
+		const container = document.getElementById('map')
+		if (zoom < 13) {
+			container.classList.add('map-zoom-out')
+		} else {
+			container.classList.remove('map-zoom-out')
+		}
 	})
 
 	map.on('load', () => {

@@ -49,10 +49,13 @@ html {
 	font-family:
 		-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
 	color: var(--text-primary);
-	background: var(--map-bg);
+	color: var(--text-primary);
+	background: var(--map-bg); /* Match map bg */
+	background-color: var(--map-bg);
 	transition:
 		background 0.3s,
 		color 0.3s;
+	overscroll-behavior: none; /* Prevent bounce efect showing gray background */
 }
 
 #map {
@@ -129,7 +132,23 @@ html {
 	background: #ef4444;
 }
 
-/* Old level classes removed, now handled via inner */
+/* Marker sizing based on zoom */
+.pollution-marker {
+	transition:
+		width 0.3s ease,
+		height 0.3s ease;
+}
+
+.map-zoom-out .pollution-marker {
+	width: 8px !important;
+	height: 8px !important;
+	border-width: 1.5px;
+}
+
+.map-zoom-out .pollution-marker-inner {
+	border-width: 1.5px;
+	animation: none; /* Stop pulsing when small to save perf and visual noise */
+}
 
 @keyframes pulse {
 	0%,
