@@ -1,33 +1,32 @@
-from app import app, db
-from sqlalchemy import text
+import os
+from flask import Flask
+from models import db, User
+from dotenv import load_dotenv
+
+load_dotenv()
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///ecopatrol.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
 
 def migrate():
-    print("🔹 Запуск миграции базы данных...")
     with app.app_context():
+        # Check if language column exists
         try:
-            # Получаем движок БД
-            engine = db.engine
-            
-            # Проверяем наличие колонки language в таблице users
-            # SQL-запрос может отличаться для SQLite и Postgres, 
-            # но мы можем просто попробовать добавить колонку и поймать ошибку, 
-            # или использовать инспектор SQLAlchemy.
-            
-            from sqlalchemy import inspect
-            inspector = inspect(engine)
-            columns = [col['name'] for col in inspector.get_columns('users')]
-            
-            if 'language' not in columns:
-                print("🔹 Добавляю колонку 'language' в таблицу 'users'...")
-                with engine.connect() as conn:
-                    conn.execute(text("ALTER TABLE users ADD COLUMN language VARCHAR(10) DEFAULT 'ru'"))
-                    conn.commit()
-                print("✅ Миграция успешно завершена!")
-            else:
-                print("✅ Колонка 'language' уже существует.")
-                
-        except Exception as e:
-            print(f"❌ Ошибка при миграции: {e}")
+            from sqlalchemy import text
+            db.session.execute(text("SELECT language FROM users LIMIT 1"))
+            print("Column 'language' already exists.")
+        except Exception:
+            print("Adding 'language' column to 'users' table...")
+            try:
+                # This works for both SQLite and PostgreSQL
+                db.session.execute(text("ALTER TABLE users ADD COLUMN language VARCHAR(10) DEFAULT 'ru'"))
+                db.session.commit()
+                print("Successfully added 'language' column.")
+            except Exception as e:
+                db.session.rollback()
+                print(f"Error adding column: {e}")
 
 if __name__ == "__main__":
     migrate()
