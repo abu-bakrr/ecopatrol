@@ -733,7 +733,9 @@ async function handlePhotoUpload(event) {
 	const files = Array.from(event.target.files)
 	if (files.length === 0) return
 
-	// tg.showAlert(`Загрузка ${files.length} фото...`) // Removed as requested
+	// Optimistic UI: Show skeletons immediately
+	uploadingCount += files.length
+	updatePhotoPreview()
 
 	for (const file of files) {
 		try {
@@ -752,7 +754,6 @@ async function handlePhotoUpload(event) {
 			if (!data.secure_url) throw new Error('No url')
 
 			uploadedPhotos.push(data.secure_url)
-			updatePhotoPreview()
 			tg.HapticFeedback.notificationOccurred('success')
 		} catch (e) {
 			console.error('Upload error:', e)
@@ -764,17 +765,6 @@ async function handlePhotoUpload(event) {
 			}
 			updatePhotoPreview()
 		}
-	}
-
-	// Safety reset after all uploads
-	if (typeof uploadingCount !== 'undefined') {
-		// Only reset if we are sure no other parallel uploads are happening?
-		// Simple approach: if files loop is done, we might be done.
-		// But the loop awaits inside.
-		// Actually, the decrement in finally block handles it per file.
-		// This is just a safety net.
-		// uploadingCount = 0;
-		updatePhotoPreview()
 	}
 }
 
