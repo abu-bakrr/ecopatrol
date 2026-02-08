@@ -25,6 +25,7 @@ class Pollution(db.Model):
     description = db.Column(db.Text)
     status = db.Column(db.String(20), default='active')  # 'active', 'cleaned'
     reward = db.Column(db.Float, default=0.0)
+    clean_comment = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     photos = db.relationship('Photo', backref='pollution', lazy=True)

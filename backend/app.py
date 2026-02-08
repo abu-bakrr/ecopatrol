@@ -100,16 +100,24 @@ def clean_pollution(p_id):
         return jsonify({'error': 'Already cleaned'}), 400
     
     p.status = 'cleaned'
+    p.clean_comment = data.get('comment', '')
+    
     for photo_url in data.get('photos', []):
         new_photo = Photo(pollution_id=p.id, url=photo_url, type='after')
         db.session.add(new_photo)
     
-    # Reward user
-    user = User.query.get(p.user_id)
-    user.balance += p.reward
+    # Reward the cleaner (from request), not the pollution creator
+    cleaner_id = data.get('user_id')
+    if cleaner_id:
+        cleaner = User.query.get(cleaner_id)
+        if cleaner:
+            cleaner.balance += p.reward
     
     db.session.commit()
-    return jsonify({'status': 'ok', 'new_balance': user.balance})
+    return jsonify({
+        'status': 'ok', 
+        'new_balance': cleaner.balance if cleaner_id and cleaner else 0
+    })
 
 @app.route('/api/profile/<int:user_id>', methods=['GET'])
 def get_profile(user_id):

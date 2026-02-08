@@ -7,52 +7,126 @@
 			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
 		/>
 		<title>Экопатруль 🌍</title>
-		<!-- Библиотеки и шрифты -->
+
+		<!-- Fonts -->
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
-			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;800&display=swap"
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
 			rel="stylesheet"
 		/>
+
+		<!-- MapLibre -->
 		<link
 			href="https://unpkg.com/maplibre-gl@4.0.0/dist/maplibre-gl.css"
 			rel="stylesheet"
 		/>
 		<script src="https://unpkg.com/maplibre-gl@4.0.0/dist/maplibre-gl.js"></script>
+
+		<!-- Telegram -->
 		<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+		<!-- Cloudinary Upload Widget -->
+		<script
+			src="https://upload-widget.cloudinary.com/global/all.js"
+			type="text/javascript"
+		></script>
+
 		<link rel="stylesheet" href="style.css" />
 	</head>
 	<body>
+		<!-- Map -->
 		<div id="map"></div>
 
-		<!-- Центральный прицел -->
-		<div id="map-center-marker">
-			<div class="marker-inner"></div>
+		<!-- Center Marker (Custom Pin SVG) -->
+		<div class="center-marker">
+			<svg width="40" height="50" viewBox="0 0 40 50" fill="none">
+				<path
+					d="M20 0C8.954 0 0 8.954 0 20c0 14 20 30 20 30s20-16 20-30C40 8.954 31.046 0 20 0z"
+					fill="#064e3b"
+				/>
+				<circle cx="20" cy="20" r="8" fill="white" />
+			</svg>
 		</div>
 
-		<!-- UI Оверлеи -->
-		<div class="top-bar glass-effect">
-			<div id="user-info">
-				<span id="username">Загрузка...</span>
-				<span id="balance">💰 0</span>
+		<!-- Profile Button -->
+		<button class="profile-btn" id="profile-btn">
+			<svg
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="#064e3b"
+				stroke-width="2"
+			>
+				<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+				<circle cx="12" cy="7" r="4" />
+			</svg>
+		</button>
+
+		<!-- Geolocation Button -->
+		<button class="geolocate-btn" id="geolocate-btn">
+			<svg
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="#064e3b"
+				stroke-width="2"
+			>
+				<circle cx="12" cy="12" r="10" />
+				<circle cx="12" cy="12" r="3" />
+			</svg>
+		</button>
+
+		<!-- Add Pollution Button -->
+		<button class="add-btn" id="add-btn">
+			<svg
+				width="20"
+				height="20"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+			>
+				<line x1="12" y1="5" x2="12" y2="19" />
+				<line x1="5" y1="12" x2="19" y2="12" />
+			</svg>
+			Отметить мусор
+		</button>
+
+		<!-- Sidebar (Profile) -->
+		<div class="sidebar" id="sidebar">
+			<div class="sidebar-header">
+				<button class="sidebar-close" id="sidebar-close">×</button>
+				<h2 id="sidebar-username">Загрузка...</h2>
+				<p style="opacity: 0.9; margin-top: 8px">Эко-герой</p>
 			</div>
-			<div id="profile-btn" class="profile-avatar">👤</div>
-		</div>
-
-		<!-- Кнопки действий -->
-		<div class="bottom-actions">
-			<button id="list-btn" class="btn btn-secondary">📋 Биржа</button>
-			<button id="add-btn" class="btn btn-primary">📍 Отметить мусор</button>
-		</div>
-
-		<!-- Модальное окно (BottomSheet стиль) -->
-		<div id="modal-overlay">
-			<div id="modal-content">
-				<div class="close-handle"></div>
-				<!-- <button id="close-modal" class="close-btn">&times;</button> -->
-				<div id="modal-body"></div>
+			<div class="sidebar-content">
+				<div class="stat-card">
+					<div class="stat-value" id="sidebar-balance">$0</div>
+					<div class="stat-label">Баланс</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-value" id="sidebar-cleaned">0</div>
+					<div class="stat-label">Очищено объектов</div>
+				</div>
+				<button class="btn btn-primary" style="width: 100%; margin-top: 16px">
+					Редактировать профиль
+				</button>
 			</div>
 		</div>
+
+		<!-- Bottom Sheet -->
+		<div class="bottom-sheet" id="bottom-sheet">
+			<div class="sheet-handle"></div>
+			<div class="sheet-content" id="sheet-content">
+				<!-- Dynamic content -->
+			</div>
+		</div>
+
+		<!-- Overlay -->
+		<div class="overlay" id="overlay"></div>
 
 		<script type="module" src="main.js"></script>
 	</body>

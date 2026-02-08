@@ -1,17 +1,21 @@
-// EcoPatrol Premium JS
+// EcoPatrol - Premium Edition
 const tg = window.Telegram.WebApp
 const API_URL = window.location.origin + '/api'
+const CLOUDINARY_CLOUD_NAME = 'dxjyi9id6' // From your .env
+const CLOUDINARY_UPLOAD_PRESET = 'ecopatrol' // You'll need to create this in Cloudinary
 
 let map
 let markers = []
 let currentUser = null
 let selectedLevel = 1
+let uploadedPhotos = []
+let currentPollution = null
 
-// Initialize App
+// Initialize
 document.addEventListener('DOMContentLoaded', async () => {
 	tg.expand()
 	tg.ready()
-	tg.headerColor = '#10b981'
+	tg.setHeaderColor('#064e3b')
 
 	initMap()
 	await authUser()
@@ -20,44 +24,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 })
 
 function initMap() {
-	// Ждем, пока библиотека загрузится
 	if (typeof maplibregl === 'undefined') {
-		console.error('MapLibre GL not loaded. Retrying...')
 		setTimeout(initMap, 500)
 		return
 	}
 
 	map = new maplibregl.Map({
 		container: 'map',
-		style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json', // More beautiful clean style
+		style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
 		center: [37.6173, 55.7558],
 		zoom: 13,
-		pitch: 45, // 3D perspective
+		pitch: 45,
 		antialias: true,
 	})
 
 	map.on('load', () => {
-		console.log('Map initialized')
-		// Add 3D buildings for Wow-effect
-		map.addLayer({
-			id: '3d-buildings',
-			source: 'composite',
-			'source-layer': 'building',
-			filter: ['==', 'extrude', 'true'],
-			type: 'fill-extrusion',
-			minzoom: 15,
-			paint: {
-				'fill-extrusion-color': '#aaa',
-				'fill-extrusion-height': ['get', 'height'],
-				'fill-extrusion-base': ['get', 'min_height'],
-				'fill-extrusion-opacity': 0.6,
-			},
-		})
+		console.log('Map loaded')
 	})
-
-	const crosshair = document.getElementById('map-center-marker')
-	map.on('movestart', () => crosshair.classList.add('active'))
-	map.on('moveend', () => crosshair.classList.remove('active'))
 }
 
 async function authUser() {
@@ -80,35 +63,92 @@ async function authUser() {
 		})
 		const data = await response.json()
 		currentUser = data.user
-		updateUI()
+		updateProfileUI()
 	} catch (e) {
 		console.error('Auth error:', e)
-		document.getElementById('username').textContent =
-			user.username || user.first_name
 	}
 }
 
-function updateUI() {
-	if (currentUser) {
-		document.getElementById('username').textContent = currentUser.username
-		document.getElementById('balance').textContent = `💰 ${currentUser.balance}`
-	}
+function updateProfileUI() {
+	if (!currentUser) return
+	document.getElementById('sidebar-username').textContent = currentUser.username
+	document.getElementById('sidebar-balance').textContent =
+		`$${currentUser.balance.toFixed(2)}`
 }
 
 function setupEventListeners() {
-	document.getElementById('add-btn').addEventListener('click', showAddForm)
+	// Profile
+	document.getElementById('profile-btn').addEventListener('click', openSidebar)
 	document
-		.getElementById('list-btn')
-		.addEventListener('click', showPollutionList)
-	document.getElementById('modal-overlay').addEventListener('click', e => {
-		if (e.target.id === 'modal-overlay') hideModal()
-	})
+		.getElementById('sidebar-close')
+		.addEventListener('click', closeSidebar)
+
+	// Geolocation
+	document.getElementById('geolocate-btn').addEventListener('click', geolocate)
+
+	// Add pollution
+	document.getElementById('add-btn').addEventListener('click', showAddForm)
+
+	// Overlay
+	document.getElementById('overlay').addEventListener('click', closeAll)
 }
 
-function getLevelColor(level) {
-	if (level === 1) return '#10b981'
-	if (level === 2) return '#f59e0b'
-	return '#ef4444'
+function openSidebar() {
+	document.getElementById('sidebar').classList.add('active')
+	document.getElementById('overlay').classList.add('active')
+	loadProfileStats()
+}
+
+function closeSidebar() {
+	document.getElementById('sidebar').classList.remove('active')
+	document.getElementById('overlay').classList.remove('active')
+}
+
+function openBottomSheet() {
+	document.getElementById('bottom-sheet').classList.add('active')
+	document.getElementById('overlay').classList.add('active')
+}
+
+function closeBottomSheet() {
+	document.getElementById('bottom-sheet').classList.remove('active')
+	document.getElementById('overlay').classList.remove('active')
+}
+
+function closeAll() {
+	closeSidebar()
+	closeBottomSheet()
+}
+
+async function loadProfileStats() {
+	if (!currentUser) return
+	try {
+		const response = await fetch(`${API_URL}/profile/${currentUser.id}`)
+		const data = await response.json()
+		document.getElementById('sidebar-cleaned').textContent = data.cleaned_count
+	} catch (e) {
+		console.error(e)
+	}
+}
+
+function geolocate() {
+	if (!navigator.geolocation) {
+		tg.showAlert('Геолокация недоступна')
+		return
+	}
+
+	navigator.geolocation.getCurrentPosition(
+		position => {
+			map.flyTo({
+				center: [position.coords.longitude, position.coords.latitude],
+				zoom: 16,
+				duration: 2000,
+			})
+			tg.HapticFeedback.impactOccurred('light')
+		},
+		error => {
+			tg.showAlert('Не удалось определить местоположение')
+		},
+	)
 }
 
 async function loadPollutions() {
@@ -121,19 +161,9 @@ async function loadPollutions() {
 
 		pollutions.forEach(p => {
 			const el = document.createElement('div')
-			el.className = 'pollution-marker'
-			el.innerHTML = `
-                <div style="
-                    width: 24px; 
-                    height: 24px; 
-                    background: ${getLevelColor(p.level)}; 
-                    border: 3px solid white; 
-                    border-radius: 50%;
-                    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-                "></div>
-            `
+			el.className = `pollution-marker level-${p.level}`
 
-			const marker = new maplibregl.Marker(el)
+			const marker = new maplibregl.Marker({ element: el })
 				.setLngLat([p.lng, p.lat])
 				.addTo(map)
 
@@ -141,42 +171,114 @@ async function loadPollutions() {
 			markers.push(marker)
 		})
 	} catch (e) {
-		console.error('Markers error:', e)
+		console.error('Load pollutions error:', e)
 	}
 }
 
 function showAddForm() {
 	const center = map.getCenter()
-	const body = document.getElementById('modal-body')
-	body.innerHTML = `
-        <h2 class="modal-title">Новое загрязнение</h2>
+	uploadedPhotos = []
+
+	const content = document.getElementById('sheet-content')
+	content.innerHTML = `
+        <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 24px;">Новое загрязнение</h2>
+        
         <div class="form-group">
-            <label>ОПАСНОСТЬ</label>
-            <div class="level-picker">
-                <button class="lvl-btn active" data-lvl="1" onclick="window.setLevel(1)">Низкая</button>
-                <button class="lvl-btn" data-lvl="2" onclick="window.setLevel(2)">Средняя</button>
-                <button class="lvl-btn" data-lvl="3" onclick="window.setLevel(3)">Высокая</button>
+            <label class="form-label">УРОВЕНЬ ОПАСНОСТИ</label>
+            <div class="level-selector">
+                <button class="level-btn active level-1" data-level="1">Низкий</button>
+                <button class="level-btn level-2" data-level="2">Средний</button>
+                <button class="level-btn level-3" data-level="3">Высокий</button>
             </div>
         </div>
+        
         <div class="form-group">
-            <label>ЧТО ТАМ?</label>
-            <textarea id="pollution-desc" rows="3" placeholder="Опишите масштаб проблемы..."></textarea>
+            <label class="form-label">ОПИСАНИЕ</label>
+            <textarea class="form-textarea" id="pollution-desc" rows="3" placeholder="Опишите проблему..."></textarea>
         </div>
-        <button class="btn btn-primary" onclick="window.submitPollution(${center.lat}, ${center.lng})">🚀 Отправить патруль</button>
+        
+        <div class="form-group">
+            <label class="form-label">ФОТО</label>
+            <div class="file-upload" id="upload-trigger">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" style="margin: 0 auto 12px;">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                <p style="color: #6b7280;">Нажмите для загрузки фото</p>
+            </div>
+            <div id="photo-preview" class="photo-grid"></div>
+        </div>
+        
+        <button class="btn btn-primary" style="width: 100%;" id="submit-pollution">
+            Отправить
+        </button>
     `
-	showModal()
-}
 
-window.setLevel = level => {
-	selectedLevel = level
-	document.querySelectorAll('.lvl-btn').forEach(btn => {
-		btn.classList.toggle('active', parseInt(btn.dataset.lvl) === level)
+	openBottomSheet()
+
+	// Level selector
+	content.querySelectorAll('.level-btn').forEach(btn => {
+		btn.addEventListener('click', () => {
+			content
+				.querySelectorAll('.level-btn')
+				.forEach(b => b.classList.remove('active'))
+			btn.classList.add('active')
+			selectedLevel = parseInt(btn.dataset.level)
+		})
+	})
+
+	// Photo upload
+	document
+		.getElementById('upload-trigger')
+		.addEventListener('click', () => uploadPhoto('before'))
+
+	// Submit
+	document.getElementById('submit-pollution').addEventListener('click', () => {
+		submitPollution(center.lat, center.lng)
 	})
 }
 
-window.submitPollution = async (lat, lng) => {
+function uploadPhoto(type) {
+	const widget = cloudinary.createUploadWidget(
+		{
+			cloudName: CLOUDINARY_CLOUD_NAME,
+			uploadPreset: CLOUDINARY_UPLOAD_PRESET,
+			sources: ['camera', 'local'],
+			multiple: true,
+			maxFiles: 5,
+			clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp'],
+			maxFileSize: 5000000,
+		},
+		(error, result) => {
+			if (!error && result && result.event === 'success') {
+				uploadedPhotos.push(result.info.secure_url)
+				updatePhotoPreview()
+				tg.HapticFeedback.notificationOccurred('success')
+			}
+		},
+	)
+
+	widget.open()
+}
+
+function updatePhotoPreview() {
+	const preview = document.getElementById('photo-preview')
+	if (!preview) return
+
+	preview.innerHTML = uploadedPhotos
+		.map(
+			url => `
+        <div class="photo-item">
+            <img src="${url}" alt="Photo">
+        </div>
+    `,
+		)
+		.join('')
+}
+
+async function submitPollution(lat, lng) {
 	const desc = document.getElementById('pollution-desc').value
-	tg.MainButton.showProgress()
 
 	try {
 		const response = await fetch(`${API_URL}/pollutions`, {
@@ -187,97 +289,191 @@ window.submitPollution = async (lat, lng) => {
 				lat,
 				lng,
 				level: selectedLevel,
-				types: ['trash'], // Simplified for MVP
+				types: ['trash'],
 				description: desc,
-				photos: [],
+				photos: uploadedPhotos,
 			}),
 		})
+
 		if (response.ok) {
-			hideModal()
+			closeBottomSheet()
 			loadPollutions()
 			tg.HapticFeedback.notificationOccurred('success')
+			tg.showAlert('Загрязнение отмечено!')
 		}
 	} catch (e) {
-		tg.showAlert('Ошибка сети')
-	}
-	tg.MainButton.hideProgress()
-}
-
-async function showPollutionList() {
-	const body = document.getElementById('modal-body')
-	body.innerHTML =
-		'<h2 class="modal-title">Биржа заданий</h2><div id="list-items">🔍 Ищем мусор...</div>'
-	showModal()
-
-	try {
-		const response = await fetch(`${API_URL}/pollutions`)
-		const pollutions = await response.json()
-		const listItems = document.getElementById('list-items')
-		listItems.innerHTML = ''
-
-		pollutions.forEach(p => {
-			const item = document.createElement('div')
-			item.className = 'list-item'
-			item.innerHTML = `
-                <div class="list-item-header">
-                    <div>
-                        <span class="badge" style="background: ${getLevelColor(p.level)}1A; color: ${getLevelColor(p.level)}">
-                            Уровень ${p.level}
-                        </span>
-                        <p style="margin: 8px 0; font-size: 0.9rem;">${p.description || 'Без описания'}</p>
-                    </div>
-                    <button class="btn btn-secondary" style="padding: 10px; flex: 0;" onclick="window.goToPollution(${p.lat}, ${p.lng})">📍</button>
-                </div>
-            `
-			listItems.appendChild(item)
-		})
-	} catch (e) {
-		console.error(e)
+		tg.showAlert('Ошибка при отправке')
 	}
 }
 
-window.goToPollution = (lat, lng) => {
-	map.flyTo({ center: [lng, lat], zoom: 17, duration: 2000 })
-	hideModal()
-}
+function showPollutionDetails(pollution) {
+	currentPollution = pollution
+	const content = document.getElementById('sheet-content')
 
-function showPollutionDetails(p) {
-	const body = document.getElementById('modal-body')
-	body.innerHTML = `
-        <h2 class="modal-title">Детали объекта</h2>
-        <div class="list-item" style="border: none; background: #f1f5f9;">
-             <p><strong>Опасность:</strong> ${p.level}/3</p>
-             <p>${p.description || 'Описание отсутствует'}</p>
+	const levelColors = {
+		1: '#059669',
+		2: '#fbbf24',
+		3: '#dc2626',
+	}
+
+	const levelNames = {
+		1: 'Низкий',
+		2: 'Средний',
+		3: 'Высокий',
+	}
+
+	const reward = pollution.level // $1, $2, $3
+
+	content.innerHTML = `
+        <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 16px;">Детали загрязнения</h2>
+        
+        <div style="background: ${levelColors[pollution.level]}20; padding: 12px 16px; border-radius: 12px; margin-bottom: 20px;">
+            <span style="color: ${levelColors[pollution.level]}; font-weight: 600;">
+                ${levelNames[pollution.level]} уровень опасности
+            </span>
         </div>
-        <button class="btn btn-primary" onclick="window.cleanPollution(${p.id})">🌿 Я убрал этот мусор!</button>
+        
+        ${pollution.description ? `<p style="margin-bottom: 20px; color: #6b7280;">${pollution.description}</p>` : ''}
+        
+        ${
+					pollution.photos && pollution.photos.length > 0 ?
+						`
+            <div class="photo-grid" style="margin-bottom: 20px;">
+                ${pollution.photos
+									.map(
+										url => `
+                    <div class="photo-item">
+                        <img src="${url}" alt="Photo">
+                    </div>
+                `,
+									)
+									.join('')}
+            </div>
+        `
+					:	''
+				}
+        
+        <div style="background: #f9fafb; padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+            <p style="font-size: 14px; color: #6b7280; margin-bottom: 8px;">Вознаграждение за очистку</p>
+            <p style="font-size: 32px; font-weight: 700; color: #064e3b;">$${reward}</p>
+        </div>
+        
+        <button class="btn btn-primary" style="width: 100%;" id="clean-btn">
+            🌿 Я убрал этот мусор!
+        </button>
     `
-	showModal()
+
+	openBottomSheet()
+
+	document.getElementById('clean-btn').addEventListener('click', showCleanForm)
 }
 
-window.cleanPollution = async id => {
+function showCleanForm() {
+	uploadedPhotos = []
+	const content = document.getElementById('sheet-content')
+
+	content.innerHTML = `
+        <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 24px;">Подтверждение очистки</h2>
+        
+        <div class="form-group">
+            <label class="form-label">ФОТО ПОСЛЕ ОЧИСТКИ</label>
+            <div class="file-upload" id="upload-after-trigger">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" style="margin: 0 auto 12px;">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                <p style="color: #6b7280;">Загрузите фото чистого места</p>
+            </div>
+            <div id="photo-preview-after" class="photo-grid"></div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">КОММЕНТАРИЙ (необязательно)</label>
+            <textarea class="form-textarea" id="clean-comment" rows="2" placeholder="Добавьте комментарий..."></textarea>
+        </div>
+        
+        <button class="btn btn-primary" style="width: 100%;" id="submit-clean">
+            Подтвердить очистку
+        </button>
+    `
+
+	document
+		.getElementById('upload-after-trigger')
+		.addEventListener('click', () => uploadPhotoAfter())
+	document.getElementById('submit-clean').addEventListener('click', submitClean)
+}
+
+function uploadPhotoAfter() {
+	const widget = cloudinary.createUploadWidget(
+		{
+			cloudName: CLOUDINARY_CLOUD_NAME,
+			uploadPreset: CLOUDINARY_UPLOAD_PRESET,
+			sources: ['camera', 'local'],
+			multiple: true,
+			maxFiles: 5,
+		},
+		(error, result) => {
+			if (!error && result && result.event === 'success') {
+				uploadedPhotos.push(result.info.secure_url)
+				updatePhotoPreviewAfter()
+			}
+		},
+	)
+
+	widget.open()
+}
+
+function updatePhotoPreviewAfter() {
+	const preview = document.getElementById('photo-preview-after')
+	if (!preview) return
+
+	preview.innerHTML = uploadedPhotos
+		.map(
+			url => `
+        <div class="photo-item">
+            <img src="${url}" alt="Photo">
+        </div>
+    `,
+		)
+		.join('')
+}
+
+async function submitClean() {
+	if (uploadedPhotos.length === 0) {
+		tg.showAlert('Пожалуйста, загрузите хотя бы одно фото')
+		return
+	}
+
+	const comment = document.getElementById('clean-comment')?.value || ''
+
 	try {
-		const response = await fetch(`${API_URL}/pollutions/${id}/clean`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ photos: [] }),
-		})
+		const response = await fetch(
+			`${API_URL}/pollutions/${currentPollution.id}/clean`,
+			{
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					user_id: currentUser.id,
+					photos: uploadedPhotos,
+					comment: comment,
+				}),
+			},
+		)
+
 		const data = await response.json()
+
 		if (response.ok) {
 			currentUser.balance = data.new_balance
-			updateUI()
-			hideModal()
+			updateProfileUI()
+			closeBottomSheet()
 			loadPollutions()
-			tg.HapticFeedback.impactOccurred('heavy')
+
+			// Show reward animation
+			tg.HapticFeedback.notificationOccurred('success')
+			tg.showAlert(`Поздравляем! Вам начислено $${currentPollution.level}`)
 		}
 	} catch (e) {
-		tg.showAlert('Ошибка сервера')
+		tg.showAlert('Ошибка при подтверждении')
 	}
-}
-
-function showModal() {
-	document.getElementById('modal-overlay').classList.add('active')
-}
-
-function hideModal() {
-	document.getElementById('modal-overlay').classList.remove('active')
 }
