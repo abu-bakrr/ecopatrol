@@ -24,6 +24,7 @@ window.closePhotoViewer = function () {
 
 let map
 let markers = []
+let pollutionsVisible = true // Track state
 let currentUser = null
 let selectedLevel = 1
 let uploadedPhotos = []
@@ -473,6 +474,9 @@ function setupEventListeners() {
 		.addEventListener('click', closeSidebar)
 	document.getElementById('theme-toggle').addEventListener('click', toggleTheme)
 	document.getElementById('geolocate-btn').addEventListener('click', geolocate)
+	document
+		.getElementById('toggle-pollutions-btn')
+		.addEventListener('click', togglePollutions)
 	document.getElementById('add-btn').addEventListener('click', showAddForm)
 	document.getElementById('overlay').addEventListener('click', closeAll)
 }
@@ -498,6 +502,38 @@ function openBottomSheet() {
 function closeBottomSheet() {
 	document.getElementById('bottom-sheet').classList.remove('active')
 	document.getElementById('overlay').classList.remove('active')
+}
+
+function togglePollutions() {
+	pollutionsVisible = !pollutionsVisible
+	const btn = document.getElementById('toggle-pollutions-btn')
+	const icon = document.getElementById('toggle-icon')
+
+	markers.forEach(marker => {
+		const el = marker.getElement()
+		if (pollutionsVisible) {
+			el.style.display = 'block'
+		} else {
+			el.style.display = 'none'
+		}
+	})
+
+	if (pollutionsVisible) {
+		btn.classList.remove('hidden-state')
+		icon.innerHTML = `
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
+        `
+	} else {
+		btn.classList.add('hidden-state')
+		// Crossed eye icon
+		icon.innerHTML = `
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+            <line x1="1" y1="1" x2="23" y2="23" />
+        `
+	}
+
+	tg.HapticFeedback.impactOccurred('light')
 }
 
 function closeAll() {
