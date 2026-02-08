@@ -700,7 +700,7 @@ async function handlePhotoUpload(event) {
 	const files = Array.from(event.target.files)
 	if (files.length === 0) return
 
-	tg.showAlert(`Загрузка ${files.length} фото...`)
+	// tg.showAlert(`Загрузка ${files.length} фото...`) // Removed as requested
 
 	for (const file of files) {
 		try {
@@ -714,24 +714,16 @@ async function handlePhotoUpload(event) {
 			)
 
 			const data = await response.json()
-			console.log('Cloudinary response:', data)
 
-			if (data.error) {
-				alert('Cloudinary Error: ' + JSON.stringify(data.error))
-				throw new Error(data.error.message)
-			}
-
-			if (!data.secure_url) {
-				alert('No secure_url in response: ' + JSON.stringify(data))
-				throw new Error('No secure_url')
-			}
+			if (data.error) throw new Error(data.error.message)
+			if (!data.secure_url) throw new Error('No url')
 
 			uploadedPhotos.push(data.secure_url)
 			updatePhotoPreview()
 			tg.HapticFeedback.notificationOccurred('success')
 		} catch (e) {
 			console.error('Upload error:', e)
-			tg.showAlert('Ошибка: ' + e.message)
+			tg.showAlert('Ошибка: ' + (e.message || 'Загрузка не удалась'))
 		}
 	}
 }
@@ -985,7 +977,7 @@ async function submitClean() {
 }
 
 // Viewer Functions
-function openPhotoViewer(url) {
+window.openPhotoViewer = function (url) {
 	const viewer = document.getElementById('photo-viewer')
 	const img = document.getElementById('viewer-img')
 	if (!viewer || !img) return
@@ -995,7 +987,7 @@ function openPhotoViewer(url) {
 	tg.HapticFeedback.impactOccurred('medium')
 }
 
-function closePhotoViewer() {
+window.closePhotoViewer = function () {
 	const viewer = document.getElementById('photo-viewer')
 	if (viewer) viewer.classList.remove('active')
 }
