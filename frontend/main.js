@@ -78,13 +78,20 @@ async function handleRegistration() {
 	const age = parseInt(document.getElementById('age').value)
 	const phone = document.getElementById('phone').value.trim()
 
+	// Validation
 	if (!firstName || !lastName || !age || !phone) {
 		tg.showAlert('Пожалуйста, заполните все поля')
 		return
 	}
 
 	if (age < 13 || age > 120) {
-		tg.showAlert('Пожалуйста, введите корректный возраст')
+		tg.showAlert('Пожалуйста, введите корректный возраст (13-120)')
+		return
+	}
+
+	// Validate phone starts with +998
+	if (!phone.startsWith('+998')) {
+		tg.showAlert('Номер телефона должен начинаться с +998')
 		return
 	}
 
@@ -94,11 +101,16 @@ async function handleRegistration() {
 		return
 	}
 
+	tg.HapticFeedback.impactOccurred('medium')
+
 	navigator.geolocation.getCurrentPosition(
 		async position => {
 			// Geolocation granted, proceed with registration
 			const initData = tg.initDataUnsafe
-			const user = initData.user || { id: Date.now(), username: 'user' }
+			const user = initData.user || {
+				id: Date.now(),
+				username: `${firstName}_${lastName}`.toLowerCase(),
+			}
 
 			try {
 				const response = await fetch(`${API_URL}/init`, {
@@ -115,6 +127,10 @@ async function handleRegistration() {
 					}),
 				})
 
+				if (!response.ok) {
+					throw new Error('Registration failed')
+				}
+
 				const data = await response.json()
 				currentUser = data.user
 
@@ -128,19 +144,25 @@ async function handleRegistration() {
 				updateProfileUI()
 
 				// Center map on user location
-				map.flyTo({
-					center: [position.coords.longitude, position.coords.latitude],
-					zoom: 15,
-					duration: 2000,
-				})
+				setTimeout(() => {
+					if (map) {
+						map.flyTo({
+							center: [position.coords.longitude, position.coords.latitude],
+							zoom: 15,
+							duration: 2000,
+						})
+					}
+				}, 500)
 
 				tg.HapticFeedback.notificationOccurred('success')
+				tg.showAlert('Регистрация успешна!')
 			} catch (e) {
 				console.error('Registration error:', e)
 				tg.showAlert('Ошибка регистрации. Попробуйте снова.')
 			}
 		},
 		error => {
+			console.error('Geolocation error:', error)
 			tg.showAlert(
 				'Для использования приложения необходимо разрешить доступ к геолокации',
 			)
