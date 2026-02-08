@@ -25,6 +25,7 @@ window.closePhotoViewer = function () {
 let map
 let markers = []
 let pollutionsVisible = true // Track state
+let lastGeolocateTime = 0 // Debounce geolocate
 let currentUser = null
 let selectedLevel = 1
 let uploadedPhotos = []
@@ -553,6 +554,10 @@ async function loadProfileStats() {
 }
 
 function geolocate() {
+	const now = Date.now()
+	if (now - lastGeolocateTime < 3000) return // Throttling: 3 seconds
+	lastGeolocateTime = now
+
 	// Optimistic UI: check cache first
 	const cached = localStorage.getItem('last_known_loc')
 	if (cached) {
