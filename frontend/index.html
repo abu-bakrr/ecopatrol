@@ -40,7 +40,7 @@
 				<h1 class="onboarding-title">Экопатруль</h1>
 				<p class="onboarding-subtitle">Создайте аккаунт для продолжения</p>
 
-				<div id="onboarding-form">
+				<form id="onboarding-form" style="width: 100%">
 					<div class="form-group">
 						<label class="form-label">Имя</label>
 						<input
@@ -48,6 +48,7 @@
 							class="form-input"
 							id="first-name"
 							placeholder="Введите имя"
+							autocomplete="given-name"
 							required
 						/>
 					</div>
@@ -59,6 +60,7 @@
 							class="form-input"
 							id="last-name"
 							placeholder="Введите фамилию"
+							autocomplete="family-name"
 							required
 						/>
 					</div>
@@ -72,6 +74,7 @@
 							placeholder="Введите возраст"
 							min="13"
 							max="120"
+							inputmode="numeric"
 							required
 						/>
 					</div>
@@ -83,18 +86,21 @@
 							class="form-input"
 							id="phone"
 							placeholder="+998 (__) ___-__-__"
+							autocomplete="tel"
+							inputmode="tel"
 							required
 						/>
 					</div>
 
 					<button
+						type="submit"
 						class="btn btn-primary"
-						style="width: 100%; margin-top: 16px"
+						style="width: 100%; margin-top: 16px; margin-bottom: 24px"
 						id="onboarding-submit"
 					>
 						Продолжить
 					</button>
-				</div>
+				</form>
 			</div>
 		</div>
 

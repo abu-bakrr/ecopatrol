@@ -63,9 +63,11 @@ function checkRegistration() {
 
 function showOnboarding() {
 	document.getElementById('onboarding').classList.remove('hidden')
-	document
-		.getElementById('onboarding-submit')
-		.addEventListener('click', handleRegistration)
+	const form = document.getElementById('onboarding-form')
+	form.addEventListener('submit', e => {
+		e.preventDefault()
+		handleRegistration()
+	})
 }
 
 function hideOnboarding() {
@@ -77,6 +79,8 @@ async function handleRegistration() {
 	const lastName = document.getElementById('last-name').value.trim()
 	const age = parseInt(document.getElementById('age').value)
 	const phone = document.getElementById('phone').value.trim()
+
+	console.log('Registration attempt:', { firstName, lastName, age, phone })
 
 	// Validation
 	if (!firstName || !lastName || !age || !phone) {
@@ -105,6 +109,8 @@ async function handleRegistration() {
 
 	navigator.geolocation.getCurrentPosition(
 		async position => {
+			console.log('Geolocation granted:', position.coords)
+
 			// Geolocation granted, proceed with registration
 			const initData = tg.initDataUnsafe
 			const user = initData.user || {
@@ -112,26 +118,38 @@ async function handleRegistration() {
 				username: `${firstName}_${lastName}`.toLowerCase(),
 			}
 
+			console.log('Telegram user:', user)
+
 			try {
+				const requestBody = {
+					telegram_id: user.id,
+					username: user.username || `${firstName} ${lastName}`,
+					first_name: firstName,
+					last_name: lastName,
+					age: age,
+					phone: phone,
+					initData: tg.initData || '',
+				}
+
+				console.log('Sending registration request:', requestBody)
+
 				const response = await fetch(`${API_URL}/init`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						telegram_id: user.id,
-						username: user.username || `${firstName} ${lastName}`,
-						first_name: firstName,
-						last_name: lastName,
-						age: age,
-						phone: phone,
-						initData: tg.initData,
-					}),
+					body: JSON.stringify(requestBody),
 				})
 
+				console.log('Response status:', response.status)
+
 				if (!response.ok) {
-					throw new Error('Registration failed')
+					const errorText = await response.text()
+					console.error('Registration failed:', errorText)
+					throw new Error(`Registration failed: ${response.status}`)
 				}
 
 				const data = await response.json()
+				console.log('Registration successful:', data)
+
 				currentUser = data.user
 
 				localStorage.setItem('registered', 'true')
@@ -158,7 +176,7 @@ async function handleRegistration() {
 				tg.showAlert('Регистрация успешна!')
 			} catch (e) {
 				console.error('Registration error:', e)
-				tg.showAlert('Ошибка регистрации. Попробуйте снова.')
+				tg.showAlert(`Ошибка регистрации: ${e.message}`)
 			}
 		},
 		error => {
