@@ -20,24 +20,30 @@ sudo apt install -y python3-pip python3-venv git curl postgresql postgresql-cont
 
 # 3. Настройка PostgreSQL
 echo "🔹 Настройка базы данных PostgreSQL..."
-# Убедимся, что сервис запущен и включен
-sudo systemctl enable postgresql
-sudo systemctl start postgresql || true
+# Принудительно останавливаем и пытаемся починить
+sudo systemctl stop postgresql || true
 
-# Проверка, запущен ли кластер (для Ubuntu/Debian)
-if ! pg_lsclusters | grep -q "online"; then
-    echo "⚠️ PostgreSQL кластер не запущен. Пытаюсь создать или запустить принудительно..."
-    sudo pg_createcluster 14 main --start || sudo systemctl restart postgresql
+# Если кластер существует, но не работает, попробуем его перезапустить или пересоздать
+if pg_lsclusters | grep -q "main"; then
+    echo "🔹 Кластер существует. Пытаюсь запустить..."
+    sudo pg_ctlcluster 14 main start || echo "⚠️ Не удалось запустить. Пробую пересоздать..."
 fi
 
-# Подождем пару секунд для инициализации сокета
-sleep 3
+# Если все еще не работает - радикальное решение (пересоздаем кластер)
+if ! pg_lsclusters | grep -q "online"; then
+    echo "⚠️ PostgreSQL все еще не в сети. Пересоздаю кластер..."
+    sudo pg_dropcluster 14 main --stop || true
+    sudo pg_createcluster 14 main --start
+fi
+
+# Подождем для инициализации сокета
+sleep 5
 
 DB_NAME="ecopatrol"
 DB_USER="eco_user"
 DB_PASS=$(openssl rand -base64 12)
 
-# Выполняем из /tmp, чтобы у пользователя postgres был доступ (в /root доступа нет)
+# Выполняем из /tmp, чтобы у пользователя postgres был доступ
 cd /tmp
 sudo -u postgres psql -c "CREATE DATABASE $DB_NAME;" || true
 sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASS';" || true
