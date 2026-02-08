@@ -464,9 +464,9 @@ html {
 }
 
 .user-id {
-	font-size: 12px;
+	font-size: 13px;
 	color: var(--text-secondary);
-	opacity: 0.8;
+	font-weight: 500;
 }
 
 .sidebar-close {
@@ -1078,4 +1078,72 @@ html {
 	border-radius: 5px;
 	font-size: 10px;
 	opacity: 0.7;
+}
+/* Reports List Styles */
+.reports-list {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	padding-bottom: 24px;
+}
+
+.report-card {
+	background: var(--bg-secondary);
+	border-radius: 16px;
+	padding: 12px;
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	border: 1px solid var(--border);
+}
+
+.report-thumb {
+	width: 60px;
+	height: 60px;
+	border-radius: 12px;
+	background-size: cover;
+	background-position: center;
+	background-color: var(--border);
+	flex-shrink: 0;
+}
+
+.report-info {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.report-date {
+	font-size: 12px;
+	color: var(--text-secondary);
+}
+
+.report-desc {
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--text-primary);
+	display: -webkit-box;
+	-webkit-line-clamp: 1;
+	line-clamp: 1;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.status-badge {
+	font-size: 11px;
+	font-weight: 600;
+	padding: 4px 8px;
+	border-radius: 8px;
+	text-transform: uppercase;
+}
+
+.status-badge.active {
+	background: rgba(251, 191, 36, 0.1);
+	color: #d97706;
+}
+
+.status-badge.cleaned {
+	background: rgba(16, 185, 129, 0.1);
+	color: #059669;
 }

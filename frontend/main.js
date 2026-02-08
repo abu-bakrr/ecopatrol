@@ -519,14 +519,14 @@ function setupEventListeners() {
 
 	// Menu Item Listeners
 	document.getElementById('menu-reports').addEventListener('click', () => {
-		tg.showAlert('Раздел "Мои отчеты" в разработке')
+		showMyReports()
 	})
 	document.getElementById('menu-history').addEventListener('click', () => {
 		tg.showAlert('Раздел "История начислений" в разработке')
 	})
 	document.getElementById('menu-info').addEventListener('click', () => {
 		tg.showAlert(
-			'Приложение EcoPatrol v27.0\nРазработано для чистого будущего.',
+			'Приложение EcoPatrol v28.0\nРазработано для чистого будущего.',
 		)
 	})
 
@@ -595,6 +595,76 @@ function togglePollutions() {
 function closeAll() {
 	closeSidebar()
 	closeBottomSheet()
+}
+
+async function showMyReports() {
+	if (!currentUser) return
+	closeSidebar()
+	const content = document.getElementById('sheet-content')
+	content.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+            <h2 style="font-size: 20px; font-weight: 600;">Мои отчеты</h2>
+            <div id="reports-loader" class="loader-small" style="display: none;"></div>
+        </div>
+        <div id="reports-list" class="reports-list">
+            <div style="padding: 20px; text-align: center; opacity: 0.5;">Загрузка...</div>
+        </div>
+        <div style="height: 20px;"></div>
+    `
+	openBottomSheet()
+
+	try {
+		const response = await fetch(`${API_URL}/pollutions/user/${currentUser.id}`)
+		if (!response.ok) throw new Error('Fetch failed')
+		const reports = await response.json()
+
+		const list = document.getElementById('reports-list')
+		if (reports.length === 0) {
+			list.innerHTML = `
+                <div style="padding: 40px 20px; text-align: center;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">📄</div>
+                    <div style="font-size: 16px; font-weight: 500; color: var(--text-primary);">У вас пока нет отчетов</div>
+                    <div style="font-size: 14px; color: var(--text-secondary); margin-top: 4px;">Отметьте первое загрязнение на карте!</div>
+                </div>
+            `
+			return
+		}
+
+		list.innerHTML = reports
+			.map(r => {
+				const date = new Date(r.created_at).toLocaleDateString('ru-RU', {
+					day: 'numeric',
+					month: 'short',
+				})
+				const photo = r.photos[0] || ''
+				const statusText = r.status === 'active' ? 'Активно' : 'Очищено'
+				return `
+                <div class="report-card" onclick="window.flyToReport(${r.lng}, ${r.lat})">
+                    <div class="report-thumb" style="background-image: url('${photo}')"></div>
+                    <div class="report-info">
+                        <div class="report-date">${date}</div>
+                        <div class="report-desc">${r.description || 'Без описания'}</div>
+                    </div>
+                    <div class="status-badge ${r.status}">${statusText}</div>
+                </div>
+            `
+			})
+			.join('')
+	} catch (e) {
+		console.error(e)
+		document.getElementById('reports-list').innerHTML = `
+            <div style="padding: 20px; text-align: center; color: #ef4444;">
+                Ошибка при загрузке данных
+            </div>
+        `
+	}
+}
+
+// Global helper for flying to report
+window.flyToReport = (lng, lat) => {
+	closeBottomSheet()
+	map.flyTo({ center: [lng, lat], zoom: 17, duration: 1500 })
+	tg.HapticFeedback.impactOccurred('medium')
 }
 
 async function loadProfileStats() {

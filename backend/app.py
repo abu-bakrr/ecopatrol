@@ -129,6 +129,24 @@ def clean_pollution(p_id):
         'new_balance': cleaner.balance if cleaner_id and cleaner else 0
     })
 
+@app.route('/api/pollutions/user/<int:user_id>', methods=['GET'])
+def get_user_pollutions(user_id):
+    pollutions = Pollution.query.filter_by(user_id=user_id).order_by(Pollution.created_at.desc()).all()
+    result = []
+    for p in pollutions:
+        result.append({
+            'id': p.id,
+            'lat': p.lat,
+            'lng': p.lng,
+            'level': p.level,
+            'types': p.types,
+            'description': p.description,
+            'status': p.status,
+            'created_at': p.created_at.isoformat(),
+            'photos': [ph.url for ph in p.photos if ph.type == 'before']
+        })
+    return jsonify(result)
+
 @app.route('/api/profile/<int:user_id>', methods=['GET'])
 def get_profile(user_id):
     user = User.query.get_or_404(user_id)
