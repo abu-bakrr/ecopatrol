@@ -168,8 +168,18 @@
 		</div>
 
 		<!-- Offline Overlay -->
-		<div class="location-blocked-overlay hidden" id="offline-overlay">
-			<div class="overlay-card">
+		<div id="offline-overlay" class="global-overlay hidden">
+			<div class="overlay-content" style="border-top: 4px solid #6b7280">
+				<div
+					class="overlay-glow"
+					style="
+						background: radial-gradient(
+							circle at center,
+							rgba(107, 114, 128, 0.15) 0%,
+							transparent 50%
+						);
+					"
+				></div>
 				<div
 					class="overlay-icon"
 					style="
