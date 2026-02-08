@@ -15,7 +15,14 @@ let isRegistered = false
 document.addEventListener('DOMContentLoaded', async () => {
 	tg.expand()
 	tg.ready()
-	tg.setHeaderColor('#059669')
+
+	// Enable fullscreen mode
+	tg.requestFullscreen()
+
+	// Set header color based on theme
+	const savedTheme = localStorage.getItem('theme') || 'light'
+	const headerColor = savedTheme === 'dark' ? '#111827' : '#ffffff'
+	tg.setHeaderColor(headerColor)
 
 	loadTheme()
 	checkRegistration()
@@ -36,6 +43,10 @@ function toggleTheme() {
 	localStorage.setItem('theme', newTheme)
 	document.getElementById('theme-toggle').classList.toggle('active')
 	tg.HapticFeedback.impactOccurred('light')
+
+	// Update header color based on theme
+	const headerColor = newTheme === 'dark' ? '#111827' : '#ffffff'
+	tg.setHeaderColor(headerColor)
 
 	// Update map style based on theme
 	if (map) {
