@@ -216,6 +216,17 @@
 		<!-- Overlay -->
 		<div class="overlay" id="overlay"></div>
 
+		<!-- Photo Viewer (Lightbox) -->
+		<div id="photo-viewer" class="photo-viewer">
+			<div class="close-viewer" onclick="window.closePhotoViewer()">×</div>
+			<img
+				src=""
+				id="viewer-img"
+				class="viewer-img"
+				onclick="event.stopPropagation()"
+			/>
+		</div>
+
 		<!-- Debug Console Structure -->
 		<button id="debug-toggle-btn">🐞 LOGS</button>
 		<div id="debug-console"></div>
@@ -284,6 +295,6 @@
 			console.log('Log system ready v10')
 		</script>
 
-		<script type="module" src="main.js?v=10"></script>
+		<script type="module" src="main.js?v=11"></script>
 	</body>
 </html>

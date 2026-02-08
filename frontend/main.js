@@ -4,11 +4,16 @@ const API_URL = window.location.origin + '/api'
 
 // Viewer Functions (Global)
 window.openPhotoViewer = function (url) {
+	console.log('--- EXECUTING openPhotoViewer ---', url)
 	const viewer = document.getElementById('photo-viewer')
 	const img = document.getElementById('viewer-img')
-	if (!viewer || !img) return
+	if (!viewer || !img) {
+		console.error('VIEWER ELEMENTS NOT FOUND', { viewer: !!viewer, img: !!img })
+		return
+	}
 	img.src = url
 	viewer.classList.add('active')
+	console.log('Viewer should be visible now (added .active)')
 	tg.HapticFeedback.impactOccurred('medium')
 }
 
