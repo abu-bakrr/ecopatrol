@@ -531,6 +531,37 @@
 			const urlParams = new URLSearchParams(window.location.search)
 			const adminTgId = urlParams.get('admin_tg_id')
 
+			const TYPE_LABELS = {
+				plastic: 'Пластик',
+				glass: 'Стекло',
+				paper: 'Бумага',
+				metal: 'Металл',
+				organic: 'Органика',
+				construction: 'Стройотходы',
+				electronic: 'Электроника',
+				tires: 'Шины',
+				hazardous: 'Опасные отходы',
+				bulky: 'Крупногабаритный мусор',
+				chemical: 'Химические отходы',
+				other: 'Прочее',
+			}
+
+			function getLocalizedTypes(types) {
+				if (!types) return '<i>Тип не указан</i>'
+				if (typeof types === 'string') {
+					// Handle comma separated string if that's what backend sends
+					return types
+						.split(',')
+						.map(t => t.trim())
+						.map(t => TYPE_LABELS[t] || t)
+						.join(', ')
+				}
+				if (Array.isArray(types)) {
+					return types.map(t => TYPE_LABELS[t] || t).join(', ')
+				}
+				return types
+			}
+
 			let currentTheme =
 				localStorage.getItem('admin-theme') || tg.colorScheme || 'light'
 			applyTheme(currentTheme)
@@ -681,8 +712,11 @@
 											:	''
 										}
 
-                    <div class="card-meta">Уровень ${p.level} • Reward: $${p.reward}</div>
-                    <div style="font-size:14px; margin-bottom:8px">${p.description || '<i>Нет описания</i>'}</div>
+                    <div class="card-meta">
+                        <div>Уровень ${p.level} • Reward: $${p.reward}</div>
+                        <div style="color:var(--primary); font-weight:700; margin-top:4px">${getLocalizedTypes(p.types)}</div>
+                    </div>
+                    <div style="font-size:14px; margin-bottom:8px">${p.description || '<i>Описание отсутствует</i>'}</div>
                     <div class="gallery">
                         ${(p.photos || []).map(url => `<img src="${url}" class="photo-thumb" onclick="openPhotoViewer('${url}')">`).join('')}
                     </div>

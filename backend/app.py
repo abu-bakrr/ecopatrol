@@ -325,6 +325,7 @@ def admin_get_pollutions():
             'cleaner_name': cleaner.first_name if cleaner else None,
             'cleaner_tg_id': cleaner.telegram_id if cleaner else None,
             'photos': [ph.url for ph in p.photos],
+            'types': p.types,
             'reward': p.reward
         })
     return jsonify(result)
