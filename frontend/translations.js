@@ -94,7 +94,7 @@ const translations = {
 		add_photo_click: 'Yuklash uchun bosing',
 		location_help_title: 'Sizga ruxsat kerak',
 		location_help_text:
-			'Ilovadan foydalanish uchun brauzer yoki Telegram sozlamalarida geolokatsiyaga ruxsat berishingiz shart. Ruxsat berganingizdan soʻng «Qaytadan urinish» tugmasini bosing.',
+			'Ilovadan foydalanish uchun brauzer yoki Telegram sozlamalarida geolokatsiyaga ruxsat berishingiz shart. Ruxsat berganingizdan soʻng Telegram-ni butunlay yopib (soʻnggi ilovalar roʻyxatidan oʻchirib) qaytadan kiring.',
 		location_retry_btn: 'Qaytadan urinish',
 	},
 	ru: {
@@ -192,7 +192,7 @@ const translations = {
 		add_photo_click: 'Нажмите для загрузки',
 		location_help_title: 'Требуется доступ',
 		location_help_text:
-			'Для работы приложения необходимо разрешить доступ к геолокации в настройках браузера или Telegram. После предоставления доступа нажмите «Повторить».',
+			'Для работы приложения необходимо разрешить доступ к геолокации в настройках браузера или Telegram. После предоставления доступа полностью перезапустите Telegram (удалите его из списка запущенных приложений) и зайдите снова.',
 		location_retry_btn: 'Повторить попытку',
 	},
 	en: {
@@ -290,7 +290,7 @@ const translations = {
 		add_photo_click: 'Click to upload',
 		location_help_title: 'Location Access Required',
 		location_help_text:
-			'To use the app, you must grant location access in your browser or Telegram settings. Once granted, click "Retry".',
+			'To use the app, you must grant location access in your browser or Telegram settings. After granting access, fully restart Telegram (remove it from recent apps) and try again.',
 		location_retry_btn: 'Try Again',
 	},
 }
