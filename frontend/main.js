@@ -576,8 +576,14 @@ function showAddForm() {
                 <button class="tag-btn" data-tag="plastic">Пластик</button>
                 <button class="tag-btn" data-tag="trash">Мусор</button>
                 <button class="tag-btn" data-tag="glass">Стекло</button>
+                <button class="tag-btn" data-tag="paper">Бумага</button>
+                <button class="tag-btn" data-tag="metal">Металл</button>
                 <button class="tag-btn" data-tag="food">Еда</button>
                 <button class="tag-btn" data-tag="construction">Стройка</button>
+                <button class="tag-btn" data-tag="electronics">Техника</button>
+                <button class="tag-btn" data-tag="chemicals">Химия</button>
+                <button class="tag-btn" data-tag="tires">Шины</button>
+                <button class="tag-btn" data-tag="bio">Биоотходы</button>
                 <button class="tag-btn" data-tag="fire">Огонь</button>
                 <button class="tag-btn" data-tag="other">Другое</button>
             </div>
@@ -868,11 +874,40 @@ function showPollutionDetails(pollution) {
 	content.innerHTML = `
         <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 16px;">Детали загрязнения</h2>
         
-        <div style="background: ${levelColors[pollution.level]}20; padding: 10px 14px; border-radius: 12px; margin-bottom: 16px;">
+        <div style="background: ${levelColors[pollution.level]}20; padding: 10px 14px; border-radius: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
             <span style="color: ${levelColors[pollution.level]}; font-weight: 600; font-size: 14px;">
                 ${levelNames[pollution.level]} уровень
             </span>
         </div>
+
+        ${
+					pollution.types && pollution.types.length > 0 ?
+						`
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px;">
+                ${pollution.types
+									.map(tag => {
+										const tagNames = {
+											plastic: 'Пластик',
+											trash: 'Мусор',
+											glass: 'Стекло',
+											paper: 'Бумага',
+											metal: 'Металл',
+											food: 'Еда',
+											construction: 'Стройка',
+											electronics: 'Техника',
+											chemicals: 'Химия',
+											tires: 'Шины',
+											bio: 'Биоотходы',
+											fire: 'Огонь',
+											other: 'Другое',
+										}
+										return `<span style="background: var(--bg-secondary); color: var(--text-secondary); padding: 4px 10px; border-radius: 20px; font-size: 12px; border: 1px solid var(--border);">${tagNames[tag] || tag}</span>`
+									})
+									.join('')}
+            </div>
+        `
+					:	''
+				}
         
         ${pollution.description ? `<p style="margin-bottom: 16px; color: var(--text-secondary); font-size: 15px;">${pollution.description}</p>` : ''}
         
