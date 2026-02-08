@@ -755,7 +755,7 @@ async function showExchange() {
                 <div class="empty-state">
                     <div class="empty-icon">🌟</div>
                     <div class="empty-title">Город чист!</div>
-                    <div class="empty-text">На данный момент нет активных заявок. Вы можете отметить новое загрязнение на карте.</div>
+                    <div class="empty-text">На данный момент нет активных заявок. Спасибо за ваш вклад в чистоту! Вы можете отметить новое загрязнение на карте.</div>
                 </div>
             `
 			return
@@ -835,7 +835,7 @@ async function showAboutInfo() {
             </div>
             
             <div style="text-align: center; margin-top: 24px; opacity: 0.4; font-size: 12px; font-weight: 500;">
-                EcoPatrol Institutional Edition v31.0<br>
+                EcoPatrol Institutional Edition v33.0<br>
                 Алмазарский район, г. Ташкент
             </div>
         </div>

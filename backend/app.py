@@ -75,6 +75,7 @@ def get_pollutions():
             'level': p.level,
             'types': p.types,
             'description': p.description,
+            'status': p.status,
             'photos': [ph.url for ph in p.photos if ph.type == 'before']
         })
     return jsonify(result)
