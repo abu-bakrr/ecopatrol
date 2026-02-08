@@ -393,6 +393,18 @@ async function loadProfileStats() {
 }
 
 function geolocate() {
+	// Optimistic UI: check cache first
+	const cached = localStorage.getItem('last_known_loc')
+	if (cached) {
+		const coords = JSON.parse(cached)
+		map.flyTo({
+			center: coords,
+			zoom: 16,
+			duration: 1500, // Faster animation
+		})
+		tg.HapticFeedback.impactOccurred('medium')
+	}
+
 	if (!navigator.geolocation) {
 		tg.showAlert('Геолокация недоступна')
 		return
@@ -400,16 +412,25 @@ function geolocate() {
 
 	navigator.geolocation.getCurrentPosition(
 		position => {
+			const coords = [position.coords.longitude, position.coords.latitude]
+			localStorage.setItem('last_known_loc', JSON.stringify(coords))
+
+			// Only fly if we didn't just fly to the exact same spot (optional, but good)
+			// Or just fly again to be precise
 			map.flyTo({
-				center: [position.coords.longitude, position.coords.latitude],
+				center: coords,
 				zoom: 16,
-				duration: 2000,
+				duration: 1500,
 			})
 			tg.HapticFeedback.impactOccurred('medium')
 		},
 		error => {
-			tg.showAlert('Не удалось определить местоположение')
+			// Only show error if we didn't show cached location
+			if (!cached) {
+				tg.showAlert('Не удалось определить местоположение')
+			}
 		},
+		{ enableHighAccuracy: true, timeout: 5000, maximumAge: 0 },
 	)
 }
 
