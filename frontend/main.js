@@ -1,6 +1,6 @@
-// EcoPatrol Main JS
+// EcoPatrol Premium JS
 const tg = window.Telegram.WebApp
-const API_URL = 'http://localhost:5000/api' // Change to VPS IP in production
+const API_URL = window.location.origin + '/api'
 
 let map
 let markers = []
@@ -11,6 +11,7 @@ let selectedLevel = 1
 document.addEventListener('DOMContentLoaded', async () => {
 	tg.expand()
 	tg.ready()
+	tg.headerColor = '#10b981'
 
 	initMap()
 	await authUser()
@@ -19,24 +20,52 @@ document.addEventListener('DOMContentLoaded', async () => {
 })
 
 function initMap() {
+	// Ждем, пока библиотека загрузится
+	if (typeof maplibregl === 'undefined') {
+		console.error('MapLibre GL not loaded. Retrying...')
+		setTimeout(initMap, 500)
+		return
+	}
+
 	map = new maplibregl.Map({
 		container: 'map',
-		style: 'https://demotiles.maplibre.org/style.json', // Basic style without API key
-		center: [37.6173, 55.7558], // Moscow coordinates
-		zoom: 12,
+		style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json', // More beautiful clean style
+		center: [37.6173, 55.7558],
+		zoom: 13,
+		pitch: 45, // 3D perspective
+		antialias: true,
 	})
 
 	map.on('load', () => {
-		console.log('Map loaded')
+		console.log('Map initialized')
+		// Add 3D buildings for Wow-effect
+		map.addLayer({
+			id: '3d-buildings',
+			source: 'composite',
+			'source-layer': 'building',
+			filter: ['==', 'extrude', 'true'],
+			type: 'fill-extrusion',
+			minzoom: 15,
+			paint: {
+				'fill-extrusion-color': '#aaa',
+				'fill-extrusion-height': ['get', 'height'],
+				'fill-extrusion-base': ['get', 'min_height'],
+				'fill-extrusion-opacity': 0.6,
+			},
+		})
 	})
+
+	const crosshair = document.getElementById('map-center-marker')
+	map.on('movestart', () => crosshair.classList.add('active'))
+	map.on('moveend', () => crosshair.classList.remove('active'))
 }
 
 async function authUser() {
 	const initData = tg.initDataUnsafe
 	const user = initData.user || {
 		id: 12345,
-		first_name: 'Тестовый',
-		last_name: 'Пользователь',
+		first_name: 'Эко',
+		last_name: 'Герой',
 	}
 
 	try {
@@ -54,6 +83,8 @@ async function authUser() {
 		updateUI()
 	} catch (e) {
 		console.error('Auth error:', e)
+		document.getElementById('username').textContent =
+			user.username || user.first_name
 	}
 }
 
@@ -69,7 +100,15 @@ function setupEventListeners() {
 	document
 		.getElementById('list-btn')
 		.addEventListener('click', showPollutionList)
-	document.getElementById('close-modal').addEventListener('click', hideModal)
+	document.getElementById('modal-overlay').addEventListener('click', e => {
+		if (e.target.id === 'modal-overlay') hideModal()
+	})
+}
+
+function getLevelColor(level) {
+	if (level === 1) return '#10b981'
+	if (level === 2) return '#f59e0b'
+	return '#ef4444'
 }
 
 async function loadPollutions() {
@@ -77,18 +116,22 @@ async function loadPollutions() {
 		const response = await fetch(`${API_URL}/pollutions`)
 		const pollutions = await response.json()
 
-		// Clear old markers
 		markers.forEach(m => m.remove())
 		markers = []
 
 		pollutions.forEach(p => {
 			const el = document.createElement('div')
-			el.className = 'marker active-pollution'
-			el.style.backgroundColor = getLevelColor(p.level)
-			el.style.width = '20px'
-			el.style.height = '20px'
-			el.style.borderRadius = '50%'
-			el.style.border = '2px solid white'
+			el.className = 'pollution-marker'
+			el.innerHTML = `
+                <div style="
+                    width: 24px; 
+                    height: 24px; 
+                    background: ${getLevelColor(p.level)}; 
+                    border: 3px solid white; 
+                    border-radius: 50%;
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+                "></div>
+            `
 
 			const marker = new maplibregl.Marker(el)
 				.setLngLat([p.lng, p.lat])
@@ -98,59 +141,42 @@ async function loadPollutions() {
 			markers.push(marker)
 		})
 	} catch (e) {
-		console.error('Load pollutions error:', e)
+		console.error('Markers error:', e)
 	}
-}
-
-function getLevelColor(level) {
-	if (level === 1) return '#4CAF50'
-	if (level === 2) return '#FF9800'
-	return '#F44336'
 }
 
 function showAddForm() {
 	const center = map.getCenter()
 	const body = document.getElementById('modal-body')
 	body.innerHTML = `
-        <h2>Отметить загрязнение</h2>
+        <h2 class="modal-title">Новое загрязнение</h2>
         <div class="form-group">
-            <label>Уровень опасности</label>
-            <div class="level-selector">
-                <button class="level-btn active" onclick="window.setLevel(1)">1</button>
-                <button class="level-btn" onclick="window.setLevel(2)">2</button>
-                <button class="level-btn" onclick="window.setLevel(3)">3</button>
+            <label>ОПАСНОСТЬ</label>
+            <div class="level-picker">
+                <button class="lvl-btn active" data-lvl="1" onclick="window.setLevel(1)">Низкая</button>
+                <button class="lvl-btn" data-lvl="2" onclick="window.setLevel(2)">Средняя</button>
+                <button class="lvl-btn" data-lvl="3" onclick="window.setLevel(3)">Высокая</button>
             </div>
         </div>
         <div class="form-group">
-            <label>Тип мусора</label>
-            <select id="pollution-type" multiple>
-                <option value="plastic">Пластик</option>
-                <option value="trash">Бытовой мусор</option>
-                <option value="water">Загрязнение воды</option>
-                <option value="other">Другое</option>
-            </select>
+            <label>ЧТО ТАМ?</label>
+            <textarea id="pollution-desc" rows="3" placeholder="Опишите масштаб проблемы..."></textarea>
         </div>
-        <div class="form-group">
-            <label>Описание</label>
-            <textarea id="pollution-desc" rows="3"></textarea>
-        </div>
-        <button class="action-btn primary" onclick="window.submitPollution(${center.lat}, ${center.lng})">Отправить</button>
+        <button class="btn btn-primary" onclick="window.submitPollution(${center.lat}, ${center.lng})">🚀 Отправить патруль</button>
     `
 	showModal()
 }
 
-// Global functions for modal interactions
 window.setLevel = level => {
 	selectedLevel = level
-	document.querySelectorAll('.level-btn').forEach((btn, idx) => {
-		btn.classList.toggle('active', idx + 1 === level)
+	document.querySelectorAll('.lvl-btn').forEach(btn => {
+		btn.classList.toggle('active', parseInt(btn.dataset.lvl) === level)
 	})
 }
 
 window.submitPollution = async (lat, lng) => {
 	const desc = document.getElementById('pollution-desc').value
-	const typeSelect = document.getElementById('pollution-type')
-	const types = Array.from(typeSelect.selectedOptions).map(opt => opt.value)
+	tg.MainButton.showProgress()
 
 	try {
 		const response = await fetch(`${API_URL}/pollutions`, {
@@ -161,25 +187,26 @@ window.submitPollution = async (lat, lng) => {
 				lat,
 				lng,
 				level: selectedLevel,
-				types,
+				types: ['trash'], // Simplified for MVP
 				description: desc,
-				photos: [], // In real app, upload to Cloudinary first
+				photos: [],
 			}),
 		})
 		if (response.ok) {
 			hideModal()
 			loadPollutions()
-			tg.showAlert('Загрязнение отмечено!')
+			tg.HapticFeedback.notificationOccurred('success')
 		}
 	} catch (e) {
-		tg.showAlert('Ошибка при отправке')
+		tg.showAlert('Ошибка сети')
 	}
+	tg.MainButton.hideProgress()
 }
 
 async function showPollutionList() {
 	const body = document.getElementById('modal-body')
 	body.innerHTML =
-		'<h2>Биржа загрязнений</h2><div id="list-items">Загрузка...</div>'
+		'<h2 class="modal-title">Биржа заданий</h2><div id="list-items">🔍 Ищем мусор...</div>'
 	showModal()
 
 	try {
@@ -192,10 +219,14 @@ async function showPollutionList() {
 			const item = document.createElement('div')
 			item.className = 'list-item'
 			item.innerHTML = `
-                <div style="border-bottom: 1px solid #eee; padding: 12px 0;">
-                    <strong>Уровень: ${p.level}</strong><br>
-                    <span>${p.types.join(', ')}</span><br>
-                    <button class="action-btn secondary" style="padding: 8px; margin-top: 8px;" onclick="window.goToPollution(${p.lat}, ${p.lng})">На карте</button>
+                <div class="list-item-header">
+                    <div>
+                        <span class="badge" style="background: ${getLevelColor(p.level)}1A; color: ${getLevelColor(p.level)}">
+                            Уровень ${p.level}
+                        </span>
+                        <p style="margin: 8px 0; font-size: 0.9rem;">${p.description || 'Без описания'}</p>
+                    </div>
+                    <button class="btn btn-secondary" style="padding: 10px; flex: 0;" onclick="window.goToPollution(${p.lat}, ${p.lng})">📍</button>
                 </div>
             `
 			listItems.appendChild(item)
@@ -206,18 +237,19 @@ async function showPollutionList() {
 }
 
 window.goToPollution = (lat, lng) => {
-	map.flyTo({ center: [lng, lat], zoom: 16 })
+	map.flyTo({ center: [lng, lat], zoom: 17, duration: 2000 })
 	hideModal()
 }
 
 function showPollutionDetails(p) {
 	const body = document.getElementById('modal-body')
 	body.innerHTML = `
-        <h2>Детали загрязнения</h2>
-        <p><strong>Тип:</strong> ${p.types.join(', ')}</p>
-        <p><strong>Уровень:</strong> ${p.level}</p>
-        <p>${p.description}</p>
-        <button class="action-btn primary" onclick="window.cleanPollution(${p.id})">✅ Я убрал это!</button>
+        <h2 class="modal-title">Детали объекта</h2>
+        <div class="list-item" style="border: none; background: #f1f5f9;">
+             <p><strong>Опасность:</strong> ${p.level}/3</p>
+             <p>${p.description || 'Описание отсутствует'}</p>
+        </div>
+        <button class="btn btn-primary" onclick="window.cleanPollution(${p.id})">🌿 Я убрал этот мусор!</button>
     `
 	showModal()
 }
@@ -235,17 +267,17 @@ window.cleanPollution = async id => {
 			updateUI()
 			hideModal()
 			loadPollutions()
-			tg.showConfirm('Поздравляем! Вам начислено вознаграждение.')
+			tg.HapticFeedback.impactOccurred('heavy')
 		}
 	} catch (e) {
-		tg.showAlert('Ошибка при очистке')
+		tg.showAlert('Ошибка сервера')
 	}
 }
 
 function showModal() {
-	document.getElementById('modal-overlay').classList.remove('hidden')
+	document.getElementById('modal-overlay').classList.add('active')
 }
 
 function hideModal() {
-	document.getElementById('modal-overlay').classList.add('hidden')
+	document.getElementById('modal-overlay').classList.remove('active')
 }
