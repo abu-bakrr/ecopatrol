@@ -525,9 +525,7 @@ function setupEventListeners() {
 		showMyHistory()
 	})
 	document.getElementById('menu-info').addEventListener('click', () => {
-		tg.showAlert(
-			'Приложение EcoPatrol v29.0\nРазработано для чистого будущего.',
-		)
+		showAboutInfo()
 	})
 
 	document
@@ -725,6 +723,60 @@ async function showMyHistory() {
             </div>
         `
 	}
+}
+
+async function showAboutInfo() {
+	closeSidebar()
+	const content = document.getElementById('sheet-content')
+	content.innerHTML = `
+        <div class="info-sheet">
+            <div class="info-header-img">🌿</div>
+            
+            <div class="info-card">
+                <div class="info-tag">О проекте</div>
+                <div class="info-title">Экопатруль Школы №242</div>
+                <div class="info-text">
+                    Этот проект разработан школой №242 Алмазарского района города Ташкента. 
+                    Мы стремимся научить детей заботе об экологии и внедрить современную систему «Эко Патруль» в нашу повседневную жизнь.
+                </div>
+                <div class="info-text" style="font-weight: 600; color: var(--text-primary);">
+                    Команда создателей: <span style="color: #10b981;">Виктория</span>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-tag">Как пользоваться</div>
+                <div class="info-list">
+                    <div class="info-list-item">
+                        <div class="info-list-icon">📍</div>
+                        <div class="info-text" style="margin-bottom: 0;"><b>Отмечайте</b>: Найдите мусор, сделайте фото и поставьте метку на карте.</div>
+                    </div>
+                    <div class="info-list-item">
+                        <div class="info-list-icon">✨</div>
+                        <div class="info-text" style="margin-bottom: 0;"><b>Очищайте</b>: Придите на место, уберите мусор и получите вознаграждение.</div>
+                    </div>
+                    <div class="info-list-item">
+                        <div class="info-list-icon">💰</div>
+                        <div class="info-text" style="margin-bottom: 0;"><b>Зарабатывайте</b>: Накапливайте баланс за каждую успешную уборку.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card" style="margin-bottom: 0;">
+                <div class="info-tag">Поддержка</div>
+                <div class="info-text">Есть вопросы или предложения? Напишите создателю проекта напрямую!</div>
+                <a href="https://t.me/gayupov_a" target="_blank" class="info-contact-btn">
+                    <span>Написать @gayupov_a</span>
+                </a>
+            </div>
+            
+            <div style="text-align: center; margin-top: 24px; opacity: 0.4; font-size: 12px; font-weight: 500;">
+                EcoPatrol v30.0 • Made with ❤️ for Nature
+            </div>
+        </div>
+        <div style="height: 20px;"></div>
+    `
+	openBottomSheet()
 }
 
 async function loadProfileStats() {
