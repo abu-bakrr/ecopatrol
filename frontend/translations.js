@@ -96,6 +96,9 @@ const translations = {
 		location_help_text:
 			'Ilovadan foydalanish uchun brauzer yoki Telegram sozlamalarida geolokatsiyaga ruxsat berishingiz shart. Ruxsat berganingizdan soʻng Telegram-ni butunlay yopib (soʻnggi ilovalar roʻyxatidan oʻchirib) qaytadan kiring.',
 		location_retry_btn: 'Qaytadan urinish',
+		offline_title: 'Internet yoʻq',
+		offline_text:
+			'Ilovadan foydalanish uchun internetga ulaning. Aloqa tiklanganda ilova avtomatik ravishable ishga tushadi.',
 	},
 	ru: {
 		app_title: 'Экопатруль 🌍',
@@ -194,6 +197,9 @@ const translations = {
 		location_help_text:
 			'Для работы приложения необходимо разрешить доступ к геолокации в настройках браузера или Telegram. После предоставления доступа полностью перезапустите Telegram (удалите его из списка запущенных приложений) и зайдите снова.',
 		location_retry_btn: 'Повторить попытку',
+		offline_title: 'Нет интернета',
+		offline_text:
+			'Для работы приложения требуется подключение к интернету. Приложение заработает автоматически при восстановлении связи.',
 	},
 	en: {
 		app_title: 'EcoPatrol 🌍',
@@ -292,6 +298,9 @@ const translations = {
 		location_help_text:
 			'To use the app, you must grant location access in your browser or Telegram settings. After granting access, fully restart Telegram (remove it from recent apps) and try again.',
 		location_retry_btn: 'Try Again',
+		offline_title: 'No Internet',
+		offline_text:
+			'Internet connection is required to use this app. It will resume automatically once connection is restored.',
 	},
 }
 

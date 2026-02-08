@@ -1489,3 +1489,10 @@ html {
 	transform: scale(0.96);
 	background: var(--primary-dark);
 }
+
+#offline-overlay {
+	z-index: 2100000 !important;
+}
+#offline-overlay .overlay-card {
+	border-top: 4px solid #6b7280;
+}

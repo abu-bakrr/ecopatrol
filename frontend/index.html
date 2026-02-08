@@ -167,6 +167,40 @@
 			</div>
 		</div>
 
+		<!-- Offline Overlay -->
+		<div class="location-blocked-overlay hidden" id="offline-overlay">
+			<div class="overlay-card">
+				<div
+					class="overlay-icon"
+					style="
+						background: #6b7280;
+						box-shadow: 0 10px 25px rgba(107, 114, 128, 0.4);
+					"
+				>
+					<svg
+						width="40"
+						height="40"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2.5"
+					>
+						<path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0 1 19 12.55" />
+						<path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39" />
+						<path d="M10.71 5.05A16 16 0 0 1 22.58 9" />
+						<path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88" />
+						<path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+						<path d="M12 20h.01" />
+					</svg>
+				</div>
+				<h2 class="overlay-title" data-t="offline_title">Нет интернета</h2>
+				<p class="overlay-text" data-t="offline_text">
+					Для работы приложения требуется подключение к интернету. Приложение
+					заработает автоматически при восстановлении связи.
+				</p>
+			</div>
+		</div>
+
 		<!-- Global Blocking Overlay (Location) -->
 		<div id="location-blocked-overlay" class="global-overlay hidden">
 			<div class="overlay-content">

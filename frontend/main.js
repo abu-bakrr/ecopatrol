@@ -113,6 +113,26 @@ const locationPromise = new Promise(resolve => {
 	)
 })
 
+function setupConnectivityListeners() {
+	const offlineOverlay = document.getElementById('offline-overlay')
+
+	const updateStatus = () => {
+		if (navigator.onLine) {
+			offlineOverlay.classList.add('hidden')
+			console.log('Online: connection restored')
+		} else {
+			offlineOverlay.classList.remove('hidden')
+			console.log('Offline: connection lost')
+		}
+	}
+
+	window.addEventListener('online', updateStatus)
+	window.addEventListener('offline', updateStatus)
+
+	// Initial check
+	updateStatus()
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
 	console.log('--- DOMContentLoaded ---')
@@ -128,6 +148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	tg.expand()
 	tg.isVerticalSwipesEnabled = false
+	setupConnectivityListeners()
 	tg.enableClosingConfirmation()
 	tg.ready()
 
