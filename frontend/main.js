@@ -631,6 +631,9 @@ function setupEventListeners() {
 	document.getElementById('menu-history').addEventListener('click', () => {
 		showMyHistory()
 	})
+	document.getElementById('menu-leaderboard').addEventListener('click', () => {
+		showLeaderboard()
+	})
 	document.getElementById('menu-info').addEventListener('click', () => {
 		showAboutInfo()
 	})
@@ -1500,6 +1503,49 @@ async function submitClean() {
 		}
 	} catch (e) {
 		tg.showAlert('Ошибка при подтверждении')
+	}
+}
+
+async function showLeaderboard() {
+	tg.HapticFeedback.impactOccurred('light')
+	const content = document.getElementById('sheet-content')
+	content.innerHTML = `
+        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">🏅 ${window.t('menu_leaderboard')}</h2>
+        <div id="leaderboard-list" class="loading">${window.t('loading')}</div>
+    `
+	openBottomSheet()
+
+	try {
+		const response = await fetch(`${API_URL}/leaderboard`)
+		const users = await response.json()
+
+		const list = document.getElementById('leaderboard-list')
+		list.classList.remove('loading')
+
+		if (users.length === 0) {
+			list.innerHTML = `<p style="text-align: center; opacity: 0.5;">${window.t('city_clean_text')}</p>`
+			return
+		}
+
+		list.innerHTML = users
+			.map(
+				(u, index) => `
+            <div class="history-item" style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-secondary); border-radius: 12px; margin-bottom: 8px;">
+                <div style="font-weight: 800; color: var(--primary); font-size: 18px; min-width: 24px;">${index + 1}</div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; color: var(--text-primary);">${u.first_name}</div>
+                    <div style="font-size: 11px; color: var(--text-secondary);">${u.cleaned_count} ${window.t('cleaned')}</div>
+                </div>
+                <div style="font-weight: 700; color: var(--primary);">$${u.balance}</div>
+            </div>
+        `,
+			)
+			.join('')
+	} catch (e) {
+		console.error('Leaderboard error:', e)
+		const list = document.getElementById('leaderboard-list')
+		if (list)
+			list.innerHTML = `<p style="color: #ef4444;">${window.t('submit_error')}</p>`
 	}
 }
 

@@ -9,6 +9,25 @@ BOT_TOKEN = os.getenv('BOT_TOKEN', 'YOUR_BOT_TOKEN')
 MINI_APP_URL = os.getenv('MINI_APP_URL', 'https://your-mini-app-url.com')
 
 bot = telebot.TeleBot(BOT_TOKEN)
+ADMIN_IDS = [5644397480]
+
+@bot.message_handler(commands=['admin'])
+def admin_command(message):
+    if message.from_user.id not in ADMIN_IDS:
+        bot.reply_to(message, "У вас нет прав доступа к этой команде. ⛔")
+        return
+
+    markup = types.InlineKeyboardMarkup()
+    # Using a query param to "authenticate" on the frontend side for now
+    web_app = types.WebAppInfo(f"{MINI_APP_URL}/admin.html?admin_tg_id={message.from_user.id}")
+    btn = types.InlineKeyboardButton("Открыть Админ-панель 🛠️", web_app=web_app)
+    markup.add(btn)
+
+    bot.send_message(
+        message.chat.id,
+        "Добро пожаловать в панель управления, Шеф! 😎\n\nЗдесь вы можете управлять пользователями и загрязнениями.",
+        reply_markup=markup
+    )
 
 @bot.message_handler(commands=['start'])
 def start(message):

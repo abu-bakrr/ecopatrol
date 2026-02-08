@@ -18,6 +18,7 @@ CORS(app)
 db.init_app(app)
 
 BOT_TOKEN = os.getenv('BOT_TOKEN', 'YOUR_BOT_TOKEN')
+ADMIN_IDS = [5644397480] # The user's ID
 
 def validate_telegram_data(init_data):
     """Validates data received from Telegram Mini App."""
@@ -228,6 +229,102 @@ def health_check():
         })
     except Exception as e:
         return jsonify({'status': 'error', 'db': str(e)}), 500
+
+# --- ADMIN & LEADERBOARD ENDPOINTS ---
+
+@app.route('/api/leaderboard', methods=['GET'])
+def get_leaderboard():
+    # Fetch top 10 users by balance (as a proxy for activity/impact)
+    # In the future, we could add a dedicated 'impact_score' or use cleaned_count
+    # Since we don't have a direct 'cleaned_count' column, we use balance
+    users = User.query.order_by(User.balance.desc()).limit(10).all()
+    result = []
+    for u in users:
+        # Calculate cleaned count for each top user
+        cleaned_count = Pollution.query.filter_by(cleaner_id=u.id, status='cleaned').count()
+        result.append({
+            'username': u.username or f"User {u.id}",
+            'first_name': u.first_name,
+            'balance': u.balance,
+            'cleaned_count': cleaned_count
+        })
+    return jsonify(result)
+
+@app.route('/api/admin/users', methods=['GET'])
+def admin_get_users():
+    tg_id = request.args.get('admin_tg_id', type=int)
+    if tg_id not in ADMIN_IDS:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    users = User.query.all()
+    result = []
+    for u in users:
+        result.append({
+            'id': u.id,
+            'telegram_id': u.telegram_id,
+            'username': u.username,
+            'first_name': u.first_name,
+            'last_name': u.last_name,
+            'balance': u.balance,
+            'phone': u.phone,
+            'created_at': u.created_at.isoformat()
+        })
+    return jsonify(result)
+
+@app.route('/api/admin/users/<int:user_id>/balance', methods=['POST'])
+def admin_update_balance(user_id):
+    data = request.json
+    tg_id = data.get('admin_tg_id')
+    if tg_id not in ADMIN_IDS:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    user = User.query.get_or_404(user_id)
+    try:
+        user.balance = float(data.get('balance', user.balance))
+        db.session.commit()
+        return jsonify({'status': 'ok', 'new_balance': user.balance})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/api/admin/pollutions', methods=['GET'])
+def admin_get_pollutions():
+    tg_id = request.args.get('admin_tg_id', type=int)
+    if tg_id not in ADMIN_IDS:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    pollutions = Pollution.query.all()
+    result = []
+    for p in pollutions:
+        result.append({
+            'id': p.id,
+            'lat': p.lat,
+            'lng': p.lng,
+            'level': p.level,
+            'status': p.status,
+            'description': p.description,
+            'creator_id': p.user_id,
+            'cleaner_id': p.cleaner_id,
+            'photos': [ph.url for ph in p.photos]
+        })
+    return jsonify(result)
+
+@app.route('/api/admin/pollutions/<int:p_id>', methods=['DELETE'])
+def admin_delete_pollution(p_id):
+    tg_id = request.args.get('admin_tg_id', type=int)
+    if tg_id not in ADMIN_IDS:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    p = Pollution.query.get_or_404(p_id)
+    try:
+        # Delete related photos first
+        Photo.query.filter_by(pollution_id=p.id).delete()
+        db.session.delete(p)
+        db.session.commit()
+        return jsonify({'status': 'ok'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 if __name__ == '__main__':
     with app.app_context():
