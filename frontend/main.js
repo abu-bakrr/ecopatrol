@@ -105,15 +105,11 @@ const locationPromise = new Promise(resolve => {
 		},
 		err => {
 			console.log('Pre-fetch geo error:', err)
-			const cached = localStorage.getItem('last_known_loc')
-			// If denied (1), we might want to resolve with error or null to trigger help screen
-			if (err.code === 1) {
-				resolve({ error: 'denied' })
-			} else {
-				resolve(cached ? { coords: JSON.parse(cached), source: 'cache' } : null)
-			}
+			// For any error (denied, unavailable, timeout), we treat it as "no permission"
+			// to trigger the help screen if they are not seeing the map properly.
+			resolve({ error: 'denied', code: err.code })
 		},
-		{ enableHighAccuracy: false, timeout: 5000, maximumAge: 30000 },
+		{ enableHighAccuracy: false, timeout: 3000, maximumAge: 30000 },
 	)
 })
 

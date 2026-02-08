@@ -1100,7 +1100,7 @@ html {
 
 /* Debug Console - Hidden by default but functional */
 #debug-toggle-btn {
-	display: none !important;
+	display: block !important;
 }
 
 #debug-console {
