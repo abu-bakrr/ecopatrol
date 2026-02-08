@@ -22,7 +22,16 @@ sudo apt install -y python3-pip python3-venv git curl postgresql postgresql-cont
 echo "🔹 Настройка базы данных PostgreSQL..."
 # Убедимся, что сервис запущен и включен
 sudo systemctl enable postgresql
-sudo systemctl start postgresql
+sudo systemctl start postgresql || true
+
+# Проверка, запущен ли кластер (для Ubuntu/Debian)
+if ! pg_lsclusters | grep -q "online"; then
+    echo "⚠️ PostgreSQL кластер не запущен. Пытаюсь создать или запустить принудительно..."
+    sudo pg_createcluster 14 main --start || sudo systemctl restart postgresql
+fi
+
+# Подождем пару секунд для инициализации сокета
+sleep 3
 
 DB_NAME="ecopatrol"
 DB_USER="eco_user"
