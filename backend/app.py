@@ -31,35 +31,44 @@ def validate_telegram_data(init_data):
 
 @app.route('/api/init', methods=['POST'])
 def init_user():
-    data = request.json
-    tg_id = data.get('telegram_id')
-    
-    user = User.query.filter_by(telegram_id=tg_id).first()
-    if not user:
-        user = User(
-            telegram_id=tg_id,
-            username=data.get('username'),
-            first_name=data.get('first_name'),
-            last_name=data.get('last_name'),
-            age=data.get('age'),
-            phone=data.get('phone')
-        )
-        db.session.add(user)
-        db.session.commit()
-    
-    return jsonify({
-        'status': 'ok',
-        'user': {
-            'id': user.id,
-            'telegram_id': user.telegram_id,
-            'username': user.username,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'age': user.age,
-            'phone': user.phone,
-            'balance': user.balance
-        }
-    })
+    try:
+        data = request.json
+        tg_id = data.get('telegram_id')
+        
+        if not tg_id:
+            return jsonify({'error': 'Missing telegram_id'}), 400
+            
+        user = User.query.filter_by(telegram_id=tg_id).first()
+        if not user:
+            user = User(
+                telegram_id=tg_id,
+                username=data.get('username'),
+                first_name=data.get('first_name'),
+                last_name=data.get('last_name'),
+                age=data.get('age'),
+                phone=data.get('phone'),
+                language=data.get('language', 'ru')
+            )
+            db.session.add(user)
+            db.session.commit()
+        
+        return jsonify({
+            'status': 'ok',
+            'user': {
+                'id': user.id,
+                'telegram_id': user.telegram_id,
+                'username': user.username,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'age': user.age,
+                'phone': user.phone,
+                'balance': user.balance,
+                'language': user.language
+            }
+        })
+    except Exception as e:
+        print(f"Error in /api/init: {e}")
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/api/pollutions', methods=['GET'])
