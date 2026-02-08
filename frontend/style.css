@@ -430,7 +430,7 @@ html {
 	left: 0;
 	width: 300px;
 	height: 100%;
-	background: var(--bg-primary);
+	background: #111827;
 	box-shadow: 4px 0 24px var(--shadow);
 	z-index: 600; /* Higher than overlay (450) */
 	transform: translateX(-100%);
@@ -764,8 +764,8 @@ html {
 	right: 0;
 	bottom: 0;
 	bottom: 0;
-	background: rgba(0, 0, 0, 0.4);
-	z-index: 450; /* Between sidebar (300) and sheet (500) */
+	background: rgba(17, 24, 39, 0.8); /* Darker backdrop */
+	z-index: 450;
 	opacity: 0;
 	visibility: hidden;
 	transition: all 0.3s;
@@ -799,7 +799,7 @@ html {
 	border-radius: 16px;
 	font-size: 16px;
 	font-family: inherit;
-	background: var(--bg-primary);
+	background: #111827;
 	color: var(--text-primary);
 	transition: all 0.2s ease;
 	appearance: none;
@@ -1099,8 +1099,6 @@ html {
 }
 
 /* Debug Console - Hidden by default but functional */
-#debug-toggle-btn {
-
 #debug-console {
 	display: none !important;
 	z-index: 10004;
