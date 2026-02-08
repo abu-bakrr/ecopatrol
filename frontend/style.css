@@ -718,7 +718,7 @@ html {
 	width: 100%;
 	height: 100%;
 	background: rgba(0, 0, 0, 0.95);
-	z-index: 2000;
+	z-index: 10000; /* Max z-index */
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -752,7 +752,31 @@ html {
 	align-items: center;
 	justify-content: center;
 	cursor: pointer;
-	z-index: 2001;
+	z-index: 10001;
 	color: white;
 	font-size: 24px;
+}
+
+/* Loading Skeleton */
+.photo-item.loading {
+	background: var(--bg-secondary);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid var(--border);
+}
+
+.spinner {
+	width: 20px;
+	height: 20px;
+	border: 2px solid rgba(0, 0, 0, 0.1);
+	border-left-color: var(--primary);
+	border-radius: 50%;
+	animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
 }
