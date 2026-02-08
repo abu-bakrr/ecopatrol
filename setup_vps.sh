@@ -20,21 +20,33 @@ sudo apt install -y python3-pip python3-venv git curl postgresql postgresql-cont
 
 # 3. Настройка PostgreSQL
 echo "🔹 Настройка базы данных PostgreSQL..."
-# Принудительно останавливаем
+
+# Остановка сервиса и принудительное завершение всех процессов Postgres
 sudo systemctl stop postgresql || true
+sudo pkill -u postgres -f postgres || true
 
-# Пересоздаем кластер для чистоты
-sudo pg_dropcluster 14 main --stop || true
-sudo pg_createcluster 14 main
+# Удаление зависших PID-файлов и блокировок, если они остались
+sudo rm -f /var/run/postgresql/*.pid
+sudo rm -f /var/run/postgresql/.s.PGSQL.5432.lock
 
-# ФИКC: В некоторых VPS нет IPv6, что вешает запуск Postgres. 
-# Принудительно ставим прослушивание только на IPv4 (127.0.0.1)
-POSTGRES_CONF="/etc/postgresql/14/main/postgresql.conf"
+# Работа с кластером
+PG_VERSION="14"
+if pg_lsclusters | grep -q "main"; then
+    echo "🔹 Кластер существует. Пытаюсь сбросить настройки для чистого запуска..."
+    sudo pg_dropcluster $PG_VERSION main --stop || true
+fi
+
+echo "🔹 Создание и запуск нового кластера..."
+sudo pg_createcluster $PG_VERSION main --start || {
+    echo "⚠️ Ошибка при создании кластера. Пробую еще раз с очисткой портов..."
+    sudo fuser -k 5432/tcp || true
+    sudo pg_createcluster $PG_VERSION main --start
+}
+
+# Фикс IPv4 (чтобы не падал на VPS без IPv6)
+POSTGRES_CONF="/etc/postgresql/$PG_VERSION/main/postgresql.conf"
 sudo sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '127.0.0.1'/" $POSTGRES_CONF
-
-# Запускаем
-echo "🔹 Запуск PostgreSQL..."
-sudo systemctl start postgresql
+sudo systemctl restart postgresql
 
 # Подождем для инициализации сокета
 sleep 5
@@ -45,8 +57,10 @@ DB_PASS=$(openssl rand -base64 12)
 
 # Выполняем из /tmp, чтобы у пользователя postgres был доступ
 cd /tmp
-sudo -u postgres psql -c "CREATE DATABASE $DB_NAME;" || true
-sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASS';" || true
+sudo -u postgres psql -c "DROP DATABASE IF EXISTS $DB_NAME;" || true
+sudo -u postgres psql -c "DROP USER IF EXISTS $DB_USER;" || true
+sudo -u postgres psql -c "CREATE DATABASE $DB_NAME;"
+sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASS';"
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;"
 cd - > /dev/null
 
@@ -55,12 +69,13 @@ DATABASE_URL="postgresql://$DB_USER:$DB_PASS@localhost/$DB_NAME"
 # 4. Настройка Backend
 echo "🔹 Настройка Python окружения..."
 cd backend
-python3 -m venv venv
+if [ ! -d "venv" ]; then
+    python3 -m venv venv
+fi
 source venv/bin/activate
 pip install -r requirements.txt gunicorn
-# pip install psycopg2-binary # Убедимся что он есть
 
-# Создание .env
+# Создание или обновление .env
 cat <<EOF > .env
 BOT_TOKEN=$BOT_TOKEN
 DATABASE_URL=$DATABASE_URL
@@ -104,14 +119,14 @@ sudo systemctl restart nginx
 
 # 6. Получение SSL сертификата
 echo "🔹 Получение SSL сертификата через Certbot..."
-# ВАЖНО: Домен уже дожен указывать на этот IP
-sudo certbot --nginx -d $DOMAIN_NAME --non-interactive --agree-tos -m $SSL_EMAIL
+# Пытаемся получить, если нет ошибок конфигурации
+sudo certbot --nginx -d $DOMAIN_NAME --non-interactive --agree-tos -m $SSL_EMAIL || echo "⚠️ Certbot не смог получить сертификат. Проверьте настройки DNS домена."
 
 # 7. Настройка Systemd для работы в фоне
 echo "🔹 Настройка фоновых служб (Backend и Bot)..."
 
 # API Сервис
-sudo bash -c "cat <<EOF > /etc/systemd/system/eco-api.service
+sudo tee /etc/systemd/system/eco-api.service > /dev/null <<EOF
 [Unit]
 Description=Ecopatrol API Service
 After=network.target
@@ -122,14 +137,12 @@ WorkingDirectory=$(pwd)/backend
 ExecStart=$(pwd)/backend/venv/bin/gunicorn -w 4 -b 127.0.0.1:5000 app:app
 Restart=always
 
-[Environment=PATH=$(pwd)/backend/venv/bin]
-
 [Install]
 WantedBy=multi-user.target
-EOF"
+EOF
 
 # Bot Сервис
-sudo bash -c "cat <<EOF > /etc/systemd/system/eco-bot.service
+sudo tee /etc/systemd/system/eco-bot.service > /dev/null <<EOF
 [Unit]
 Description=Ecopatrol Bot Service
 After=network.target
@@ -142,11 +155,17 @@ Restart=always
 
 [Install]
 WantedBy=multi-user.target
-EOF"
+EOF
 
 sudo systemctl daemon-reload
 sudo systemctl enable eco-api eco-bot
-sudo systemctl start eco-api eco-bot
+sudo systemctl restart eco-api eco-bot
+
+echo "🎉 ========================================"
+echo "🎉   УСТАНОВКА ЗАВЕРШЕНА УСПЕШНО!        "
+echo "🎉   Приложение: https://$DOMAIN_NAME    "
+echo "🎉   БД: PostgreSQL (пароль сохранен в .env)"
+echo "🎉 ========================================"
 
 echo "🎉 ========================================"
 echo "🎉   УСТАНОВКА ЗАВЕРШЕНА УСПЕШНО!        "
