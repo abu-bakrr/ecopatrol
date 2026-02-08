@@ -34,19 +34,36 @@ def init_user():
     data = request.json
     tg_id = data.get('telegram_id')
     
-    user = User.query.filter_by(telegram_id=tg_id).first()
+    try:
+        user = User.query.filter_by(telegram_id=tg_id).first()
+    except Exception as e:
+        print(f"Database query error: {e}")
+        return jsonify({'status': 'error', 'message': 'Database error. Did you run migrate_db.py?'}), 500
+
     if not user:
-        user = User(
-            telegram_id=tg_id,
-            username=data.get('username'),
-            first_name=data.get('first_name'),
-            last_name=data.get('last_name'),
-            age=data.get('age'),
-            phone=data.get('phone')
-        )
-        db.session.add(user)
-        db.session.commit()
+        try:
+            user = User(
+                telegram_id=tg_id,
+                username=data.get('username'),
+                first_name=data.get('first_name'),
+                last_name=data.get('last_name'),
+                age=data.get('age'),
+                phone=data.get('phone')
+            )
+            db.session.add(user)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(f"User creation error: {e}")
+            return jsonify({'status': 'error', 'message': 'Failed to create user. Check database schema.'}), 500
     
+    # Safely get language to avoid 500 if column is missing
+    user_lang = 'ru'
+    try:
+        user_lang = getattr(user, 'language', 'ru')
+    except Exception:
+        pass
+
     return jsonify({
         'status': 'ok',
         'user': {
@@ -58,7 +75,7 @@ def init_user():
             'age': user.age,
             'phone': user.phone,
             'balance': user.balance,
-            'language': user.language
+            'language': user_lang
         }
     })
 
