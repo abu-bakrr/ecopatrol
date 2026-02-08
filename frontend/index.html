@@ -98,36 +98,47 @@
 					</div>
 				</form>
 
-				<div id="location-help" class="location-help hidden">
-					<div class="location-help-icon">📍</div>
-					<h2 class="location-help-title" data-t="location_help_title">
-						Требуется доступ
-					</h2>
-					<p class="location-help-text" data-t="location_help_text">
-						Для работы приложения необходимо разрешить доступ к геолокации в
-						настройках браузера или Telegram. После предоставления доступа
-						нажмите «Повторить».
-					</p>
-					<button
-						type="button"
-						class="btn btn-primary"
-						id="retry-geo-btn"
-						data-t="location_retry_btn"
-					>
-						Повторить попытку
-					</button>
-				</div>
-
 				<button
-						type="submit"
-						class="btn btn-primary"
-						style="width: 100%; margin-top: 16px; margin-bottom: 24px"
-						id="onboarding-submit"
-						data-t="form_continue"
+					type="submit"
+					class="btn btn-primary"
+					form="onboarding-form"
+					id="submit-onboarding"
+					style="width: 100%; margin-top: 16px; margin-bottom: 24px"
+				>
+					Продолжить
+				</button>
+			</div>
+		</div>
+
+		<!-- Global Blocking Overlay (Location) -->
+		<div id="location-blocked-overlay" class="global-overlay hidden">
+			<div class="overlay-content">
+				<div class="overlay-glow"></div>
+				<div class="overlay-icon">
+					<svg
+						width="40"
+						height="40"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
 					>
-						Продолжить
-					</button>
-				</form>
+						<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+						<circle cx="12" cy="10" r="3" />
+					</svg>
+				</div>
+				<h2 class="overlay-title" data-t="location_help_title">
+					Требуется доступ
+				</h2>
+				<p class="overlay-text" data-t="location_help_text">
+					Для работы приложения необходимо разрешить доступ к геолокации в
+					настройках. Это нужно для отображения карты и вашей позиции.
+				</p>
+				<button class="btn btn-overlay" id="retry-geo-btn-global">
+					<span data-t="location_retry_btn">Повторить попытку</span>
+				</button>
 			</div>
 		</div>
 
