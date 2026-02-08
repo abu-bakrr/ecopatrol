@@ -42,6 +42,16 @@ const locationPromise = new Promise(resolve => {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
+	// 0. IMMEDIATE FIX: Force height to prevent gray blocks
+	function fixHeight() {
+		const vh = window.innerHeight
+		document.documentElement.style.setProperty('--vh', `${vh}px`)
+		document.body.style.height = `${vh}px`
+		document.getElementById('map').style.height = `${vh}px`
+	}
+	window.addEventListener('resize', fixHeight)
+	fixHeight()
+
 	tg.expand()
 	tg.ready()
 
@@ -51,7 +61,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 	// Set header color based on theme
 	const savedTheme = localStorage.getItem('theme') || 'light'
 	const headerColor = savedTheme === 'dark' ? '#111827' : '#ffffff'
+	const bgColor = savedTheme === 'dark' ? '#242f3e' : '#fcfcfc'
+
 	tg.setHeaderColor(headerColor)
+	tg.setBackgroundColor(bgColor) // Set immediately
 
 	loadTheme()
 	checkRegistration()
