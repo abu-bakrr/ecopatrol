@@ -580,7 +580,11 @@
 			// Capture Global Errors
 			window.onerror = function (msg, url, line) {
 				logToScreen(`Global Error: ${msg} \nLine: ${line}`, 'error')
-				debugConsole.classList.add('active') // Auto-open on error
+
+				// ONLY AUTO-OPEN IF ONLINE AND ADMIN ENABLED LOGS
+				if (navigator.onLine && debugBtn.style.display !== 'none') {
+					debugConsole.classList.add('active')
+				}
 				return false
 			}
 
@@ -606,7 +610,11 @@
 			console.error = function (...args) {
 				originalError.apply(console, args)
 				logToScreen(args.join(' '), 'error')
-				debugConsole.classList.add('active') // Auto-open on error
+
+				// ONLY AUTO-OPEN IF ONLINE AND ADMIN ENABLED LOGS
+				if (navigator.onLine && debugBtn.style.display !== 'none') {
+					debugConsole.classList.add('active')
+				}
 			}
 
 			console.warn = function (...args) {
