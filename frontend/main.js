@@ -90,33 +90,31 @@ window.setLanguage = async function (lang) {
 	tg.HapticFeedback.impactOccurred('light')
 }
 
-// Start pre-fetching location immediately
 const locationPromise = new Promise(resolve => {
-	// 1. Try cache first
-	const cached = localStorage.getItem('last_known_loc')
-	if (cached) {
-		resolve({ coords: JSON.parse(cached), source: 'cache' })
+	if (!navigator.geolocation) {
+		const cached = localStorage.getItem('last_known_loc')
+		resolve(cached ? { coords: JSON.parse(cached), source: 'cache' } : null)
+		return
 	}
 
-	// 2. Try live location in parallel
-	if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition(
-			pos => {
-				// Update cache
-				const coords = [pos.coords.longitude, pos.coords.latitude]
-				localStorage.setItem('last_known_loc', JSON.stringify(coords))
-				// Resolve if not already resolved (Promise handles this mostly, but we want live data if fast enough)
-				resolve({ coords: coords, source: 'live' })
-			},
-			err => {
-				console.log('Pre-fetch geo error:', err)
-				if (!cached) resolve(null)
-			},
-			{ enableHighAccuracy: false, timeout: 5000, maximumAge: 30000 },
-		)
-	} else {
-		if (!cached) resolve(null)
-	}
+	navigator.geolocation.getCurrentPosition(
+		pos => {
+			const coords = [pos.coords.longitude, pos.coords.latitude]
+			localStorage.setItem('last_known_loc', JSON.stringify(coords))
+			resolve({ coords: coords, source: 'live' })
+		},
+		err => {
+			console.log('Pre-fetch geo error:', err)
+			const cached = localStorage.getItem('last_known_loc')
+			// If denied (1), we might want to resolve with error or null to trigger help screen
+			if (err.code === 1) {
+				resolve({ error: 'denied' })
+			} else {
+				resolve(cached ? { coords: JSON.parse(cached), source: 'cache' } : null)
+			}
+		},
+		{ enableHighAccuracy: false, timeout: 5000, maximumAge: 30000 },
+	)
 })
 
 // Initialize
@@ -167,9 +165,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 	window.setLanguage(savedLang)
 
 	// DELAY MAP INIT: Wait for Telegram animation to finish
-	setTimeout(() => {
-		checkRegistration()
-	}, 100) // Reduced from 300 to 100 for better performance
+	// IMMEDIATE MAP INIT: No need to wait 300ms
+	checkRegistration()
 })
 
 function initBottomSheetDrag() {
@@ -223,24 +220,30 @@ function initBottomSheetDrag() {
 function checkRegistration() {
 	isRegistered = localStorage.getItem('registered') === 'true'
 
-	if (isRegistered) {
-		hideOnboarding()
+	locationPromise.then(loc => {
+		// If denied, ALWAYS show help, even if registered
+		if (loc && loc.error === 'denied') {
+			showOnboarding()
+			document.getElementById('onboarding-form').classList.add('hidden')
+			document.getElementById('location-help').classList.remove('hidden')
+			document.getElementById('submit-onboarding').classList.add('hidden')
+			return
+		}
 
-		// Use pre-fetched location
-		locationPromise.then(loc => {
+		if (isRegistered) {
+			hideOnboarding()
 			if (loc && loc.coords) {
 				initMap(loc.coords)
 			} else {
 				initMap()
 			}
-		})
-
-		authUser()
-		setupEventListeners()
-		loadPollutions()
-	} else {
-		showOnboarding()
-	}
+			authUser()
+			setupEventListeners()
+			loadPollutions()
+		} else {
+			showOnboarding()
+		}
+	})
 }
 
 function showOnboarding() {
@@ -730,8 +733,8 @@ function closeAll() {
 }
 
 async function showMyReports() {
-	if (!currentUser) return
 	closeSidebar()
+	if (!currentUser) return
 	const content = document.getElementById('sheet-content')
 	content.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
@@ -800,8 +803,8 @@ window.flyToReport = (lng, lat) => {
 }
 
 async function showMyHistory() {
-	if (!currentUser) return
 	closeSidebar()
+	if (!currentUser) return
 	const content = document.getElementById('sheet-content')
 	content.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
@@ -1531,7 +1534,10 @@ async function submitClean() {
 }
 
 async function showLeaderboard() {
-	closeSidebar()
+	// Close sidebar manually to avoid overlay flicker
+	const sidebar = document.getElementById('sidebar')
+	if (sidebar) sidebar.classList.remove('active')
+
 	tg.HapticFeedback.impactOccurred('light')
 	const content = document.getElementById('sheet-content')
 	content.innerHTML = `
