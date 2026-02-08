@@ -780,3 +780,40 @@ html {
 		transform: rotate(360deg);
 	}
 }
+
+/* Debug Console */
+#debug-console {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 50vh;
+	background: rgba(0, 0, 0, 0.9);
+	color: #0f0;
+	font-family: monospace;
+	font-size: 12px;
+	padding: 10px;
+	overflow-y: auto;
+	z-index: 10002;
+	display: none;
+	pointer-events: auto;
+	border-top: 1px solid #333;
+}
+
+#debug-console.active {
+	display: block;
+}
+
+#debug-toggle-btn {
+	position: fixed;
+	bottom: 100px;
+	right: 10px;
+	z-index: 10003;
+	background: red;
+	color: white;
+	border: none;
+	padding: 5px 10px;
+	border-radius: 5px;
+	font-size: 10px;
+	opacity: 0.7;
+}

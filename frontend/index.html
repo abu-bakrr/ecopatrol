@@ -218,13 +218,63 @@
 
 		<!-- Error Handler for Mobile Debugging -->
 		<script>
-			window.onerror = function (msg, url, line) {
-				// alert('Global Error: ' + msg + '\nLine: ' + line);
-				// Uncomment above if needed, but for now just log
-				console.error('Global Error: ' + msg + '\nLine: ' + line)
+			// Simple on-screen logger
+			const debugConsole = document.getElementById('debug-console')
+			const debugBtn = document.getElementById('debug-toggle-btn')
+
+			debugBtn.addEventListener('click', () => {
+				debugConsole.classList.toggle('active')
+			})
+
+			function logToScreen(msg, type = 'log') {
+				const line = document.createElement('div')
+				line.style.borderBottom = '1px solid #333'
+				line.style.padding = '2px 0'
+				line.style.wordBreak = 'break-all'
+
+				if (type === 'error') line.style.color = '#ff5555'
+				else if (type === 'warn') line.style.color = '#ffff55'
+
+				line.textContent = `[${new Date().toLocaleTimeString()}] ${String(msg)}`
+				debugConsole.appendChild(line)
+				debugConsole.scrollTop = debugConsole.scrollHeight
 			}
+
+			// Capture Global Errors
+			window.onerror = function (msg, url, line) {
+				logToScreen(`Global Error: ${msg} \nLine: ${line}`, 'error')
+				debugConsole.classList.add('active') // Auto-open on error
+				return false
+			}
+
+			// Override Console
+			const originalLog = console.log
+			const originalError = console.error
+			const originalWarn = console.warn
+
+			console.log = function (...args) {
+				originalLog.apply(console, args)
+				logToScreen(args.join(' '))
+			}
+
+			console.error = function (...args) {
+				originalError.apply(console, args)
+				logToScreen(args.join(' '), 'error')
+				debugConsole.classList.add('active') // Auto-open on error
+			}
+
+			console.warn = function (...args) {
+				originalWarn.apply(console, args)
+				logToScreen(args.join(' '), 'warn')
+			}
+
+			console.log('Debug console initialized')
 		</script>
 
-		<script type="module" src="main.js?v=4"></script>
+		<!-- Debug Console Structure -->
+		<button id="debug-toggle-btn">🐞 LOGS</button>
+		<div id="debug-console"></div>
+
+		<script type="module" src="main.js?v=5"></script>
 	</body>
 </html>
