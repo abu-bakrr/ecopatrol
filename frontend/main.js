@@ -146,104 +146,135 @@ function hideOnboarding() {
 }
 
 async function handleRegistration() {
-	const firstName = document.getElementById('first-name').value.trim()
-	const lastName = document.getElementById('last-name').value.trim()
-	const age = parseInt(document.getElementById('age').value)
-	const phone = document.getElementById('phone').value.trim()
+	try {
+        const firstNameInput = document.getElementById('first-name');
+        const lastNameInput = document.getElementById('last-name');
+        const ageInput = document.getElementById('age');
+        const phoneInput = document.getElementById('phone');
 
-	console.log('Registration attempt:', { firstName, lastName, age, phone })
+        if (!firstNameInput || !lastNameInput || !ageInput || !phoneInput) {
+            console.error('Missing form elements');
+            tg.showAlert('Ошибка: форма регистрации повреждена. Попробуйте перезагрузить приложение.');
+            return;
+        }
 
-	// Validation
-	if (!firstName || !lastName || !age || !phone) {
-		tg.showAlert('Пожалуйста, заполните все поля')
-		return
-	}
+        const firstName = firstNameInput.value.trim()
+        const lastName = lastNameInput.value.trim()
+        const age = parseInt(ageInput.value)
+        const phone = phoneInput.value.trim()
 
-	if (age < 13 || age > 120) {
-		tg.showAlert('Пожалуйста, введите корректный возраст (13-120)')
-		return
-	}
+        console.log('Registration attempt:', { firstName, lastName, age, phone })
 
-	// Validate phone starts with +998
-	if (!phone.startsWith('+998')) {
-		tg.showAlert('Номер телефона должен начинаться с +998')
-		return
-	}
+        // Validation
+        if (!firstName || !lastName || !age || !phone) {
+            tg.showAlert('Пожалуйста, заполните все поля')
+            return
+        }
 
-	// Request geolocation
-	if (!navigator.geolocation) {
-		tg.showAlert('Геолокация недоступна на вашем устройстве')
-		return
-	}
+        if (isNaN(age) || age < 13 || age > 120) {
+            tg.showAlert('Пожалуйста, введите корректный возраст (13-120)')
+            return
+        }
 
-	tg.HapticFeedback.impactOccurred('medium')
+        // Validate phone starts with +998
+        if (!phone.startsWith('+998')) {
+            tg.showAlert('Номер телефона должен начинаться с +998')
+            return
+        }
 
-	navigator.geolocation.getCurrentPosition(
-		async position => {
-			console.log('Geolocation granted:', position.coords)
+        // Request geolocation
+        if (!navigator.geolocation) {
+            tg.showAlert('Геолокация недоступна на вашем устройстве')
+            return
+        }
 
-			// Geolocation granted, proceed with registration
-			const initData = tg.initDataUnsafe
-			const user = initData.user || {
-				id: Date.now(),
-				username: `${firstName}_${lastName}`.toLowerCase(),
-			}
+        tg.HapticFeedback.impactOccurred('medium')
 
-			console.log('Telegram user:', user)
+        navigator.geolocation.getCurrentPosition(
+            async position => {
+                console.log('Geolocation granted:', position.coords)
 
-			try {
-				const requestBody = {
-					telegram_id: user.id,
-					username: user.username || `${firstName} ${lastName}`,
-					first_name: firstName,
-					last_name: lastName,
-					age: age,
-					phone: phone,
-					initData: tg.initData || '',
-				}
+                // Geolocation granted, proceed with registration
+                const initData = tg.initDataUnsafe
+                const user = initData.user || {
+                    id: Date.now(),
+                    username: `${firstName}_${lastName}`.toLowerCase(),
+                }
 
-				console.log('Sending registration request:', requestBody)
+                console.log('Telegram user:', user)
 
-				const response = await fetch(`${API_URL}/init`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(requestBody),
-				})
+                try {
+                    const requestBody = {
+                        telegram_id: user.id,
+                        username: user.username || `${firstName} ${lastName}`,
+                        first_name: firstName,
+                        last_name: lastName,
+                        age: age,
+                        phone: phone,
+                        initData: tg.initData || '',
+                    }
 
-				console.log('Response status:', response.status)
+                    console.log('Sending registration request:', requestBody)
 
-				if (!response.ok) {
-					const errorText = await response.text()
-					console.error('Registration failed:', errorText)
-					throw new Error(`Registration failed: ${response.status}`)
-				}
+                    const response = await fetch(`${API_URL}/init`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(requestBody),
+                    })
 
-				const data = await response.json()
-				console.log('Registration successful:', data)
+                    console.log('Response status:', response.status)
 
-				currentUser = data.user
+                    if (!response.ok) {
+                        const errorText = await response.text()
+                        console.error('Registration failed:', errorText)
+                        // Show specific error from server if available and safe, or generic
+                        tg.showAlert(`Ошибка регистрации (${response.status}): ${errorText.substring(0, 100)}`)
+                        throw new Error(`Registration failed: ${response.status} ${errorText}`)
+                    }
 
-				localStorage.setItem('registered', 'true')
-				isRegistered = true
+                    const data = await response.json()
+                    console.log('Registration successful:', data)
 
-				hideOnboarding()
-				// Initialize map with user location
-				if (position && position.coords) {
-					initMap([position.coords.longitude, position.coords.latitude])
-				} else {
-					initMap()
-				}
+                    currentUser = data.user
 
-				setupEventListeners()
-				loadPollutions()
-				updateProfileUI()
+                    localStorage.setItem('registered', 'true')
+                    isRegistered = true
 
-				tg.HapticFeedback.notificationOccurred('success')
-				tg.showAlert('Регистрация успешна!')
-			} catch (e) {
-				console.error('Registration error:', e)
-				tg.showAlert(`Ошибка регистрации: ${e.message}`)
-			}
+                    hideOnboarding()
+                    // Initialize map with user location
+                    if (position && position.coords) {
+                        initMap([position.coords.longitude, position.coords.latitude])
+                    } else {
+                        initMap()
+                    }
+
+                    setupEventListeners()
+                    loadPollutions()
+                    updateProfileUI()
+
+                    tg.HapticFeedback.notificationOccurred('success')
+                    tg.showAlert('Регистрация успешна!')
+                } catch (e) {
+                    console.error('Registration network/server error:', e)
+                    tg.showAlert(`Ошибка соединения: ${e.message}`)
+                }
+            },
+            error => {
+                console.error('Geolocation error:', error)
+                tg.showAlert(
+                    'Для регистрации необходим доступ к геолокации. Пожалуйста, разрешите доступ.',
+                )
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0,
+            },
+        )
+    } catch (outerError) {
+        console.error('Critical registration error:', outerError);
+        tg.showAlert('Критическая ошибка формы: ' + outerError.message);
+    }
 		},
 		error => {
 			console.error('Geolocation error:', error)
