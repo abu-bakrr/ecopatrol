@@ -31,16 +31,19 @@ def validate_telegram_data(init_data):
 
 @app.route('/api/init', methods=['POST'])
 def init_user():
-    data = request.json
+    data = request.json or {}
     tg_id = data.get('telegram_id')
+    print(f"--- INIT USER ATTEMPT --- tg_id: {tg_id}")
     
     try:
         user = User.query.filter_by(telegram_id=tg_id).first()
+        print(f"Found user: {bool(user)}")
     except Exception as e:
         print(f"Database query error: {e}")
-        return jsonify({'status': 'error', 'message': 'Database error. Did you run migrate_db.py?'}), 500
+        return jsonify({'status': 'error', 'message': f'Database error: {e}'}), 500
 
     if not user:
+        print(f"Creating new user: {tg_id}")
         try:
             user = User(
                 telegram_id=tg_id,
@@ -52,10 +55,11 @@ def init_user():
             )
             db.session.add(user)
             db.session.commit()
+            print("User created successfully")
         except Exception as e:
             db.session.rollback()
             print(f"User creation error: {e}")
-            return jsonify({'status': 'error', 'message': 'Failed to create user. Check database schema.'}), 500
+            return jsonify({'status': 'error', 'message': f'Creation failed: {e}'}), 500
     
     # Safely get language to avoid 500 if column is missing
     user_lang = 'ru'
@@ -202,9 +206,27 @@ def update_language(user_id):
         return jsonify({'error': 'Invalid language'}), 400
     
     user = User.query.get_or_404(user_id)
-    user.language = lang
-    db.session.commit()
-    return jsonify({'status': 'ok', 'language': user.language})
+    try:
+        user.language = lang
+        db.session.commit()
+        return jsonify({'status': 'ok', 'language': user.language})
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error updating language: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    try:
+        user_count = User.query.count()
+        return jsonify({
+            'status': 'ok',
+            'db': 'connected',
+            'users': user_count,
+            'environment': 'vps' if 'postgresql' in app.config['SQLALCHEMY_DATABASE_URI'] else 'local'
+        })
+    except Exception as e:
+        return jsonify({'status': 'error', 'db': str(e)}), 500
 
 if __name__ == '__main__':
     with app.app_context():
