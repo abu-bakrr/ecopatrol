@@ -526,7 +526,7 @@ function setupEventListeners() {
 	})
 	document.getElementById('menu-info').addEventListener('click', () => {
 		tg.showAlert(
-			'Приложение EcoPatrol v23.0\nРазработано для чистого будущего.',
+			'Приложение EcoPatrol v27.0\nРазработано для чистого будущего.',
 		)
 	})
 

@@ -156,17 +156,13 @@ html {
 .top-vignette {
 	top: 0;
 	height: 120px;
-	background: linear-gradient(
-		to bottom,
-		var(--bg-primary) 0%,
-		transparent 100%
-	);
+	background: linear-gradient(to bottom, var(--map-bg) 0%, transparent 100%);
 }
 
 .bottom-vignette {
 	bottom: 0;
 	height: 160px;
-	background: linear-gradient(to top, var(--bg-primary) 0%, transparent 100%);
+	background: linear-gradient(to top, var(--map-bg) 0%, transparent 100%);
 }
 
 /* Marker sizing based on zoom */
@@ -478,7 +474,7 @@ html {
 }
 
 .theme-icon-btn {
-	background: var(--bg-secondary);
+	background: transparent;
 	border: none;
 	width: 40px;
 	height: 40px;
@@ -489,6 +485,8 @@ html {
 	align-items: center;
 	justify-content: center;
 	transition: all 0.2s;
+	-webkit-tap-highlight-color: transparent;
+	outline: none;
 }
 
 .theme-icon-btn:active {
