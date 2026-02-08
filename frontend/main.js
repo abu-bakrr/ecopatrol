@@ -270,6 +270,10 @@ function initMap(initialCenter = null) {
 		attributionControl: false, // Cleaner look
 		dragRotate: false, // Disable rotation by mouse drag
 		touchPitch: false, // Disable pitch by touch
+		maxBounds: [
+			[55.0, 36.0], // Southwest coordinates (approx)
+			[74.0, 46.0], // Northeast coordinates (approx)
+		],
 	})
 
 	// Disable rotation by touch (keep zoom)
