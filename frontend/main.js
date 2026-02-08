@@ -805,7 +805,14 @@ function updatePhotoPreview() {
 async function submitPollution(lat, lng, tags = []) {
 	const desc = document.getElementById('pollution-desc').value
 
-	// VALIDATION: At least one tag OR description required
+	// VALIDATION: Photos are mandatory
+	if (uploadedPhotos.length === 0) {
+		tg.showAlert('Пожалуйста, загрузите хотя бы одно фото (обязательно)')
+		tg.HapticFeedback.notificationOccurred('error')
+		return
+	}
+
+	// VALIDATION: At least one tag OR description recommended
 	if (tags.length === 0 && !desc.trim()) {
 		tg.showAlert('Выберите тип загрязнения или добавьте описание')
 		tg.HapticFeedback.notificationOccurred('error')
@@ -944,7 +951,7 @@ function showCleanForm() {
         <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">Подтверждение очистки</h2>
         
         <div class="form-group">
-            <label class="form-label">Фото после очистки</label>
+            <label class="form-label">Фото после очистки (обязательно)</label>
             <div class="file-upload" id="upload-after-trigger">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 8px; opacity: 0.5;">
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
@@ -952,7 +959,7 @@ function showCleanForm() {
                     <polyline points="21 15 16 10 5 21"/>
                 </svg>
                 <p style="color: var(--text-secondary); font-size: 14px;">Загрузите фото чистого места</p>
-                <input type="file" id="photo-input-after" accept="image/*" multiple capture="environment">
+                <input type="file" id="photo-input-after" accept="image/*" multiple>
             </div>
             <div id="photo-preview-after" class="photo-grid"></div>
         </div>
@@ -1024,7 +1031,8 @@ function updatePhotoPreviewAfter() {
 
 async function submitClean() {
 	if (uploadedPhotos.length === 0) {
-		tg.showAlert('Пожалуйста, загрузите хотя бы одно фото')
+		tg.showAlert('Пожалуйста, загрузите фото после очистки (обязательно)')
+		tg.HapticFeedback.notificationOccurred('error')
 		return
 	}
 
