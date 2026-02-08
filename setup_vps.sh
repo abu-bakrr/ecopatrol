@@ -96,6 +96,10 @@ MINI_APP_URL=https://$DOMAIN_NAME
 CLOUDINARY_URL=$CLOUDINARY_URL
 EOF
 
+# Инициализация таблиц в базе данных
+echo "🔹 Инициализация таблиц в базе данных..."
+python3 -c "from app import app, db; ctx=app.app_context(); ctx.push(); db.create_all(); ctx.pop()"
+
 deactivate
 cd ..
 
