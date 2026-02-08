@@ -463,6 +463,19 @@ function updateProfileUI() {
 		`ID: ${currentUser.telegram_id}`
 	document.getElementById('sidebar-balance').textContent =
 		`$${currentUser.balance.toFixed(2)}`
+	setProfileAvatar(fullName)
+}
+
+function setProfileAvatar(name) {
+	const avatar = document.getElementById('sidebar-avatar')
+	if (!avatar || !name) return
+	const initials = name
+		.split(' ')
+		.map(word => word[0])
+		.join('')
+		.toUpperCase()
+		.substring(0, 2)
+	avatar.textContent = initials
 }
 
 function setupEventListeners() {
