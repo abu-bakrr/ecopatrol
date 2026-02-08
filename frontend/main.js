@@ -466,6 +466,37 @@ function updateProfileUI() {
 	setProfileAvatar(fullName)
 }
 
+function toggleTheme() {
+	const body = document.body
+	const icon = document.getElementById('theme-icon')
+	if (body.getAttribute('data-theme') === 'dark') {
+		body.removeAttribute('data-theme')
+		tg.setHeaderColor('#ffffff')
+		tg.setBackgroundColor('#ffffff')
+		// Sun icon for Light Mode
+		icon.innerHTML = `
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+        `
+	} else {
+		body.setAttribute('data-theme', 'dark')
+		tg.setHeaderColor('#121212')
+		tg.setBackgroundColor('#121212')
+		// Moon icon for Dark Mode
+		icon.innerHTML = `
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        `
+	}
+	tg.HapticFeedback.impactOccurred('light')
+}
+
 function setProfileAvatar(name) {
 	const avatar = document.getElementById('sidebar-avatar')
 	if (!avatar || !name) return
@@ -483,11 +514,22 @@ function setupEventListeners() {
 	document.getElementById('balance-btn').addEventListener('click', () => {
 		tg.showAlert('Биржа в разработке')
 	})
-	document
-		.getElementById('sidebar-close')
-		.addEventListener('click', closeSidebar)
 	document.getElementById('theme-toggle').addEventListener('click', toggleTheme)
 	document.getElementById('geolocate-btn').addEventListener('click', geolocate)
+
+	// Menu Item Listeners
+	document.getElementById('menu-reports').addEventListener('click', () => {
+		tg.showAlert('Раздел "Мои отчеты" в разработке')
+	})
+	document.getElementById('menu-history').addEventListener('click', () => {
+		tg.showAlert('Раздел "История начислений" в разработке')
+	})
+	document.getElementById('menu-info').addEventListener('click', () => {
+		tg.showAlert(
+			'Приложение EcoPatrol v23.0\nРазработано для чистого будущего.',
+		)
+	})
+
 	document
 		.getElementById('toggle-pollutions-btn')
 		.addEventListener('click', togglePollutions)
