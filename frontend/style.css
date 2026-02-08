@@ -156,13 +156,21 @@ html {
 .top-vignette {
 	top: 0;
 	height: 120px;
-	background: linear-gradient(to bottom, var(--map-bg) 0%, transparent 100%);
+	background: linear-gradient(
+		to bottom,
+		var(--bg-page, #111827) 0%,
+		transparent 100%
+	);
 }
 
 .bottom-vignette {
 	bottom: 0;
 	height: 160px;
-	background: linear-gradient(to top, var(--map-bg) 0%, transparent 100%);
+	background: linear-gradient(
+		to top,
+		var(--bg-page, #111827) 0%,
+		transparent 100%
+	);
 }
 
 /* Marker sizing based on zoom */
@@ -430,10 +438,11 @@ html {
 	left: 0;
 	width: 300px;
 	height: 100%;
-	background: #111827;
+	background: var(--bg-primary);
 	box-shadow: 4px 0 24px var(--shadow);
-	z-index: 600; /* Higher than overlay (450) */
+	z-index: 600;
 	transform: translateX(-100%);
+	pointer-events: auto !important;
 	transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 	overflow-y: auto;
 	backdrop-filter: blur(12px);
@@ -799,7 +808,7 @@ html {
 	border-radius: 16px;
 	font-size: 16px;
 	font-family: inherit;
-	background: #111827;
+	background: var(--bg-primary); /* Variable defined in :root */
 	color: var(--text-primary);
 	transition: all 0.2s ease;
 	appearance: none;
@@ -1098,31 +1107,7 @@ html {
 	}
 }
 
-/* Debug Console - Hidden by default but functional */
-#debug-console {
-	display: none !important;
-	z-index: 10004;
-}
-
-#debug-console.active {
-	display: flex !important;
-	z-index: 10004;
-}
-
-#debug-toggle-btn {
-	position: fixed;
-	bottom: 100px;
-	right: 10px;
-	z-index: 10005;
-	background: red;
-	color: white;
-	border: none;
-	padding: 5px 10px;
-	border-radius: 5px;
-	font-size: 10px;
-	opacity: 0.7;
-	display: block !important;
-}
+/* Debug styles moved to index.html for maximum reliability and priority */
 /* Reports List Styles */
 .reports-list {
 	display: flex;

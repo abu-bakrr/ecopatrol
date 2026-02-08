@@ -370,6 +370,16 @@ def admin_update_reward(p_id):
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+@app.route('/api/config', methods=['GET'])
+def get_public_config():
+    try:
+        debug_setting = GlobalSetting.query.filter_by(key='debug_logs_enabled').first()
+        return jsonify({
+            'debug_logs_enabled': debug_setting.value if debug_setting else 'false'
+        })
+    except Exception as e:
+        return jsonify({'debug_logs_enabled': 'false', 'error': str(e)})
+
 @app.route('/api/admin/settings', methods=['GET'])
 def admin_get_settings():
     tg_id = request.args.get('admin_tg_id', type=int)

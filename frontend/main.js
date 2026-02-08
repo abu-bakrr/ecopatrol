@@ -219,7 +219,19 @@ function checkRegistration() {
 	if (isRegistered) {
 		hideOnboarding()
 
-		// SPEED OPTIMIZATION: Try to init map with cache immediately
+		// FETCH PUBLIC CONFIG (Like Debug Mode)
+		fetch(`${API_URL}/config`)
+			.then(r => r.json())
+			.then(s => {
+				const debugBtn = document.getElementById('debug-toggle-btn')
+				if (debugBtn) {
+					debugBtn.style.display =
+						s.debug_logs_enabled === 'true' ? 'block' : 'none'
+				}
+			})
+			.catch(e => console.log('Config fetch error:', e))
+
+		// SPEED OPTIMIZATION...
 		const cached = localStorage.getItem('last_known_loc')
 		if (cached) {
 			try {

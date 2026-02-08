@@ -507,7 +507,31 @@
 					<label class="input-label">Награда Уровень 3</label>
 					<input type="number" id="set-3" class="input-field" />
 				</div>
-				<button class="btn btn-solid" onclick="saveSettings()">
+				<label
+					class="input-group"
+					style="
+						display: flex;
+						align-items: center;
+						gap: 10px;
+						cursor: pointer;
+						padding: 10px 0;
+					"
+				>
+					<input
+						type="checkbox"
+						id="set-debug"
+						style="width: 20px; height: 20px; cursor: pointer"
+					/>
+					<span
+						style="font-weight: 700; color: var(--text-main); font-size: 14px"
+						>Включить кнопку логов (Debug)</span
+					>
+				</label>
+				<button
+					class="btn btn-solid"
+					onclick="saveSettings()"
+					style="margin-top: 10px"
+				>
 					Сохранить настройки
 				</button>
 			</div>
@@ -739,6 +763,8 @@
 					document.getElementById('set-1').value = s.reward_level_1
 					document.getElementById('set-2').value = s.reward_level_2
 					document.getElementById('set-3').value = s.reward_level_3
+					document.getElementById('set-debug').checked =
+						s.debug_logs_enabled === 'true'
 				}
 			}
 
@@ -747,6 +773,8 @@
 					reward_level_1: document.getElementById('set-1').value,
 					reward_level_2: document.getElementById('set-2').value,
 					reward_level_3: document.getElementById('set-3').value,
+					debug_logs_enabled:
+						document.getElementById('set-debug').checked ? 'true' : 'false',
 				}
 				const res = await apiFetch('/admin/settings', {
 					method: 'POST',
