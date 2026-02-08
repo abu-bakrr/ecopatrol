@@ -236,12 +236,6 @@ function initMap() {
 	map.on('load', () => {
 		// Trigger geolocation on load
 		geolocate.trigger()
-
-		// Add navigation controls
-		map.addControl(
-			new maplibregl.NavigationControl({ showCompass: false }),
-			'bottom-right',
-		)
 	})
 
 	// Handle map movement
@@ -378,25 +372,33 @@ function geolocate() {
 
 async function loadPollutions() {
 	try {
+		console.log('Loading pollutions...')
 		const response = await fetch(`${API_URL}/pollutions`)
+		if (!response.ok) throw new Error('Failed to fetch pollutions')
 		const pollutions = await response.json()
+		console.log('Pollutions loaded:', pollutions)
 
 		markers.forEach(m => m.remove())
 		markers = []
 
 		pollutions.forEach(p => {
 			const el = document.createElement('div')
-			el.className = `pollution-marker level-${p.level}`
+			el.className = `pollution-marker level-${p.level || 1}`
 
 			const marker = new maplibregl.Marker({ element: el })
 				.setLngLat([p.lng, p.lat])
 				.addTo(map)
 
-			el.addEventListener('click', () => showPollutionDetails(p))
+			el.addEventListener('click', e => {
+				e.stopPropagation()
+				console.log('Pollution clicked:', p)
+				showPollutionDetails(p)
+			})
 			markers.push(marker)
 		})
 	} catch (e) {
 		console.error('Load pollutions error:', e)
+		tg.showAlert('Не удалось загрузить данные о загрязнениях')
 	}
 }
 
