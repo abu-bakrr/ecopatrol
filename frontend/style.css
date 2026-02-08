@@ -355,8 +355,9 @@ html {
 	width: 280px;
 	height: 100%;
 	background: var(--bg-primary);
+	background: var(--bg-primary);
 	box-shadow: 2px 0 12px var(--shadow);
-	z-index: 100;
+	z-index: 300; /* Higher than sheet */
 	transform: translateX(-100%);
 	transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 	overflow-y: auto;
@@ -443,8 +444,10 @@ html {
 	background: var(--bg-primary);
 	border-top-left-radius: 16px;
 	border-top-right-radius: 16px;
+	border-top-left-radius: 16px;
+	border-top-right-radius: 16px;
 	box-shadow: 0 -2px 12px var(--shadow);
-	z-index: 50;
+	z-index: 200; /* Above profile buttons (100) */
 	transform: translateY(100%);
 	transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 	max-height: 80vh;
@@ -474,8 +477,9 @@ html {
 	left: 0;
 	right: 0;
 	bottom: 0;
+	bottom: 0;
 	background: rgba(0, 0, 0, 0.4);
-	z-index: 40;
+	z-index: 150; /* Below sheet (200) but above buttons (100) */
 	opacity: 0;
 	visibility: hidden;
 	transition: all 0.3s;
@@ -554,10 +558,34 @@ html {
 .level-btn.active.level-3 {
 	background: #ef4444;
 	border-color: #ef4444;
+	border-color: #ef4444;
 	color: white;
 }
 
-/* Buttons */
+/* Tag Selector */
+.tag-selector {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.tag-btn {
+	padding: 8px 14px;
+	border: 1px solid var(--border);
+	background: var(--bg-primary);
+	border-radius: 20px;
+	font-size: 13px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s;
+	color: var(--text-primary);
+}
+
+.tag-btn.active {
+	background: var(--primary);
+	border-color: var(--primary);
+	color: white;
+}
 .btn {
 	padding: 10px 18px;
 	border: none;

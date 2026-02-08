@@ -639,10 +639,23 @@ function updatePhotoPreview() {
 		.join('')
 }
 
-async function submitPollution(lat, lng) {
+async function submitPollution(lat, lng, tags = []) {
 	const desc = document.getElementById('pollution-desc').value
 
+	// VALIDATION: At least one tag OR description required
+	if (tags.length === 0 && !desc.trim()) {
+		tg.showAlert('Выберите тип загрязнения или добавьте описание')
+		tg.HapticFeedback.notificationOccurred('error')
+		return
+	}
+
 	try {
+		const btn = document.getElementById('submit-pollution')
+		if (btn) {
+			btn.textContent = 'Отправка...'
+			btn.disabled = true
+		}
+
 		const response = await fetch(`${API_URL}/pollutions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -651,7 +664,7 @@ async function submitPollution(lat, lng) {
 				lat,
 				lng,
 				level: selectedLevel,
-				types: ['trash'],
+				types: tags.length > 0 ? tags : ['trash'], // Fallback if needed, but validation handles it
 				description: desc,
 				photos: uploadedPhotos,
 			}),
