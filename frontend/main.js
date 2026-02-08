@@ -672,7 +672,7 @@ function showAddForm() {
 	dragZone.style.top = '0'
 	dragZone.style.left = '0'
 	dragZone.style.right = '0'
-	dragZone.style.height = '40px' // Larger hit area
+	dragZone.style.height = '20px' // Reduced height to avoid covering content
 	dragZone.style.zIndex = '10'
 	sheet.appendChild(dragZone)
 
