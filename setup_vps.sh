@@ -36,43 +36,38 @@ sudo apt install -y python3-pip python3-venv git curl postgresql postgresql-cont
 
 # 4. Настройка PostgreSQL
 echo "🔹 Настройка базы данных PostgreSQL..."
-sudo systemctl stop postgresql || true
-sudo pkill -9 -u postgres || true
-sudo rm -rf /var/run/postgresql/*
-sudo rm -rf /var/lib/postgresql/14/main
-sudo rm -rf /etc/postgresql/14/main
+# Определяем версию установленного Postgres
+PG_VER=$(psql --version | grep -oE '[0-9]+' | head -1)
+echo "✅ Определена версия PostgreSQL: $PG_VER"
 
-echo "🔹 Создание нового кластера PostgreSQL 14..."
-cd /tmp
-sudo pg_createcluster 14 main --start || {
-    sudo rm -rf /var/lib/postgresql/14/main
-    sudo mkdir -p /var/lib/postgresql/14/main
-    sudo chown postgres:postgres /var/lib/postgresql/14/main
-    sudo -u postgres /usr/lib/postgresql/14/bin/initdb -D /var/lib/postgresql/14/main
-    sudo systemctl start postgresql
-}
-cd - > /dev/null
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
 
-POSTGRES_CONF="/etc/postgresql/14/main/postgresql.conf"
+# Настройка доступа
+POSTGRES_CONF="/etc/postgresql/$PG_VER/main/postgresql.conf"
+HBA_CONF="/etc/postgresql/$PG_VER/main/pg_hba.conf"
+
 if [ -f "$POSTGRES_CONF" ]; then
     sudo sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '127.0.0.1'/" $POSTGRES_CONF
+    # Разрешаем md5 для локальных подключений
+    sudo sed -i "s/local   all             all                                     peer/local   all             all                                     md5/" $HBA_CONF
     sudo systemctl restart postgresql
 fi
 
-sleep 5
+sleep 3
 DB_NAME="ecopatrol"
 DB_USER="eco_user"
 DB_PASS=$(openssl rand -base64 12)
 
-cd /tmp
+# Создаем базу и пользователя через системный сокет
 sudo -u postgres psql -c "DROP DATABASE IF EXISTS $DB_NAME;" || true
 sudo -u postgres psql -c "DROP USER IF EXISTS $DB_USER;" || true
 sudo -u postgres psql -c "CREATE DATABASE $DB_NAME;"
 sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASS';"
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;"
-cd - > /dev/null
 
-DATABASE_URL="postgresql://$DB_USER:$DB_PASS@127.0.0.1/$DB_NAME"
+# Используем пустое значение хоста для подключения через Unix сокет (самое надежное на Linux)
+DATABASE_URL="postgresql://$DB_USER:$DB_PASS@/$DB_NAME"
 
 # 5. Настройка Backend
 echo "🔹 Настройка Python окружения в $PROJECT_ROOT/backend..."
