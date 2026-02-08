@@ -170,135 +170,103 @@ function hideOnboarding() {
 }
 
 async function handleRegistration() {
-	const firstName = document.getElementById('first-name').value.trim()
-	const lastName = document.getElementById('last-name').value.trim()
-	const age = parseInt(document.getElementById('age').value)
-	const phone = document.getElementById('phone').value.trim()
+    const firstName = document.getElementById('first-name').value.trim()
+    const lastName = document.getElementById('last-name').value.trim()
+    const age = parseInt(document.getElementById('age').value)
+    const phone = document.getElementById('phone').value.trim()
 
-	console.log('Registration attempt:', { firstName, lastName, age, phone })
+    console.log('Registration attempt:', { firstName, lastName, age, phone })
 
-	// Validation
-// 1. Validation in handleRegistration
-	if (!firstName || !lastName || !age || !phone) {
-		showNotification('Пожалуйста, заполните все поля', 'error')
-		return
-	}
+    // Validation
+    if (!firstName || !lastName || !age || !phone) {
+        showNotification('Пожалуйста, заполните все поля', 'error')
+        return
+    }
 
-	if (age < 13 || age > 120) {
-		showNotification('Пожалуйста, введите корректный возраст (13-120)', 'error')
-		return
-	}
+    if (age < 13 || age > 120) {
+        showNotification('Пожалуйста, введите корректный возраст (13-120)', 'error')
+        return
+    }
 
-	if (!phone.startsWith('+998')) {
-		showNotification('Номер телефона должен начинаться с +998', 'error')
-		return
-	}
+    if (!phone.startsWith('+998')) {
+        showNotification('Номер телефона должен начинаться с +998', 'error')
+        return
+    }
 
-	if (!navigator.geolocation) {
-		showNotification('Геолокация недоступна на вашем устройстве', 'error')
-		return
-	}
+    if (!navigator.geolocation) {
+        showNotification('Геолокация недоступна на вашем устройстве', 'error')
+        return
+    }
 
-// 2. Registration success/error
-				showNotification('Регистрация успешна!', 'success')
-			} catch (e) {
-				console.error('Registration error:', e)
-				showNotification(`Ошибка регистрации: ${e.message}`, 'error')
-			}
-		},
-		error => {
-			console.error('Geolocation error:', error)
-			showNotification('Для использования приложения необходимо разрешить доступ к геолокации', 'error')
-		},
+    tg.HapticFeedback.impactOccurred('medium')
 
-// 3. Balance btn
-	document.getElementById('balance-btn').addEventListener('click', () => {
-		showNotification('Биржа в разработке')
-	})
+    navigator.geolocation.getCurrentPosition(
+        async position => {
+            console.log('Geolocation granted:', position.coords)
 
-// 4. Geo error
-			if (!cached) {
-				showNotification('Не удалось определить местоположение', 'error')
-			}
-		},
-		{ enableHighAccuracy: true, timeout: 5000, maximumAge: 0 },
-	)
+            const initData = tg.initDataUnsafe
+            const user = initData.user || {
+                id: Date.now(),
+                username: `${firstName}_${lastName}`.toLowerCase(),
+            }
+
+            try {
+                const requestBody = {
+                    telegram_id: user.id,
+                    username: user.username || `${firstName} ${lastName}`,
+                    first_name: firstName,
+                    last_name: lastName,
+                    age: age,
+                    phone: phone,
+                    initData: tg.initData || '',
+                }
+
+                const response = await fetch(`${API_URL}/init`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody),
+                })
+
+                if (!response.ok) {
+                    const errorText = await response.text()
+                    throw new Error(`Registration failed: ${response.status}`)
+                }
+
+                const data = await response.json()
+                currentUser = data.user
+                
+                localStorage.setItem('registered', 'true')
+                isRegistered = true
+
+                hideOnboarding()
+                if (position && position.coords) {
+                    initMap([position.coords.longitude, position.coords.latitude])
+                } else {
+                    initMap()
+                }
+
+                setupEventListeners()
+                loadPollutions()
+                updateProfileUI()
+
+                showNotification('Регистрация успешна!', 'success')
+            } catch (e) {
+                console.error('Registration error:', e)
+                showNotification(`Ошибка регистрации: ${e.message}`, 'error')
+            }
+        },
+        error => {
+            console.error('Geolocation error:', error)
+            showNotification('Для использования приложения необходимо разрешить доступ к геолокации', 'error')
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0,
+        },
+    )
 }
-
-// 5. Geo disabled check
-	if (!navigator.geolocation) {
-		showNotification('Геолокация недоступна', 'error')
-		return
-	}
-
-// 6. Load pollutions error
-	} catch (e) {
-		console.error('Load pollutions error:', e)
-		showNotification('Не удалось загрузить данные о загрязнениях', 'error')
-	}
-
-// 7. Upload photo error
-		} catch (e) {
-			console.error('Upload error:', e)
-			showNotification('Ошибка: ' + (e.message || 'Загрузка не удалась'), 'error')
-		}
-
-// 8. Submit validations
-	if (tags.length === 0 && !desc.trim()) {
-		showNotification('Выберите тип загрязнения или добавьте описание', 'error')
-		// tg.HapticFeedback.notificationOccurred('error') // Handled inside showNotification
-		return
-	}
-
-// 9. Submit success/error
-		if (response.ok) {
-			closeBottomSheet()
-			loadPollutions()
-			// tg.HapticFeedback.notificationOccurred('success') // Handled inside showNotification
-			showNotification('Загрязнение отмечено!', 'success')
-		}
-	} catch (e) {
-		showNotification('Ошибка при отправке', 'error')
-	}
-
-// 10. Confirm clean success/error
-			showNotification(`Поздравляем! Вам начислено $${currentPollution.level}`, 'success')
-		}
-	} catch (e) {
-		showNotification('Ошибка при подтверждении', 'error')
-	}
-
-	tg.HapticFeedback.impactOccurred('medium')
-
-	navigator.geolocation.getCurrentPosition(
-		async position => {
-			console.log('Geolocation granted:', position.coords)
-
-			// Geolocation granted, proceed with registration
-			const initData = tg.initDataUnsafe
-			const user = initData.user || {
-				id: Date.now(),
-				username: `${firstName}_${lastName}`.toLowerCase(),
-			}
-
-			console.log('Telegram user:', user)
-
-			try {
-				const requestBody = {
-					telegram_id: user.id,
-					username: user.username || `${firstName} ${lastName}`,
-					first_name: firstName,
-					last_name: lastName,
-					age: age,
-					phone: phone,
-					initData: tg.initData || '',
-				}
-
-				console.log('Sending registration request:', requestBody)
-
-				const response = await fetch(`${API_URL}/init`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
+	headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify(requestBody),
 				})
 
@@ -552,8 +520,6 @@ function geolocate() {
 			const coords = [position.coords.longitude, position.coords.latitude]
 			localStorage.setItem('last_known_loc', JSON.stringify(coords))
 
-			// Only fly if we didn't just fly to the exact same spot (optional, but good)
-			// Or just fly again to be precise
 			map.flyTo({
 				center: coords,
 				zoom: 16,
@@ -562,7 +528,6 @@ function geolocate() {
 			tg.HapticFeedback.impactOccurred('medium')
 		},
 		error => {
-			// Only show error if we didn't show cached location
 			if (!cached) {
 				showNotification('Не удалось определить местоположение', 'error')
 			}
@@ -573,11 +538,11 @@ function geolocate() {
 
 async function loadPollutions() {
 	try {
-		console.log('Loading pollutions...')
+        console.log('Loading pollutions...')
 		const response = await fetch(`${API_URL}/pollutions`)
 		if (!response.ok) throw new Error('Failed to fetch pollutions')
 		const pollutions = await response.json()
-		console.log('Pollutions loaded:', pollutions)
+        console.log('Pollutions loaded:', pollutions)
 
 		markers.forEach(m => m.remove())
 		markers = []
@@ -604,7 +569,6 @@ async function loadPollutions() {
 
 			el.addEventListener('click', e => {
 				e.stopPropagation()
-				console.log('Pollution clicked:', p)
 				showPollutionDetails(p)
 			})
 			markers.push(marker)
@@ -810,28 +774,13 @@ async function handlePhotoUpload(event) {
 			console.error('Upload error:', e)
 			showNotification('Ошибка: ' + (e.message || 'Загрузка не удалась'), 'error')
 		} finally {
-			// Ensure we decrease count even on error
-			// (Note: uploadingCount logic was missed in previous replace?
-			// I need to check if uploadingCount is defined globally)
-			// It was defined in showAddForm scope, so handlePhotoUpload can't see it if it's outside!
-			// WAIT. handlePhotoUpload is defined in global scope (or module scope), showAddForm is too.
-			// If uploadingCount is local to showAddForm, handlePhotoUpload CANNOT see it.
-			// BUG FOUND: uploadCount was local variable in showAddForm, but handlePhotoUpload uses it?
-			// No, handlePhotoUpload is defined OUTSIDE showAddForm.
-			// I need to make uploadingCount global or pass it?
-			// Actually, handlePhotoUpload is attached via addEventListener in showAddForm.
-			// But handlePhotoUpload is defined separately.
-			// Solution: Move uploadingCount to global scope for simplicity.
+            uploadingCount--;
+            updatePhotoPreview();
 		}
 	}
-	if (typeof uploadingCount !== 'undefined') {
-		uploadingCount = 0 // Reset just in case
-		updatePhotoPreviewLocal() // This function is ALSO local to showAddForm!
-		// handlePhotoUpload calls updatePhotoPreview, which is global.
-		// My previous edit tried to make updatePhotoPreviewLocal inside handlePhotoUpload?
-		// No, I tried to rewrite handlePhotoUpload to use a local function.
-		// Let's revert to a robust global approach.
-	}
+    // Also update if we return early or finish the loop
+    if (uploadingCount < 0) uploadingCount = 0;
+    updatePhotoPreview();
 }
 
 function updatePhotoPreview() {
