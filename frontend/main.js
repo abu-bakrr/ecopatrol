@@ -1,12 +1,6 @@
 // EcoPatrol - Onboarding Edition
 const tg = window.Telegram.WebApp
 const API_URL = window.location.origin + '/api'
-console.log('--- APP START ---', {
-	origin: window.location.origin,
-	API_URL: API_URL,
-	platform: tg.platform,
-	initDataRaw: !!tg.initData,
-})
 
 // Viewer Functions (Global)
 window.openPhotoViewer = function (url) {
@@ -220,32 +214,24 @@ function initBottomSheetDrag() {
 }
 
 function checkRegistration() {
-	console.log('--- CHECK REGISTRATION ---')
 	isRegistered = localStorage.getItem('registered') === 'true'
-	console.log('isRegistered state:', isRegistered)
 
 	if (isRegistered) {
-		console.log('User is registered, hiding onboarding...')
 		hideOnboarding()
 
-		console.log('Starting location pre-fetch resolution...')
+		// Use pre-fetched location
 		locationPromise.then(loc => {
-			console.log('locationPromise resolved:', loc)
 			if (loc && loc.coords) {
-				console.log('Initializing map with coords:', loc.coords)
 				initMap(loc.coords)
 			} else {
-				console.log('No coords, initializing map with default center')
 				initMap()
 			}
 		})
 
-		console.log('Initiating background auth and data load...')
 		authUser()
 		setupEventListeners()
 		loadPollutions()
 	} else {
-		console.log('User NOT registered, showing onboarding...')
 		showOnboarding()
 	}
 }

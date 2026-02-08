@@ -437,47 +437,6 @@
 				true,
 			)
 
-			// Add Debug Buttons
-			const debugActions = document.createElement('div')
-			debugActions.style.padding = '8px'
-			debugActions.style.display = 'flex'
-			debugActions.style.gap = '8px'
-			debugActions.style.borderBottom = '2px solid #555'
-
-			const healthBtn = document.createElement('button')
-			healthBtn.textContent = 'CHECK API & DB'
-			healthBtn.style.background = '#059669'
-			healthBtn.style.color = 'white'
-			healthBtn.style.border = 'none'
-			healthBtn.style.padding = '4px 8px'
-			healthBtn.style.borderRadius = '4px'
-			healthBtn.onclick = async () => {
-				logToScreen('Checking health...')
-				try {
-					const res = await fetch(window.location.origin + '/api/health')
-					const data = await res.json()
-					logToScreen('HEALTH: ' + JSON.stringify(data))
-				} catch (e) {
-					logToScreen('HEALTH ERROR: ' + e.message, 'error')
-				}
-			}
-
-			const resetBtn = document.createElement('button')
-			resetBtn.textContent = 'RESET APP'
-			resetBtn.style.background = '#ef4444'
-			resetBtn.style.color = 'white'
-			resetBtn.style.border = 'none'
-			resetBtn.style.padding = '4px 8px'
-			resetBtn.style.borderRadius = '4px'
-			resetBtn.onclick = () => {
-				localStorage.clear()
-				location.reload()
-			}
-
-			debugActions.appendChild(healthBtn)
-			debugActions.appendChild(resetBtn)
-			debugConsole.prepend(debugActions)
-
 			// Override Console
 			const originalLog = console.log
 			const originalError = console.error
