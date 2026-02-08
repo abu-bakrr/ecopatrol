@@ -178,26 +178,94 @@ async function handleRegistration() {
 	console.log('Registration attempt:', { firstName, lastName, age, phone })
 
 	// Validation
+// 1. Validation in handleRegistration
 	if (!firstName || !lastName || !age || !phone) {
-		tg.showAlert('Пожалуйста, заполните все поля')
+		showNotification('Пожалуйста, заполните все поля', 'error')
 		return
 	}
 
 	if (age < 13 || age > 120) {
-		tg.showAlert('Пожалуйста, введите корректный возраст (13-120)')
+		showNotification('Пожалуйста, введите корректный возраст (13-120)', 'error')
 		return
 	}
 
-	// Validate phone starts with +998
 	if (!phone.startsWith('+998')) {
-		tg.showAlert('Номер телефона должен начинаться с +998')
+		showNotification('Номер телефона должен начинаться с +998', 'error')
 		return
 	}
 
-	// Request geolocation
 	if (!navigator.geolocation) {
-		tg.showAlert('Геолокация недоступна на вашем устройстве')
+		showNotification('Геолокация недоступна на вашем устройстве', 'error')
 		return
+	}
+
+// 2. Registration success/error
+				showNotification('Регистрация успешна!', 'success')
+			} catch (e) {
+				console.error('Registration error:', e)
+				showNotification(`Ошибка регистрации: ${e.message}`, 'error')
+			}
+		},
+		error => {
+			console.error('Geolocation error:', error)
+			showNotification('Для использования приложения необходимо разрешить доступ к геолокации', 'error')
+		},
+
+// 3. Balance btn
+	document.getElementById('balance-btn').addEventListener('click', () => {
+		showNotification('Биржа в разработке')
+	})
+
+// 4. Geo error
+			if (!cached) {
+				showNotification('Не удалось определить местоположение', 'error')
+			}
+		},
+		{ enableHighAccuracy: true, timeout: 5000, maximumAge: 0 },
+	)
+}
+
+// 5. Geo disabled check
+	if (!navigator.geolocation) {
+		showNotification('Геолокация недоступна', 'error')
+		return
+	}
+
+// 6. Load pollutions error
+	} catch (e) {
+		console.error('Load pollutions error:', e)
+		showNotification('Не удалось загрузить данные о загрязнениях', 'error')
+	}
+
+// 7. Upload photo error
+		} catch (e) {
+			console.error('Upload error:', e)
+			showNotification('Ошибка: ' + (e.message || 'Загрузка не удалась'), 'error')
+		}
+
+// 8. Submit validations
+	if (tags.length === 0 && !desc.trim()) {
+		showNotification('Выберите тип загрязнения или добавьте описание', 'error')
+		// tg.HapticFeedback.notificationOccurred('error') // Handled inside showNotification
+		return
+	}
+
+// 9. Submit success/error
+		if (response.ok) {
+			closeBottomSheet()
+			loadPollutions()
+			// tg.HapticFeedback.notificationOccurred('success') // Handled inside showNotification
+			showNotification('Загрязнение отмечено!', 'success')
+		}
+	} catch (e) {
+		showNotification('Ошибка при отправке', 'error')
+	}
+
+// 10. Confirm clean success/error
+			showNotification(`Поздравляем! Вам начислено $${currentPollution.level}`, 'success')
+		}
+	} catch (e) {
+		showNotification('Ошибка при подтверждении', 'error')
 	}
 
 	tg.HapticFeedback.impactOccurred('medium')
@@ -263,16 +331,17 @@ async function handleRegistration() {
 				updateProfileUI()
 
 				tg.HapticFeedback.notificationOccurred('success')
-				tg.showAlert('Регистрация успешна!')
+				showNotification('Регистрация успешна!', 'success')
 			} catch (e) {
 				console.error('Registration error:', e)
-				tg.showAlert(`Ошибка регистрации: ${e.message}`)
+				showNotification(`Ошибка регистрации: ${e.message}`, 'error')
 			}
 		},
 		error => {
 			console.error('Geolocation error:', error)
-			tg.showAlert(
+			showNotification(
 				'Для использования приложения необходимо разрешить доступ к геолокации',
+                'error'
 			)
 		},
 		{
@@ -410,7 +479,7 @@ function updateProfileUI() {
 function setupEventListeners() {
 	document.getElementById('profile-btn').addEventListener('click', openSidebar)
 	document.getElementById('balance-btn').addEventListener('click', () => {
-		tg.showAlert('Биржа в разработке')
+		showNotification('Биржа в разработке')
 	})
 	document
 		.getElementById('sidebar-close')
@@ -474,7 +543,7 @@ function geolocate() {
 	}
 
 	if (!navigator.geolocation) {
-		tg.showAlert('Геолокация недоступна')
+		showNotification('Геолокация недоступна', 'error')
 		return
 	}
 
@@ -495,7 +564,7 @@ function geolocate() {
 		error => {
 			// Only show error if we didn't show cached location
 			if (!cached) {
-				tg.showAlert('Не удалось определить местоположение')
+				showNotification('Не удалось определить местоположение', 'error')
 			}
 		},
 		{ enableHighAccuracy: true, timeout: 5000, maximumAge: 0 },
@@ -542,7 +611,7 @@ async function loadPollutions() {
 		})
 	} catch (e) {
 		console.error('Load pollutions error:', e)
-		tg.showAlert('Не удалось загрузить данные о загрязнениях')
+		showNotification('Не удалось загрузить данные о загрязнениях', 'error')
 	}
 }
 
@@ -739,7 +808,7 @@ async function handlePhotoUpload(event) {
 			tg.HapticFeedback.notificationOccurred('success')
 		} catch (e) {
 			console.error('Upload error:', e)
-			tg.showAlert('Ошибка: ' + (e.message || 'Загрузка не удалась'))
+			showNotification('Ошибка: ' + (e.message || 'Загрузка не удалась'), 'error')
 		} finally {
 			// Ensure we decrease count even on error
 			// (Note: uploadingCount logic was missed in previous replace?
@@ -804,8 +873,8 @@ async function submitPollution(lat, lng, tags = []) {
 
 	// VALIDATION: At least one tag OR description required
 	if (tags.length === 0 && !desc.trim()) {
-		tg.showAlert('Выберите тип загрязнения или добавьте описание')
-		tg.HapticFeedback.notificationOccurred('error')
+		showNotification('Выберите тип загрязнения или добавьте описание', 'error')
+		// tg.HapticFeedback.notificationOccurred('error') // Handled in showNotification
 		return
 	}
 
@@ -833,11 +902,11 @@ async function submitPollution(lat, lng, tags = []) {
 		if (response.ok) {
 			closeBottomSheet()
 			loadPollutions()
-			tg.HapticFeedback.notificationOccurred('success')
-			tg.showAlert('Загрязнение отмечено!')
+			// tg.HapticFeedback.notificationOccurred('success') // Handled in showNotification
+			showNotification('Загрязнение отмечено!', 'success')
 		}
 	} catch (e) {
-		tg.showAlert('Ошибка при отправке')
+		showNotification('Ошибка при отправке', 'error')
 	}
 }
 
