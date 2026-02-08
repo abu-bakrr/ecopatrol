@@ -698,6 +698,9 @@ function showAddForm() {
 
 async function handlePhotoUpload(event) {
 	const files = Array.from(event.target.files)
+	if (files.length === 0) return
+
+	tg.showAlert(`Загрузка ${files.length} фото...`)
 
 	for (const file of files) {
 		try {
@@ -707,19 +710,28 @@ async function handlePhotoUpload(event) {
 
 			const response = await fetch(
 				`https://api.cloudinary.com/v1_1/dxjyi9id6/image/upload`,
-				{
-					method: 'POST',
-					body: formData,
-				},
+				{ method: 'POST', body: formData },
 			)
 
 			const data = await response.json()
+			console.log('Cloudinary response:', data)
+
+			if (data.error) {
+				alert('Cloudinary Error: ' + JSON.stringify(data.error))
+				throw new Error(data.error.message)
+			}
+
+			if (!data.secure_url) {
+				alert('No secure_url in response: ' + JSON.stringify(data))
+				throw new Error('No secure_url')
+			}
+
 			uploadedPhotos.push(data.secure_url)
 			updatePhotoPreview()
 			tg.HapticFeedback.notificationOccurred('success')
 		} catch (e) {
 			console.error('Upload error:', e)
-			tg.showAlert('Ошибка загрузки фото')
+			tg.showAlert('Ошибка: ' + e.message)
 		}
 	}
 }
@@ -728,15 +740,19 @@ function updatePhotoPreview() {
 	const preview = document.getElementById('photo-preview')
 	if (!preview) return
 
+	// Use background-image for better sizing reliability
 	preview.innerHTML = uploadedPhotos
 		.map(
 			url => `
-        <div class="photo-item">
-            <img src="${url}" alt="Photo">
+        <div class="photo-item" style="background-image: url('${url}'); background-size: cover; background-position: center; width: 80px; height: 80px;">
         </div>
     `,
 		)
 		.join('')
+
+	if (uploadedPhotos.length > 0) {
+		preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+	}
 }
 
 async function submitPollution(lat, lng, tags = []) {
