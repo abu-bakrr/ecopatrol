@@ -1,6 +1,12 @@
 // EcoPatrol - Onboarding Edition
 const tg = window.Telegram.WebApp
 const API_URL = window.location.origin + '/api'
+console.log('--- APP START ---', {
+	origin: window.location.origin,
+	API_URL: API_URL,
+	platform: tg.platform,
+	initDataRaw: !!tg.initData,
+})
 
 // Viewer Functions (Global)
 window.openPhotoViewer = function (url) {
@@ -75,9 +81,9 @@ window.setLanguage = async function (lang) {
 	})
 
 	// Update Backend if logged in
-	if (currentUser && currentUser.telegram_id) {
+	if (currentUser && currentUser.id) {
 		try {
-			await fetch(`${API_URL}/profile/${currentUser.telegram_id}/language`, {
+			await fetch(`${API_URL}/profile/${currentUser.id}/language`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ language: lang }),
@@ -121,6 +127,7 @@ const locationPromise = new Promise(resolve => {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
+	console.log('--- DOMContentLoaded ---')
 	// 0. IMMEDIATE FIX: Force height to prevent gray blocks
 	function fixHeight() {
 		const vh = window.innerHeight
@@ -213,33 +220,32 @@ function initBottomSheetDrag() {
 }
 
 function checkRegistration() {
+	console.log('--- CHECK REGISTRATION ---')
 	isRegistered = localStorage.getItem('registered') === 'true'
+	console.log('isRegistered state:', isRegistered)
 
 	if (isRegistered) {
+		console.log('User is registered, hiding onboarding...')
 		hideOnboarding()
 
-		// Use pre-fetched location
+		console.log('Starting location pre-fetch resolution...')
 		locationPromise.then(loc => {
+			console.log('locationPromise resolved:', loc)
 			if (loc && loc.coords) {
-				// If it's a raw array (from cache) or object with lat/lng?
-				// My logic above saves array [lng, lat] to cache.
-				// Live returns object.
-				// Actually let's just pass `loc.coords` to initMap.
-				console.log('Using location from:', loc.source)
+				console.log('Initializing map with coords:', loc.coords)
 				initMap(loc.coords)
-
-				// If source was cache, try to update with live in background if not already running?
-				// The navigator.getCurrentPosition above runs anyway.
-				// We can add a "refine" step later if needed.
 			} else {
+				console.log('No coords, initializing map with default center')
 				initMap()
 			}
 		})
 
+		console.log('Initiating background auth and data load...')
 		authUser()
 		setupEventListeners()
 		loadPollutions()
 	} else {
+		console.log('User NOT registered, showing onboarding...')
 		showOnboarding()
 	}
 }
@@ -338,11 +344,18 @@ async function handleRegistration() {
 
 				if (!response.ok) {
 					const errorText = await response.text()
-					console.error('Registration failed:', errorText)
+					console.error(`Registration failed: ${response.status}`, errorText)
 					throw new Error(`Registration failed: ${response.status}`)
 				}
 
-				const data = await response.json()
+				const responseText = await response.text()
+				let data
+				try {
+					data = JSON.parse(responseText)
+				} catch (parseError) {
+					console.error('Failed to parse registration response:', responseText)
+					throw new Error('Server returned invalid JSON')
+				}
 				console.log('Registration successful:', data)
 
 				currentUser = data.user
@@ -476,6 +489,7 @@ async function authUser() {
 		last_name: 'Герой',
 	}
 
+	console.log('--- FETCHING /api/init ---', { telegram_id: user.id })
 	try {
 		const response = await fetch(`${API_URL}/init`, {
 			method: 'POST',
@@ -487,7 +501,21 @@ async function authUser() {
 				initData: tg.initData,
 			}),
 		})
-		const data = await response.json()
+		console.log('--- AUTH RESPONSE STATUS ---', response.status)
+		if (!response.ok) {
+			const errorText = await response.text()
+			console.error(`Auth failed: ${response.status}`, errorText)
+			return
+		}
+
+		const responseText = await response.text()
+		let data
+		try {
+			data = JSON.parse(responseText)
+		} catch (parseError) {
+			console.error('Failed to parse auth response:', responseText)
+			return
+		}
 		currentUser = data.user
 		updateProfileUI()
 	} catch (e) {
