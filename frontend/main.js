@@ -218,11 +218,23 @@ function checkRegistration() {
 
 	if (isRegistered) {
 		hideOnboarding()
+
+		// SPEED OPTIMIZATION: Try to init map with cache immediately
+		const cached = localStorage.getItem('last_known_loc')
+		if (cached) {
+			try {
+				const coords = JSON.parse(cached)
+				initMap(coords)
+			} catch (e) {
+				console.error('Failed to parse cached location', e)
+			}
+		}
+
 		authUser()
 		setupEventListeners()
 		loadPollutions()
 
-		// Start checking location for the blocking overlay
+		// Check permissions/update location in background
 		checkLocationStatus()
 	} else {
 		showOnboarding()

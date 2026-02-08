@@ -18,7 +18,26 @@
 		<!-- Telegram -->
 		<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-		<link rel="stylesheet" href="style.css?v=918" />
+		<link rel="stylesheet" href="style.css?v=919" />
+		<style>
+			/* Critical styles to prevent white flash and ensure logs visibility */
+			html,
+			body {
+				background: #111827 !important;
+			}
+			#map {
+				background: #111827 !important;
+			}
+			#debug-toggle-btn {
+				display: block !important;
+				z-index: 100000 !important;
+				opacity: 1 !important;
+				background: #ef4444 !important;
+			}
+			.onboarding {
+				background: #111827 !important;
+			}
+		</style>
 	</head>
 	<body>
 		<!-- Onboarding Screen -->
@@ -515,7 +534,7 @@
 			console.log('Log system ready v10')
 		</script>
 
-		<script src="translations.js?v=915"></script>
-		<script type="module" src="main.js?v=915"></script>
+		<script src="translations.js?v=919"></script>
+		<script type="module" src="main.js?v=919"></script>
 	</body>
 </html>
