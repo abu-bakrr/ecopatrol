@@ -225,16 +225,34 @@ function initMap() {
 		antialias: true,
 	})
 
-	const centerMarker = document.getElementById('center-marker')
+	// Add Geolocate Control
+	const geolocate = new maplibregl.GeolocateControl({
+		positionOptions: { enableHighAccuracy: true },
+		trackUserLocation: true,
+		showUserLocation: true,
+	})
+	map.addControl(geolocate)
 
+	map.on('load', () => {
+		// Trigger geolocation on load
+		geolocate.trigger()
+
+		// Add navigation controls
+		map.addControl(
+			new maplibregl.NavigationControl({ showCompass: false }),
+			'bottom-right',
+		)
+	})
+
+	// Handle map movement
 	map.on('movestart', () => {
 		isDragging = true
-		centerMarker.classList.add('dragging')
+		document.getElementById('center-marker').classList.add('dragging')
 	})
 
 	map.on('moveend', () => {
 		isDragging = false
-		centerMarker.classList.remove('dragging')
+		document.getElementById('center-marker').classList.remove('dragging')
 	})
 
 	map.on('load', () => {

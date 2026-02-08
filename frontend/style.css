@@ -56,13 +56,21 @@ html {
 }
 
 #map {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: 1;
+	background: var(--map-bg);
+}
+
+/* Ensure markers don't get messed up */
+.maplibregl-marker {
 	position: absolute;
 	top: 0;
 	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 1;
-	background: var(--map-bg);
+	will-change: transform;
 }
 
 /* Center Marker - Higher position and bigger lift */
