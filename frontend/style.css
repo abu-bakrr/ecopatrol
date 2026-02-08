@@ -41,6 +41,9 @@ html {
 	height: var(--vh, 100dvh); /* Use JS fixed height if available */
 	margin: 0;
 	padding: 0;
+	/* Force background color to avoid gray defaults */
+	background-color: var(--map-bg) !important;
+	background: var(--map-bg) !important;
 	overflow: hidden;
 	position: fixed;
 	top: 0;
