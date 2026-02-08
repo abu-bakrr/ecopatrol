@@ -833,8 +833,9 @@ function showPollutionDetails(pollution) {
                 ${pollution.photos
 									.map(
 										url => `
-                    <div class="photo-item">
-                        <img src="${url}" alt="Photo">
+                    <div class="photo-item" 
+                         style="background-image: url('${url}'); background-size: cover; background-position: center; width: 80px; height: 80px;"
+                         onclick="openPhotoViewer('${url}')">
                     </div>
                 `,
 									)
@@ -981,4 +982,20 @@ async function submitClean() {
 	} catch (e) {
 		tg.showAlert('Ошибка при подтверждении')
 	}
+}
+
+// Viewer Functions
+function openPhotoViewer(url) {
+	const viewer = document.getElementById('photo-viewer')
+	const img = document.getElementById('viewer-img')
+	if (!viewer || !img) return
+
+	img.src = url
+	viewer.classList.add('active')
+	tg.HapticFeedback.impactOccurred('medium')
+}
+
+function closePhotoViewer() {
+	const viewer = document.getElementById('photo-viewer')
+	if (viewer) viewer.classList.remove('active')
 }
