@@ -553,6 +553,17 @@
 			})
 
 			function logToScreen(msg, type = 'log') {
+				// SILENCE NETWORK ERRORS WHEN OFFLINE
+				const msgStr = String(msg).toLowerCase()
+				if (
+					!navigator.onLine &&
+					(msgStr.includes('fetch') ||
+						msgStr.includes('load failed') ||
+						msgStr.includes('networkerror'))
+				) {
+					return
+				}
+
 				const line = document.createElement('div')
 				line.style.borderBottom = '1px solid #333'
 				line.style.padding = '2px 0'

@@ -83,7 +83,8 @@ window.setLanguage = async function (lang) {
 				body: JSON.stringify({ language: lang }),
 			})
 		} catch (e) {
-			console.error('Failed to sync language to backend', e)
+			if (navigator.onLine)
+				console.error('Failed to sync language to backend', e)
 		}
 	}
 
@@ -250,7 +251,9 @@ function checkRegistration() {
 						s.debug_logs_enabled === 'true' ? 'block' : 'none'
 				}
 			})
-			.catch(e => console.log('Config fetch error:', e))
+			.catch(e => {
+				if (navigator.onLine) console.log('Config fetch error:', e)
+			})
 
 		// SPEED OPTIMIZATION...
 		const cached = localStorage.getItem('last_known_loc')
@@ -1112,8 +1115,10 @@ async function loadPollutions() {
 			markers.push(marker)
 		})
 	} catch (e) {
-		console.error('Load pollutions error:', e)
-		tg.showAlert('Не удалось загрузить данные о загрязнениях')
+		if (navigator.onLine) {
+			console.error('Load pollutions error:', e)
+			tg.showAlert('Не удалось загрузить данные о загрязнениях')
+		}
 	}
 }
 
@@ -1608,7 +1613,7 @@ async function showLeaderboard() {
 			)
 			.join('')
 	} catch (e) {
-		console.error('Leaderboard error:', e)
+		if (navigator.onLine) console.error('Leaderboard error:', e)
 		const list = document.getElementById('leaderboard-list')
 		if (list)
 			list.innerHTML = `<p style="color: #ef4444;">${window.t('submit_error')}</p>`
