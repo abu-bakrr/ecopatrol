@@ -20,21 +20,21 @@ sudo apt install -y python3-pip python3-venv git curl postgresql postgresql-cont
 
 # 3. Настройка PostgreSQL
 echo "🔹 Настройка базы данных PostgreSQL..."
-# Принудительно останавливаем и пытаемся починить
+# Принудительно останавливаем
 sudo systemctl stop postgresql || true
 
-# Если кластер существует, но не работает, попробуем его перезапустить или пересоздать
-if pg_lsclusters | grep -q "main"; then
-    echo "🔹 Кластер существует. Пытаюсь запустить..."
-    sudo pg_ctlcluster 14 main start || echo "⚠️ Не удалось запустить. Пробую пересоздать..."
-fi
+# Пересоздаем кластер для чистоты
+sudo pg_dropcluster 14 main --stop || true
+sudo pg_createcluster 14 main
 
-# Если все еще не работает - радикальное решение (пересоздаем кластер)
-if ! pg_lsclusters | grep -q "online"; then
-    echo "⚠️ PostgreSQL все еще не в сети. Пересоздаю кластер..."
-    sudo pg_dropcluster 14 main --stop || true
-    sudo pg_createcluster 14 main --start
-fi
+# ФИКC: В некоторых VPS нет IPv6, что вешает запуск Postgres. 
+# Принудительно ставим прослушивание только на IPv4 (127.0.0.1)
+POSTGRES_CONF="/etc/postgresql/14/main/postgresql.conf"
+sudo sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '127.0.0.1'/" $POSTGRES_CONF
+
+# Запускаем
+echo "🔹 Запуск PostgreSQL..."
+sudo systemctl start postgresql
 
 # Подождем для инициализации сокета
 sleep 5
