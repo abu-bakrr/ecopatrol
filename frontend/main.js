@@ -477,45 +477,21 @@ async function authUser() {
 	}
 
 	try {
-		const body = {
-			telegram_id: user.id,
-			username:
-				user.username || `${user.first_name} ${user.last_name || ''}`.trim(),
-			first_name: user.first_name,
-			last_name: user.last_name,
-			initData: tg.initData,
-		}
-		console.log('Auth request:', body)
-
 		const response = await fetch(`${API_URL}/init`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(body),
+			body: JSON.stringify({
+				telegram_id: user.id,
+				username:
+					user.username || `${user.first_name} ${user.last_name || ''}`.trim(),
+				initData: tg.initData,
+			}),
 		})
-
-		const text = await response.text()
-		console.log('Auth response text:', text)
-
-		try {
-			const data = JSON.parse(text)
-			currentUser = data.user
-			updateProfileUI()
-		} catch (parseError) {
-			console.error('JSON Parse Error:', parseError, 'Text:', text)
-			throw parseError
-		}
+		const data = await response.json()
+		currentUser = data.user
+		updateProfileUI()
 	} catch (e) {
-		console.error('Auth error detailed:', e)
-		// If we are in local testing and fetch fails, let's dummy login
-		if (user.id === 12345) {
-			console.log('Dummy login for local testing')
-			currentUser = {
-				telegram_id: 12345,
-				username: 'Test User',
-				balance: 100,
-			}
-			updateProfileUI()
-		}
+		console.error('Auth error:', e)
 	}
 }
 
