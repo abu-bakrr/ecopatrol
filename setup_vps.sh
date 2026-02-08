@@ -77,7 +77,7 @@ sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASS';"
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;"
 cd - > /dev/null
 
-DATABASE_URL="postgresql://$DB_USER:$DB_PASS@localhost/$DB_NAME"
+DATABASE_URL="postgresql://$DB_USER:$DB_PASS@127.0.0.1/$DB_NAME"
 
 # 4. Настройка Backend
 echo "🔹 Настройка Python окружения..."
