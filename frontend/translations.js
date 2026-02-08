@@ -92,6 +92,10 @@ const translations = {
 		add_level_label: 'Xavf darajasi',
 		add_tags_label: 'Nima bilan zararlangan?',
 		add_photo_click: 'Yuklash uchun bosing',
+		location_help_title: 'Sizga ruxsat kerak',
+		location_help_text:
+			'Ilovadan foydalanish uchun brauzer yoki Telegram sozlamalarida geolokatsiyaga ruxsat berishingiz shart. Ruxsat berganingizdan soʻng «Qaytadan urinish» tugmasini bosing.',
+		location_retry_btn: 'Qaytadan urinish',
 	},
 	ru: {
 		app_title: 'Экопатруль 🌍',
@@ -186,6 +190,10 @@ const translations = {
 		add_level_label: 'Уровень опасности',
 		add_tags_label: 'Чем загрязнено?',
 		add_photo_click: 'Нажмите для загрузки',
+		location_help_title: 'Требуется доступ',
+		location_help_text:
+			'Для работы приложения необходимо разрешить доступ к геолокации в настройках браузера или Telegram. После предоставления доступа нажмите «Повторить».',
+		location_retry_btn: 'Повторить попытку',
 	},
 	en: {
 		app_title: 'EcoPatrol 🌍',
@@ -280,6 +288,10 @@ const translations = {
 		add_level_label: 'Danger Level',
 		add_tags_label: 'What is polluted?',
 		add_photo_click: 'Click to upload',
+		location_help_title: 'Location Access Required',
+		location_help_text:
+			'To use the app, you must grant location access in your browser or Telegram settings. Once granted, click "Retry".',
+		location_retry_btn: 'Try Again',
 	},
 }
 

@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	// DELAY MAP INIT: Wait for Telegram animation to finish
 	setTimeout(() => {
 		checkRegistration()
-	}, 300) // 300ms is usually enough for transition
+	}, 100) // Reduced from 300 to 100 for better performance
 })
 
 function initBottomSheetDrag() {
@@ -301,87 +301,98 @@ async function handleRegistration() {
 
 	tg.HapticFeedback.impactOccurred('medium')
 
-	navigator.geolocation.getCurrentPosition(
-		async position => {
-			console.log('Geolocation granted:', position.coords)
+	const geoSuccessCallback = async position => {
+		console.log('Geolocation granted:', position.coords)
 
-			// Geolocation granted, proceed with registration
-			const initData = tg.initDataUnsafe
-			const user = initData.user || {
-				id: Date.now(),
-				username: `${firstName}_${lastName}`.toLowerCase(),
+		// Geolocation granted, proceed with registration
+		const initData = tg.initDataUnsafe
+		const user = initData.user || {
+			id: Date.now(),
+			username: `${firstName}_${lastName}`.toLowerCase(),
+		}
+
+		console.log('Telegram user:', user)
+
+		try {
+			const requestBody = {
+				telegram_id: user.id,
+				username: user.username || `${firstName} ${lastName}`,
+				first_name: firstName,
+				last_name: lastName,
+				age: age,
+				phone: phone,
+				initData: tg.initData || '',
 			}
 
-			console.log('Telegram user:', user)
+			console.log('Sending registration request:', requestBody)
 
+			const response = await fetch(`${API_URL}/init`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(requestBody),
+			})
+
+			console.log('Response status:', response.status)
+
+			if (!response.ok) {
+				const errorText = await response.text()
+				console.error(`Registration failed: ${response.status}`, errorText)
+				throw new Error(`Registration failed: ${response.status}`)
+			}
+
+			const responseText = await response.text()
+			let data
 			try {
-				const requestBody = {
-					telegram_id: user.id,
-					username: user.username || `${firstName} ${lastName}`,
-					first_name: firstName,
-					last_name: lastName,
-					age: age,
-					phone: phone,
-					initData: tg.initData || '',
-				}
-
-				console.log('Sending registration request:', requestBody)
-
-				const response = await fetch(`${API_URL}/init`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(requestBody),
-				})
-
-				console.log('Response status:', response.status)
-
-				if (!response.ok) {
-					const errorText = await response.text()
-					console.error(`Registration failed: ${response.status}`, errorText)
-					throw new Error(`Registration failed: ${response.status}`)
-				}
-
-				const responseText = await response.text()
-				let data
-				try {
-					data = JSON.parse(responseText)
-				} catch (parseError) {
-					console.error('Failed to parse registration response:', responseText)
-					throw new Error('Server returned invalid JSON')
-				}
-				console.log('Registration successful:', data)
-
-				currentUser = data.user
-
-				localStorage.setItem('registered', 'true')
-				isRegistered = true
-
-				hideOnboarding()
-				// Initialize map with user location
-				if (position && position.coords) {
-					initMap([position.coords.longitude, position.coords.latitude])
-				} else {
-					initMap()
-				}
-
-				setupEventListeners()
-				loadPollutions()
-				updateProfileUI()
-
-				tg.HapticFeedback.notificationOccurred('success')
-				tg.showAlert(window.t('reg_success') || 'Регистрация успешна!')
-			} catch (e) {
-				console.error('Registration error:', e)
-				tg.showAlert(`Ошибка регистрации: ${e.message}`)
+				data = JSON.parse(responseText)
+			} catch (parseError) {
+				console.error('Failed to parse registration response:', responseText)
+				throw new Error('Server returned invalid JSON')
 			}
-		},
-		error => {
-			console.error('Geolocation error:', error)
+			console.log('Registration successful:', data)
+
+			currentUser = data.user
+
+			localStorage.setItem('registered', 'true')
+			isRegistered = true
+
+			hideOnboarding()
+			// Initialize map with user location
+			if (position && position.coords) {
+				initMap([position.coords.longitude, position.coords.latitude])
+			} else {
+				initMap()
+			}
+
+			setupEventListeners()
+			loadPollutions()
+			updateProfileUI()
+
+			tg.HapticFeedback.notificationOccurred('success')
+			tg.showAlert(window.t('reg_success') || 'Регистрация успешна!')
+		} catch (e) {
+			console.error('Registration error:', e)
+			tg.showAlert(`Ошибка регистрации: ${e.message}`)
+		}
+	}
+
+	const geoErrorCallback = error => {
+		console.error('Geolocation error:', error)
+		// Code 1 is PERMISSION_DENIED
+		if (error.code === 1) {
+			document.getElementById('onboarding-form').classList.add('hidden')
+			document.getElementById('location-help').classList.remove('hidden')
+			document.getElementById('submit-onboarding').classList.add('hidden')
+		} else {
 			tg.showAlert(
 				window.t('geo_required') ||
 					'Для использования приложения необходимо разрешить доступ к геолокации',
 			)
-		},
+		}
+	}
+
+	navigator.geolocation.getCurrentPosition(
+		geoSuccessCallback,
+		geoErrorCallback,
 		{
 			enableHighAccuracy: true,
 			timeout: 10000,
@@ -389,6 +400,19 @@ async function handleRegistration() {
 		},
 	)
 }
+
+// Add global listener for retry button
+document.addEventListener('DOMContentLoaded', () => {
+	const retryBtn = document.getElementById('retry-geo-btn')
+	if (retryBtn) {
+		retryBtn.addEventListener('click', () => {
+			document.getElementById('location-help').classList.add('hidden')
+			document.getElementById('onboarding-form').classList.remove('hidden')
+			document.getElementById('submit-onboarding').classList.remove('hidden')
+			handleRegistration()
+		})
+	}
+})
 
 function initMap(initialCenter = null) {
 	if (typeof maplibregl === 'undefined') {
@@ -1507,6 +1531,7 @@ async function submitClean() {
 }
 
 async function showLeaderboard() {
+	closeSidebar()
 	tg.HapticFeedback.impactOccurred('light')
 	const content = document.getElementById('sheet-content')
 	content.innerHTML = `

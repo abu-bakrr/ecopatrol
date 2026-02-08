@@ -1407,3 +1407,36 @@ html {
 	font-size: 14px;
 	box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
+/* Location Help (Geolocation Denial) */
+.location-help {
+	background: var(--bg-secondary);
+	padding: 24px;
+	border-radius: 20px;
+	border: 1px solid var(--border);
+	text-align: center;
+	margin-top: 20px;
+	width: 100%;
+}
+
+.location-help.hidden {
+	display: none;
+}
+
+.location-help-icon {
+	font-size: 40px;
+	margin-bottom: 12px;
+}
+
+.location-help-title {
+	font-size: 18px;
+	font-weight: 700;
+	margin-bottom: 8px;
+	color: var(--text-primary);
+}
+
+.location-help-text {
+	font-size: 14px;
+	line-height: 1.5;
+	color: var(--text-secondary);
+	margin-bottom: 20px;
+}
