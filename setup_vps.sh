@@ -21,32 +21,36 @@ sudo apt install -y python3-pip python3-venv git curl postgresql postgresql-cont
 # 3. Настройка PostgreSQL
 echo "🔹 Настройка базы данных PostgreSQL..."
 
-# Остановка сервиса и принудительное завершение всех процессов Postgres
+# 1. Принудительная очистка всех застрявших процессов
 sudo systemctl stop postgresql || true
-sudo pkill -u postgres -f postgres || true
+sudo pkill -9 -u postgres || true
+sudo fuser -k 5432/tcp || true
 
-# Удаление зависших PID-файлов и блокировок, если они остались
-sudo rm -f /var/run/postgresql/*.pid
-sudo rm -f /var/run/postgresql/.s.PGSQL.5432.lock
+# 2. Удаление старых заблокированных файлов
+sudo rm -rf /var/run/postgresql/*
+sudo rm -rf /var/lib/postgresql/14/main
+sudo rm -rf /etc/postgresql/14/main
 
-# Работа с кластером
-PG_VERSION="14"
-if pg_lsclusters | grep -q "main"; then
-    echo "🔹 Кластер существует. Пытаюсь сбросить настройки для чистого запуска..."
-    sudo pg_dropcluster $PG_VERSION main --stop || true
-fi
+# 3. Полная переустановка пакетов, если они повреждены (на всякий случай)
+# sudo apt-get purge -y postgresql-14 postgresql-contrib || true
+# sudo apt-get install -y postgresql-14 postgresql-contrib
 
-echo "🔹 Создание и запуск нового кластера..."
-sudo pg_createcluster $PG_VERSION main --start || {
-    echo "⚠️ Ошибка при создании кластера. Пробую еще раз с очисткой портов..."
-    sudo fuser -k 5432/tcp || true
-    sudo pg_createcluster $PG_VERSION main --start
+# 4. Создание кластера с чистого листа
+echo "🔹 Создание нового кластера PostgreSQL 14..."
+sudo pg_createcluster 14 main --start || {
+    echo "⚠️ Ошибка pg_createcluster. Пробую пересоздать директории вручную..."
+    sudo mkdir -p /var/lib/postgresql/14/main
+    sudo chown postgres:postgres /var/lib/postgresql/14/main
+    sudo -u postgres /usr/lib/postgresql/14/bin/initdb -D /var/lib/postgresql/14/main
+    sudo systemctl start postgresql
 }
 
-# Фикс IPv4 (чтобы не падал на VPS без IPv6)
-POSTGRES_CONF="/etc/postgresql/$PG_VERSION/main/postgresql.conf"
-sudo sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '127.0.0.1'/" $POSTGRES_CONF
-sudo systemctl restart postgresql
+# 5. ФИКC: Отключаем IPv6, чтобы не было конфликтов на VPS
+POSTGRES_CONF="/etc/postgresql/14/main/postgresql.conf"
+if [ -f "$POSTGRES_CONF" ]; then
+    sudo sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '127.0.0.1'/" $POSTGRES_CONF
+    sudo systemctl restart postgresql
+fi
 
 # Подождем для инициализации сокета
 sleep 5
@@ -55,7 +59,8 @@ DB_NAME="ecopatrol"
 DB_USER="eco_user"
 DB_PASS=$(openssl rand -base64 12)
 
-# Выполняем из /tmp, чтобы у пользователя postgres был доступ
+# 6. Создание БД и пользователя
+echo "🔹 Создание базы данных и пользователя..."
 cd /tmp
 sudo -u postgres psql -c "DROP DATABASE IF EXISTS $DB_NAME;" || true
 sudo -u postgres psql -c "DROP USER IF EXISTS $DB_USER;" || true
