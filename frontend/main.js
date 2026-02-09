@@ -2032,6 +2032,21 @@ window.showCityStatus = async () => {
 }
 
 // Init Air Quality (Fetch based on map center when moved)
-setTimeout(fetchAirQuality, 3000)
+setTimeout(() => {
+	fetchAirQuality()
+
+	// Explicit Event Listener for robustness
+	const widget = document.getElementById('air-widget')
+	if (widget) {
+		widget.addEventListener('click', e => {
+			console.log('Air Widget Clicked (JS Listener)')
+			e.stopPropagation() // Stop map from catching it
+			e.preventDefault()
+			tg.HapticFeedback.impactOccurred('medium')
+			showCityStatus()
+		})
+	}
+}, 3000)
+
 // Update every 10 mins OR when map moves securely (optional, simple for now)
 setInterval(fetchAirQuality, 600000)
