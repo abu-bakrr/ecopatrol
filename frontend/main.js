@@ -2105,19 +2105,29 @@ window.showCityStatus = async () => {
             <!-- Modern Header -->
             <div style="text-align: center; margin-bottom: 24px;">
                 <div style="width: 60px; height: 60px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(59, 130, 246, 0.15)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="url(#buildingGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <defs>
-                            <linearGradient id="buildingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <linearGradient id="buildingGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
                                 <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
                             </linearGradient>
                         </defs>
-                        <path d="M3 21h18"/>
-                        <path d="M5 21V7l8-4 8 4v14"/>
-                        <rect x="9" y="9" width="2" height="2" fill="currentColor" opacity="0.5"/>
-                        <rect x="13" y="9" width="2" height="2" fill="currentColor" opacity="0.5"/>
-                        <rect x="9" y="13" width="2" height="2" fill="currentColor" opacity="0.5"/>
-                        <rect x="13" y="13" width="2" height="2" fill="currentColor" opacity="0.5"/>
+                        <!-- Skyline silhouette -->
+                        <rect x="3" y="10" width="4" height="11" fill="url(#buildingGradient2)" rx="0.5"/>
+                        <rect x="8" y="6" width="4" height="15" fill="url(#buildingGradient2)" rx="0.5"/>
+                        <rect x="13" y="8" width="4" height="13" fill="url(#buildingGradient2)" rx="0.5"/>
+                        <rect x="18" y="4" width="3" height="17" fill="url(#buildingGradient2)" rx="0.5"/>
+                        <!-- Windows -->
+                        <rect x="9" y="8" width="1" height="1" fill="white" opacity="0.6"/>
+                        <rect x="11" y="8" width="1" height="1" fill="white" opacity="0.6"/>
+                        <rect x="9" y="11" width="1" height="1" fill="white" opacity="0.6"/>
+                        <rect x="11" y="11" width="1" height="1" fill="white" opacity="0.6"/>
+                        <rect x="14" y="10" width="1" height="1" fill="white" opacity="0.6"/>
+                        <rect x="16" y="10" width="1" height="1" fill="white" opacity="0.6"/>
+                        <rect x="14" y="13" width="1" height="1" fill="white" opacity="0.6"/>
+                        <rect x="16" y="13" width="1" height="1" fill="white" opacity="0.6"/>
+                        <!-- Base line -->
+                        <line x1="2" y1="21" x2="22" y2="21" stroke="url(#buildingGradient2)" stroke-width="1.5" stroke-linecap="round"/>
                     </svg>
                 </div>
                 <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin: 0;">${t('city_status_title')}</h2>
