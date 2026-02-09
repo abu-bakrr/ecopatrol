@@ -47,21 +47,54 @@ def init_user():
         return jsonify({'status': 'error', 'message': f'Database error: {e}'}), 500
 
     if not user:
-        print(f"User {tg_id} not found - needs registration")
-        return jsonify({
-            'status': 'ok',
-            'needs_registration': True,
-            'telegram_id': tg_id
-        })
+        # If no registration data, return needs_registration
+        if not data.get('phone') or not data.get('age'):
+            print(f"User {tg_id} not found - needs registration")
+            return jsonify({
+                'status': 'ok',
+                'needs_registration': True,
+                'telegram_id': tg_id
+            })
+        
+        # Else create the user (Registration Case)
+        print(f"Creating new user: {tg_id}")
+        try:
+            user = User(
+                telegram_id=tg_id,
+                username=data.get('username'),
+                first_name=data.get('first_name'),
+                last_name=data.get('last_name'),
+                age=data.get('age'),
+                phone=data.get('phone')
+            )
+            db.session.add(user)
+            db.session.commit()
+            print("User created successfully")
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'status': 'error', 'message': f'Creation failed: {e}'}), 500
     
-    # If user exists but has no phone (incomplete registration), require re-registration
-    if not user.phone:
+    # If user exists but has no phone and no new phone provided, require registration
+    elif not user.phone and not data.get('phone'):
         print(f"User {tg_id} exists but has no phone - needs registration")
         return jsonify({
             'status': 'ok',
             'needs_registration': True,
             'telegram_id': tg_id
         })
+    
+    # If user exists but registration data is provided, update it (e.g. adding missing phone)
+    elif data.get('phone') and data.get('age'):
+        print(f"Updating user {tg_id} with registration data")
+        try:
+            user.phone = data.get('phone')
+            user.age = data.get('age')
+            user.first_name = data.get('first_name', user.first_name)
+            user.last_name = data.get('last_name', user.last_name)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'status': 'error', 'message': f'Update failed: {e}'}), 500
     
     # Safely get language to avoid 500 if column is missing
     user_lang = 'ru'
