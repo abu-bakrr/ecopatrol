@@ -1713,7 +1713,7 @@ function showGhostMarker(lng, lat, level) {
 	// Auto-cleanup after animation ends
 	setTimeout(() => {
 		marker.remove()
-	}, 3500)
+	}, 5000)
 }
 
 function showReportDetails(r) {
@@ -1733,28 +1733,34 @@ function showReportDetails(r) {
 		:	window.t('status_cleaned')
 
 	content.innerHTML = `
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-            <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin: 0;">${window.t('report_title')}</h2>
-            <span class="status-badge ${r.status}">${statusText}</span>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+            <h2 style="font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0;">${window.t('report_title')}</h2>
+            <span class="status-badge ${r.status}" style="padding: 6px 14px; font-weight: 700; border-radius: 12px;">${statusText}</span>
         </div>
         
-        <!-- Header Info -->
-        <div style="background: var(--bg-secondary); padding: 16px; border-radius: 16px; margin-bottom: 24px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">${window.t('detail_added_at')}</div>
-                    <div style="font-size: 16px; font-weight: 600;">${date}</div>
-                </div>
-                <div style="text-align: right;">
-                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">${window.t('reward_label')}</div>
-                    <div style="font-size: 18px; font-weight: 800; color: var(--primary);">$${r.level || 0}</div>
-                </div>
+        <!-- Premium Info Cards -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;">
+            <div style="background: var(--bg-secondary); padding: 16px; border-radius: 20px; border: 1px solid var(--border);">
+                <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">${window.t('detail_added_at')}</div>
+                <div style="font-size: 15px; font-weight: 700;">${date}</div>
+            </div>
+            <div style="background: var(--bg-secondary); padding: 16px; border-radius: 20px; border: 1px solid var(--border); text-align: right;">
+                <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">${window.t('reward_label')}</div>
+                <div style="font-size: 20px; font-weight: 800; color: var(--primary);">$${r.level || 0}</div>
+            </div>
+            <div style="background: var(--bg-secondary); padding: 16px; border-radius: 20px; border: 1px solid var(--border);">
+                <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">${window.t('detail_level_label')}</div>
+                <div style="font-size: 15px; font-weight: 700; color: var(--primary);">Level ${r.level || 1}</div>
+            </div>
+            <div style="background: var(--bg-secondary); padding: 16px; border-radius: 20px; border: 1px solid var(--border); text-align: right;">
+                <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">${window.t('detail_types_label')}</div>
+                <div style="font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${r.types ? r.types.join(', ') : '---'}</div>
             </div>
         </div>
 
         <!-- Before Section -->
-        <div class="form-group" style="margin-bottom: 24px;">
-            <label class="form-label" style="display: flex; align-items: center; gap: 8px;">
+        <div style="background: var(--bg-secondary); padding: 20px; border-radius: 24px; margin-bottom: 24px;">
+            <label class="form-label" style="font-weight: 800; font-size: 15px; margin-bottom: 16px; display: block;">
                 ${window.t('detail_before_photo')}
             </label>
             <div class="photo-grid">
@@ -1769,8 +1775,8 @@ function showReportDetails(r) {
             ${
 							r.description ?
 								`
-            <div style="margin-top: 12px; font-size: 13px; color: var(--text-secondary); background: var(--bg-primary); padding: 12px; border-radius: 12px; border-left: 3px solid var(--primary);">
-                <div style="font-size: 10px; text-transform: uppercase; opacity: 0.6; margin-bottom: 4px;">${window.t('detail_description_label')}</div>
+            <div style="margin-top: 16px; font-size: 14px; color: var(--text-secondary); background: var(--bg-primary); padding: 16px; border-radius: 16px; border-left: 4px solid var(--primary); line-height: 1.6;">
+                <div style="font-size: 10px; text-transform: uppercase; font-weight: 700; opacity: 0.5; margin-bottom: 6px;">${window.t('detail_description_label')}</div>
                 ${r.description}
             </div>
             `
@@ -1782,8 +1788,8 @@ function showReportDetails(r) {
         ${
 					r.status === 'cleaned' ?
 						`
-        <div class="form-group" style="margin-bottom: 24px; padding: 16px; background: rgba(16, 185, 129, 0.05); border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.1);">
-            <label class="form-label" style="display: flex; align-items: center; gap: 8px;">
+        <div style="background: rgba(16, 185, 129, 0.08); padding: 20px; border-radius: 24px; border: 1px solid rgba(16, 185, 129, 0.15); margin-bottom: 24px;">
+            <label class="form-label" style="font-weight: 800; font-size: 15px; margin-bottom: 16px; display: block; color: var(--primary);">
                 ${window.t('detail_after_photo')}
             </label>
             <div class="photo-grid">
@@ -1796,14 +1802,14 @@ function showReportDetails(r) {
                 `,
 											)
 											.join('')
-									:	`<div style="font-size: 13px; color: var(--text-secondary); font-style: italic; opacity: 0.6;">${window.t('no_photo')}</div>`
+									:	`<div style="font-size: 13px; color: var(--text-secondary); font-style: italic; opacity: 0.6; text-align: center; width: 100%;">${window.t('no_photo')}</div>`
 								}
             </div>
             ${
 							r.comment ?
 								`
-            <div style="margin-top: 12px; font-size: 13px; color: var(--text-secondary); background: white; padding: 12px; border-radius: 12px; border-left: 3px solid var(--primary);">
-                <div style="font-size: 10px; text-transform: uppercase; opacity: 0.6; margin-bottom: 4px;">${window.t('detail_comment_label')}</div>
+            <div style="margin-top: 16px; font-size: 14px; color: var(--text-secondary); background: white; padding: 16px; border-radius: 16px; border-left: 4px solid var(--primary); line-height: 1.6;">
+                <div style="font-size: 10px; text-transform: uppercase; font-weight: 700; opacity: 0.5; margin-bottom: 6px;">${window.t('detail_comment_label')}</div>
                 ${r.comment}
             </div>
             `
@@ -1815,8 +1821,8 @@ function showReportDetails(r) {
 				}
 
         <!-- Actions -->
-        <div style="margin-top: 12px; padding-bottom: 20px;">
-            <button class="btn btn-primary" style="width: 100%; height: 54px; font-size: 16px; border-radius: 16px;" onclick="window.flyToReport(${r.lng}, ${r.lat}, ${r.level}, '${r.status}')">
+        <div style="margin-top: 12px; padding-bottom: 24px;">
+            <button class="btn btn-primary" style="width: 100%; height: 60px; font-size: 17px; font-weight: 700; border-radius: 18px; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.25);" onclick="window.flyToReport(${r.lng}, ${r.lat}, ${r.level}, '${r.status}')">
                 ${window.t('show_on_map')}
             </button>
         </div>

@@ -108,6 +108,8 @@ const translations = {
 		show_on_map: 'Xaritada koʻrsatish',
 		detail_description_label: 'Zararlanish tavsifi',
 		detail_comment_label: 'Tozalash boʻyicha izoh',
+		detail_types_label: 'Zararlanish turlari',
+		detail_level_label: 'Xavf darajasi',
 	},
 	ru: {
 		app_title: 'Экопатруль',
@@ -218,6 +220,8 @@ const translations = {
 		show_on_map: 'Показать на карте',
 		detail_description_label: 'Описание загрязнения',
 		detail_comment_label: 'Комментарий к очистке',
+		detail_types_label: 'Типы загрязнения',
+		detail_level_label: 'Уровень опасности',
 	},
 	en: {
 		app_title: 'EcoPatrol',
@@ -328,6 +332,8 @@ const translations = {
 		show_on_map: 'Show on Map',
 		detail_description_label: 'Pollution description',
 		detail_comment_label: 'Cleaning comment',
+		detail_types_label: 'Pollution types',
+		detail_level_label: 'Danger level',
 	},
 }
 
