@@ -489,7 +489,32 @@ function initMap(initialCenter = null) {
 	map.on('load', () => {
 		map.resize()
 		console.log('Map resized and loaded')
+
+		// DIAGNOSTIC LOGS FOR THEME MATCHING
+		setTimeout(() => {
+			const mapEl = document.getElementById('map')
+			const bgColor = window.getComputedStyle(mapEl).backgroundColor
+			console.log('--- THEME DIAGNOSTIC ---')
+			console.log('Theme:', theme)
+			console.log('Map Computed BG:', bgColor)
+			console.log(
+				'Body Computed BG:',
+				window.getComputedStyle(document.body).backgroundColor,
+			)
+			console.log(
+				'Vignette var(--map-bg):',
+				window
+					.getComputedStyle(document.documentElement)
+					.getPropertyValue('--map-bg'),
+			)
+		}, 1000)
 	})
+
+	// Global helper for manual tuning
+	window.setVignetteColor = color => {
+		document.documentElement.style.setProperty('--map-bg', color)
+		console.log('Vignette color overridden to:', color)
+	}
 
 	// Disable rotation by touch (keep zoom)
 	map.touchZoomRotate.disableRotation()
