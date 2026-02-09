@@ -139,12 +139,15 @@ const Tour = {
 		// Close sidebar if it's open
 		if (window.closeSidebar) window.closeSidebar()
 
+		// Prepare content immediately to prevent empty flash
+		this.renderStep()
+
 		document.getElementById('tour-overlay').classList.add('active')
 		document.getElementById('tour-tooltip').classList.add('active')
 
-		// Add a small delay to let sidebar animation finish/start
+		// Re-position after sidebar settles
 		setTimeout(() => {
-			this.renderStep()
+			this.positionTooltip(this.steps[this.currentStep])
 		}, 300)
 
 		if (tg) tg.HapticFeedback.impactOccurred('medium')

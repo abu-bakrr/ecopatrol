@@ -1794,10 +1794,13 @@ html {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	gap: 10px;
+	margin-top: 4px;
 }
 .tour-dots {
 	display: flex;
-	gap: 6px;
+	gap: 4px;
+	flex-shrink: 0;
 }
 .tour-dot {
 	width: 6px;
@@ -1812,7 +1815,14 @@ html {
 }
 .tour-btns {
 	display: flex;
-	gap: 8px;
+	gap: 6px;
+	flex-shrink: 1;
+	min-width: 0;
+}
+.btn-tour-solid,
+.btn-tour-outline {
+	white-space: nowrap;
+	flex-shrink: 1;
 }
 .btn-tour-solid {
 	background: var(--primary);
