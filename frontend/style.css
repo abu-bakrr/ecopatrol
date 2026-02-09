@@ -1412,13 +1412,14 @@ html {
 	font-size: 14px;
 	box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
-/* Air Quality Widget */
+/* Air Quality Widget (Circular - Matches Button Stack) */
 .air-widget {
 	position: absolute;
-	right: 16px;
-	top: calc(50% + 112px); /* +56px from pollution toggle */
-	transform: translateY(-50%);
-	z-index: 100; /* Above other buttons */
+	left: 12px; /* Moved to Left to avoid Eye button stack */
+	top: calc(
+		44px + env(safe-area-inset-top) + 12px + 56px
+	); /* Under Profile Button */
+	z-index: 1500; /* High z-index to ensure clickability */
 	width: 44px;
 	height: 44px;
 	border-radius: 9999px;
@@ -1433,7 +1434,7 @@ html {
 }
 
 .air-widget:active {
-	transform: translateY(-50%) scale(0.95);
+	transform: scale(0.95);
 }
 
 .air-value {
