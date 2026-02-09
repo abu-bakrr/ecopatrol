@@ -105,10 +105,19 @@ const Tour = {
 		if (this.isActive) return
 		this.isActive = true
 		this.currentStep = 0
+
+		// Close sidebar if it's open
+		if (window.closeSidebar) window.closeSidebar()
+
 		document.getElementById('tour-overlay').classList.add('active')
 		document.getElementById('tour-tooltip').classList.add('active')
-		this.renderStep()
-		tg.HapticFeedback.impactOccurred('medium')
+
+		// Add a small delay to let sidebar animation finish/start
+		setTimeout(() => {
+			this.renderStep()
+		}, 300)
+
+		if (tg) tg.HapticFeedback.impactOccurred('medium')
 	},
 
 	stop() {
@@ -117,14 +126,14 @@ const Tour = {
 		document.getElementById('tour-tooltip').classList.remove('active')
 		this.removeSpotlight()
 		localStorage.setItem('tour_completed', 'true')
-		tg.HapticFeedback.impactOccurred('light')
+		if (tg) tg.HapticFeedback.impactOccurred('light')
 	},
 
 	next() {
 		if (this.currentStep < this.steps.length - 1) {
 			this.currentStep++
 			this.renderStep()
-			tg.HapticFeedback.impactOccurred('light')
+			if (tg) tg.HapticFeedback.impactOccurred('light')
 		} else {
 			this.stop()
 		}
@@ -134,7 +143,7 @@ const Tour = {
 		if (this.currentStep > 0) {
 			this.currentStep--
 			this.renderStep()
-			tg.HapticFeedback.impactOccurred('light')
+			if (tg) tg.HapticFeedback.impactOccurred('light')
 		}
 	},
 
