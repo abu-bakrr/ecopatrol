@@ -854,7 +854,7 @@ async function showMyReports() {
     `
 	// Clear history so this becomes the new "root" of the sheet
 	sheetHistory = []
-	renderSheetPage(html)
+	renderSheetPage(html, false)
 
 	try {
 		const response = await fetch(`${API_URL}/pollutions/user/${currentUser.id}`)
@@ -953,8 +953,9 @@ async function showMyHistory() {
         </div>
         <div style="height: 20px;"></div>
     `
-	openBottomSheet()
-	sheetHistory = [] // Clear history logic
+	// Clear history so this becomes the new "root" of the sheet
+	sheetHistory = []
+	renderSheetPage(html, false)
 
 	try {
 		const response = await fetch(`${API_URL}/history/user/${currentUser.id}`)
@@ -1120,7 +1121,7 @@ async function showAboutInfo() {
     `
 	// Clear history so this becomes the new "root" of the sheet
 	sheetHistory = []
-	openBottomSheet()
+	renderSheetPage(html, false)
 }
 
 async function loadProfileStats() {
@@ -1689,7 +1690,7 @@ async function showLeaderboard() {
     `
 	// Clear history so this becomes the new "root" of the sheet
 	sheetHistory = []
-	renderSheetPage(html)
+	renderSheetPage(html, false)
 
 	try {
 		const response = await fetch(`${API_URL}/leaderboard`)
