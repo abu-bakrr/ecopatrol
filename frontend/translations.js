@@ -42,6 +42,17 @@ const translations = {
 		clean_pollution_comment: 'Siz nima qildingiz? (ixtiyoriy)',
 		clean_pollution_photo: 'Natija rasmi (majburiy)',
 		clean_pollution_submit: 'Tasdiqlash va mukofot olish',
+		quality_good: 'Yaxshi',
+		quality_moderate: 'O‘rtacha',
+		quality_bad: 'Yomon',
+		air_quality: 'Havo sifati',
+		city_status_title: 'Shahar eko-pasporti',
+		radiation: 'Radiatsiya',
+		weather: 'Ob-havo',
+		pressure: 'Bosim',
+		wind: 'Shamol',
+
+		// Existing keys...
 		types: {
 			plastic: 'Plastik',
 			glass: 'Shisha',
@@ -165,6 +176,17 @@ const translations = {
 		clean_pollution_comment: 'Что вы сделали? (необязательно)',
 		clean_pollution_photo: 'Фото результата (обязательно)',
 		clean_pollution_submit: 'Подтвердить и получить награду',
+		quality_good: 'Хорошо',
+		quality_moderate: 'Средне',
+		quality_bad: 'Вредно',
+		air_quality: 'Качество воздуха',
+		city_status_title: 'Эко-паспорт города',
+		radiation: 'Радиация',
+		weather: 'Погода',
+		pressure: 'Давление',
+		wind: 'Ветер',
+
+		// Existing keys...
 		types: {
 			plastic: 'Пластик',
 			glass: 'Стекло',

@@ -1888,3 +1888,147 @@ function showReportDetails(r) {
     `
 	renderSheetPage(html)
 }
+
+// --- CITY PASSPORT & AIR QUALITY ---
+
+let cityStats = {
+	aqi: '-',
+	pm10: '-',
+	temp: '-',
+	wind: '-',
+	radiation: '0.11 мкЗв/ч', // Simulation
+}
+
+async function fetchAirQuality() {
+	try {
+		// Open-Meteo Air Quality API for Tashkent
+		const response = await fetch(
+			'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=41.2646&longitude=69.2163&hourly=pm10,pm2_5,european_aqi&current=european_aqi,pm10,pm2_5&timezone=auto',
+		)
+		const data = await response.json()
+
+		if (data.current) {
+			const aqi = data.current.european_aqi
+			const pm10 = data.current.pm10
+
+			cityStats.aqi = aqi
+			cityStats.pm10 = pm10
+
+			updateAirWidget(aqi)
+		}
+
+		// Also fetch weather
+		const weatherRes = await fetch(
+			'https://api.open-meteo.com/v1/forecast?latitude=41.2646&longitude=69.2163&current=temperature_2m,wind_speed_10m&timezone=auto',
+		)
+		const weatherData = await weatherRes.json()
+
+		if (weatherData.current) {
+			cityStats.temp = weatherData.current.temperature_2m
+			cityStats.wind = weatherData.current.wind_speed_10m
+		}
+	} catch (e) {
+		console.error('Air Quality Fetch Error:', e)
+	}
+}
+
+function updateAirWidget(aqi) {
+	const ticket = document.getElementById('air-widget')
+	const valueEl = ticket.querySelector('.air-value')
+	const labelEl = ticket.querySelector('.air-label') // Use label for text status if needed
+
+	// Determine status
+	let status = 'good'
+	let textKey = 'quality_good'
+
+	if (aqi > 40) {
+		status = 'moderate'
+		textKey = 'quality_moderate'
+	}
+	if (aqi > 80) {
+		status = 'bad'
+		textKey = 'quality_bad'
+	}
+
+	// Remove old classes
+	ticket.classList.remove('air-good', 'air-moderate', 'air-bad')
+	ticket.classList.add(`air-${status}`)
+
+	valueEl.textContent = `AQI ${aqi} • ${window.t(textKey)}`
+}
+
+window.showCityStatus = async () => {
+	closeSidebar()
+
+	const totalPollutions = allPollutions.length // Approximate active
+	// We don't have total cleaned count easily available globally without a fetch,
+	// but we can use a fetch or just show what we have.
+	// For now let's use the sidebar stats if available
+	const cleanedCount =
+		document.getElementById('sidebar-cleaned')?.textContent || '-'
+
+	const html = `
+        <div class="info-sheet">
+            <div class="info-header-img" style="font-size: 48px; margin-bottom: 10px;">🏙️</div>
+            <h2 style="text-align: center; font-size: 20px; font-weight: 700; margin-bottom: 24px;">
+                ${window.t('city_status_title')}
+            </h2>
+
+            <!-- Air Quality Big Circle -->
+            <div class="aqi-circle">
+                <div class="aqi-number" style="color: var(--text-primary)">${cityStats.aqi}</div>
+                <div class="aqi-text">AQI</div>
+            </div>
+            
+            <div class="city-stats-grid">
+                <!-- Weather -->
+                <div class="stat-card">
+                    <div class="stat-card-icon">🌡️</div>
+                    <div class="stat-card-label">${window.t('weather')}</div>
+                    <div class="stat-card-value">${cityStats.temp}°C</div>
+                </div>
+                
+                <!-- Wind -->
+                 <div class="stat-card">
+                    <div class="stat-card-icon">💨</div>
+                    <div class="stat-card-label">${window.t('wind')}</div>
+                    <div class="stat-card-value">${cityStats.wind} km/h</div>
+                </div>
+
+                <!-- Radiation (Simulated) -->
+                <div class="stat-card">
+                    <div class="stat-card-icon">☢️</div>
+                    <div class="stat-card-label">${window.t('radiation')}</div>
+                    <div class="stat-card-value" style="color: #10b981;">0.12 µSv</div>
+                </div>
+                
+                <!-- Active Pollutions -->
+                <div class="stat-card">
+                    <div class="stat-card-icon">⚠️</div>
+                    <div class="stat-card-label">${window.t('menu_pollutions')}</div>
+                    <div class="stat-card-value" style="color: #ef4444;">${totalPollutions}</div>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                 <div class="info-tag" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">${window.t('cleaned')}</div>
+                 <div style="font-size: 32px; font-weight: 800; text-align: center; margin: 12px 0;">
+                    ${cleanedCount}
+                 </div>
+                 <div style="text-align: center; font-size: 13px; opacity: 0.6;">
+                    Загрязнений ликвидировано волонтерами
+                 </div>
+            </div>
+
+            <div style="height: 20px;"></div>
+        </div>
+    `
+
+	sheetHistory = []
+	renderSheetPage(html, false)
+}
+
+// Init Air Quality
+setTimeout(fetchAirQuality, 2000)
+// Update every 10 mins
+setInterval(fetchAirQuality, 600000)
