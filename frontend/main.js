@@ -266,6 +266,9 @@ function goBackInSheet() {
 function checkRegistration() {
 	isRegistered = localStorage.getItem('registered') === 'true'
 
+	// Initialize Tour system
+	if (window.Tour) Tour.init()
+
 	if (isRegistered) {
 		hideOnboarding()
 
@@ -299,6 +302,12 @@ function checkRegistration() {
 
 		// Check permissions/update location in background
 		checkLocationStatus()
+
+		// Auto-start tour for new users who haven't completed it
+		const tourDone = localStorage.getItem('tour_completed')
+		if (!tourDone && window.Tour) {
+			setTimeout(() => Tour.start(), 2000)
+		}
 	} else {
 		showOnboarding()
 	}
