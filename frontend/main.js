@@ -1911,10 +1911,19 @@ async function fetchAirQuality() {
 			lng = center.lng
 		}
 
+		console.log(`📍 Fetching air quality for: lat=${lat}, lng=${lng}`)
+
 		// Open-Meteo Air Quality API
-		const response = await fetch(
-			`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lng}&hourly=pm10,pm2_5,european_aqi&current=european_aqi,pm10,pm2_5&timezone=auto`,
-		)
+		const aqiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lng}&hourly=pm10,pm2_5,european_aqi&current=european_aqi,pm10,pm2_5&timezone=auto`
+		console.log(`🔗 AQI URL: ${aqiUrl}`)
+
+		const response = await fetch(aqiUrl)
+
+		if (!response.ok) {
+			throw new Error(
+				`AQI API returned ${response.status}: ${response.statusText}`,
+			)
+		}
 
 		const data = await response.json()
 		console.log('🌍 Air Quality API Response:', JSON.stringify(data))
@@ -1937,9 +1946,17 @@ async function fetchAirQuality() {
 		}
 
 		// Also fetch weather
-		const weatherRes = await fetch(
-			`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,wind_speed_10m&timezone=auto`,
-		)
+		const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,wind_speed_10m&timezone=auto`
+		console.log(`🔗 Weather URL: ${weatherUrl}`)
+
+		const weatherRes = await fetch(weatherUrl)
+
+		if (!weatherRes.ok) {
+			throw new Error(
+				`Weather API returned ${weatherRes.status}: ${weatherRes.statusText}`,
+			)
+		}
+
 		const weatherData = await weatherRes.json()
 		console.log('🌤️ Weather API Response:', JSON.stringify(weatherData))
 
@@ -1956,7 +1973,25 @@ async function fetchAirQuality() {
 			console.warn('⚠️ weatherData.current is MISSING in API response!')
 		}
 	} catch (e) {
-		console.error('Air Quality Fetch Error:', e)
+		console.error('❌ Air Quality Fetch Error:', e)
+		console.error('Error details:', {
+			message: e.message,
+			stack: e.stack,
+			name: e.name,
+		})
+
+		// Show user-friendly error in widget
+		const widget = document.getElementById('air-widget')
+		if (widget) {
+			const spinner = widget.querySelector('.air-spinner')
+			const valueEl = widget.querySelector('.air-value')
+			if (spinner) spinner.style.display = 'none'
+			if (valueEl) {
+				valueEl.style.display = 'block'
+				valueEl.textContent = '⚠️'
+				valueEl.title = 'Network error: ' + e.message
+			}
+		}
 	}
 }
 
