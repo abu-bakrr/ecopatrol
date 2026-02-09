@@ -1427,6 +1427,59 @@ html {
 	font-size: 14px;
 	box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
+
+/* Safety Guide Styles */
+.safety-level-card {
+	background: var(--bg-secondary);
+	border-radius: 20px;
+	padding: 20px;
+	margin-bottom: 16px;
+	border: 1px solid var(--border);
+	transition: transform 0.2s;
+}
+
+.safety-level-header {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 10px;
+	font-size: 16px;
+}
+
+.safety-level-dot {
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+}
+
+.safety-level-desc {
+	font-size: 14px;
+	color: var(--text-secondary);
+	line-height: 1.5;
+	margin-bottom: 12px;
+}
+
+.safety-level-tools {
+	font-size: 13px;
+	background: var(--bg-primary);
+	padding: 10px 14px;
+	border-radius: 12px;
+	border: 1px solid var(--border);
+}
+
+/* Level Specific Colors */
+.safety-level-card.level-1 .safety-level-dot {
+	background: #10b981;
+	box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+.safety-level-card.level-2 .safety-level-dot {
+	background: #f59e0b;
+	box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+}
+.safety-level-card.level-3 .safety-level-dot {
+	background: #ef4444;
+	box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
 /* Air Quality Widget (Circular - Top Right Stack) */
 .air-widget {
 	position: absolute;

@@ -789,6 +789,9 @@ function setupEventListeners() {
 	document.getElementById('menu-info').addEventListener('click', () => {
 		showAboutInfo()
 	})
+	document.getElementById('menu-safety').addEventListener('click', () => {
+		showSafetyGuide()
+	})
 
 	document
 		.getElementById('toggle-pollutions-btn')
@@ -1088,6 +1091,73 @@ async function showExchange() {
 		content.innerHTML =
 			'<div class="error-msg">Не удалось загрузить биржу задач</div>'
 	}
+}
+
+async function showSafetyGuide() {
+	closeSidebar()
+	const lang = currentLang || 'ru'
+	const data = window.safetyContent[lang]
+
+	const html = `
+        <div class="info-sheet">
+            <div class="info-header-img" style="background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);">🛡️</div>
+            
+            <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 24px; text-align: center;">${data.title}</h2>
+
+            <!-- Pollution Levels -->
+            <div style="margin-bottom: 32px;">
+                <div class="info-tag" style="background: rgba(16, 185, 129, 0.1); color: #10b981; margin-bottom: 16px;">Уровни загрязнения</div>
+                ${data.levels
+									.map(
+										(l, i) => `
+                    <div class="safety-level-card level-${i + 1}">
+                        <div class="safety-level-header">
+                            <span class="safety-level-dot"></span>
+                            <strong>${l.label}</strong>
+                        </div>
+                        <p class="safety-level-desc">${l.description}</p>
+                        <div class="safety-level-tools">
+                            <strong>Экипировка:</strong> ${l.tools}
+                        </div>
+                    </div>
+                `,
+									)
+									.join('')}
+            </div>
+
+            <!-- General Rules -->
+            <div class="info-card">
+                <div class="info-tag">Основные правила</div>
+                <div class="info-list">
+                    ${data.rules
+											.map(
+												r => `
+                        <div class="info-list-item">
+                            <div class="info-list-icon" style="background: #10b981;">✓</div>
+                            <div class="info-text" style="margin-bottom: 0; font-size: 14px;">${r}</div>
+                        </div>
+                    `,
+											)
+											.join('')}
+                </div>
+            </div>
+
+            <!-- Glass Specific Rule -->
+            <div class="info-card" style="border-left: 4px solid #ef4444; background: rgba(239, 68, 68, 0.05);">
+                <div class="info-tag" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">${data.glass_rule.title}</div>
+                <div class="info-text" style="color: var(--text-primary); font-weight: 500;">
+                    ${data.glass_rule.text}
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 32px; opacity: 0.5; font-size: 13px;">
+                Ваша безопасность — наш главный приоритет.<br>Берегите себя и природу!
+            </div>
+        </div>
+        <div style="height: 40px;"></div>
+    `
+	sheetHistory = []
+	renderSheetPage(html, false)
 }
 
 async function showAboutInfo() {
