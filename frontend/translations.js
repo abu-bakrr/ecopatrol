@@ -106,6 +106,8 @@ const translations = {
 		detail_comment: 'Izoh',
 		detail_added_at: 'Qoʻshilgan vaqti',
 		show_on_map: 'Xaritada koʻrsatish',
+		detail_description_label: 'Zararlanish tavsifi',
+		detail_comment_label: 'Tozalash boʻyicha izoh',
 	},
 	ru: {
 		app_title: 'Экопатруль 🌍',
@@ -214,6 +216,8 @@ const translations = {
 		detail_comment: 'Комментарий',
 		detail_added_at: 'Дата добавления',
 		show_on_map: 'Показать на карте',
+		detail_description_label: 'Описание загрязнения',
+		detail_comment_label: 'Комментарий к очистке',
 	},
 	en: {
 		app_title: 'EcoPatrol 🌍',
@@ -322,6 +326,8 @@ const translations = {
 		detail_comment: 'Comment',
 		detail_added_at: 'Added at',
 		show_on_map: 'Show on Map',
+		detail_description_label: 'Pollution description',
+		detail_comment_label: 'Cleaning comment',
 	},
 }
 

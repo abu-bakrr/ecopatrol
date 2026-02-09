@@ -1718,8 +1718,6 @@ function showGhostMarker(lng, lat, level) {
 
 function showReportDetails(r) {
 	const content = document.getElementById('sheet-content')
-	// We might need to fetch full data if list doesn't have it, but usually a single pollution object is small enough
-	// For now assume r has everything we need or we can fetch it
 	const date = new Date(r.created_at).toLocaleDateString(
 		currentLang === 'uz' ? 'uz-UZ' : 'ru-RU',
 		{
@@ -1735,84 +1733,93 @@ function showReportDetails(r) {
 		:	window.t('status_cleaned')
 
 	content.innerHTML = `
-        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">${window.t('report_title')}</h2>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+            <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin: 0;">${window.t('report_title')}</h2>
+            <span class="status-badge ${r.status}">${statusText}</span>
+        </div>
         
-        <div style="background: var(--bg-secondary); padding: 14px; border-radius: 12px; margin-bottom: 16px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <span style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">${window.t('detail_added_at')}</span>
-                <span class="status-badge ${r.status}" style="margin:0;">${statusText}</span>
+        <!-- Header Info -->
+        <div style="background: var(--bg-secondary); padding: 16px; border-radius: 16px; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">${window.t('detail_added_at')}</div>
+                    <div style="font-size: 16px; font-weight: 600;">${date}</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">${window.t('reward_label')}</div>
+                    <div style="font-size: 18px; font-weight: 800; color: var(--primary);">$${r.level || 0}</div>
+                </div>
             </div>
-            <div style="font-size: 16px; font-weight: 600; color: var(--text-primary);">${date}</div>
         </div>
 
-        <div class="form-group">
-            <label class="form-label">${window.t('detail_before_photo')}</label>
+        <!-- Before Section -->
+        <div class="form-group" style="margin-bottom: 24px;">
+            <label class="form-label" style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 18px;">🚩</span> ${window.t('detail_before_photo')}
+            </label>
             <div class="photo-grid">
                 ${r.photos
 									.map(
 										url => `
-                    <div class="photo-item" style="background-image: url('${url}')" onclick="openPhotoViewer('${url}')"></div>
+                    <div class="photo-item contain" style="background-image: url('${url}')" onclick="openPhotoViewer('${url}')"></div>
                 `,
 									)
 									.join('')}
             </div>
-        </div>
-
-        ${
-					r.status === 'cleaned' && r.after_photos ?
-						`
-        <div class="form-group">
-            <label class="form-label">${window.t('detail_after_photo')}</label>
-            <div class="photo-grid">
-                ${r.after_photos
-									.map(
-										url => `
-                    <div class="photo-item" style="background-image: url('${url}')" onclick="openPhotoViewer('${url}')"></div>
-                `,
-									)
-									.join('')}
-            </div>
-        </div>
-        `
-					:	''
-				}
-
-        ${
-					r.description ?
-						`
-        <div class="form-group">
-            <label class="form-label">${window.t('add_pollution_desc')}</label>
-            <div style="background: var(--bg-secondary); padding: 12px; border-radius: 12px; color: var(--text-secondary); font-size: 14px; line-height: 1.5;">
+            ${
+							r.description ?
+								`
+            <div style="margin-top: 12px; font-size: 13px; color: var(--text-secondary); background: var(--bg-primary); padding: 12px; border-radius: 12px; border-left: 3px solid #ef4444;">
+                <div style="font-size: 10px; text-transform: uppercase; opacity: 0.6; margin-bottom: 4px;">${window.t('detail_description_label')}</div>
                 ${r.description}
             </div>
+            `
+							:	''
+						}
         </div>
-        `
-					:	''
-				}
 
+        <!-- After Section -->
         ${
-					r.comment ?
+					r.status === 'cleaned' ?
 						`
-        <div class="form-group">
-            <label class="form-label">${window.t('detail_comment')}</label>
-            <div style="background: var(--bg-secondary); padding: 12px; border-radius: 12px; color: var(--text-secondary); font-size: 14px; line-height: 1.5; border-left: 3px solid var(--primary);">
+        <div class="form-group" style="margin-bottom: 24px; padding: 16px; background: rgba(16, 185, 129, 0.05); border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.1);">
+            <label class="form-label" style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 18px;">✅</span> ${window.t('detail_after_photo')}
+            </label>
+            <div class="photo-grid">
+                ${
+									r.after_photos && r.after_photos.length > 0 ?
+										r.after_photos
+											.map(
+												url => `
+                    <div class="photo-item contain" style="background-image: url('${url}')" onclick="openPhotoViewer('${url}')"></div>
+                `,
+											)
+											.join('')
+									:	`<div style="font-size: 13px; color: var(--text-secondary); font-style: italic; opacity: 0.6;">${window.t('no_photo')}</div>`
+								}
+            </div>
+            ${
+							r.comment ?
+								`
+            <div style="margin-top: 12px; font-size: 13px; color: var(--text-secondary); background: white; padding: 12px; border-radius: 12px; border-left: 3px solid var(--primary);">
+                <div style="font-size: 10px; text-transform: uppercase; opacity: 0.6; margin-bottom: 4px;">${window.t('detail_comment_label')}</div>
                 ${r.comment}
             </div>
+            `
+							:	''
+						}
         </div>
         `
 					:	''
 				}
 
-        <div style="background: var(--bg-secondary); padding: 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <span style="font-weight: 600; font-size: 14px; color: var(--text-secondary);">${window.t('reward_label')}</span>
-            <span style="font-size: 20px; font-weight: 800; color: var(--primary);">$${r.level || 0}</span>
+        <!-- Actions -->
+        <div style="margin-top: 12px; padding-bottom: 20px;">
+            <button class="btn btn-primary" style="width: 100%; height: 54px; font-size: 16px; border-radius: 16px;" onclick="window.flyToReport(${r.lng}, ${r.lat}, ${r.level}, '${r.status}')">
+                📍 ${window.t('show_on_map')}
+            </button>
         </div>
-
-        <button class="btn btn-primary" style="width: 100%;" onclick="window.flyToReport(${r.lng}, ${r.lat}, ${r.level}, '${r.status}')">
-            ${window.t('show_on_map')}
-        </button>
-        
-        <div style="height: 20px;"></div>
     `
 	openBottomSheet()
 }

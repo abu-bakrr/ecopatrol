@@ -571,8 +571,10 @@ html {
 	transition: transform 0.2s;
 }
 
-.stat-item:active {
-	transform: scale(0.98);
+.photo-item.contain {
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-color: var(--bg-primary);
 }
 
 .stat-icon {
@@ -1553,8 +1555,14 @@ html {
 /* Ghost Marker (Temporary feedback for cleaned items) */
 .pollution-marker.ghost {
 	pointer-events: none;
-	animation: ghost-fade 3s forwards cubic-bezier(0.4, 0, 0.2, 1);
-	z-index: 50;
+	animation: ghost-fade 3.5s forwards cubic-bezier(0.4, 0, 0.2, 1);
+	z-index: 5000 !important;
+}
+
+.pollution-marker.ghost .pollution-marker-inner {
+	background: var(--primary) !important;
+	box-shadow: 0 0 20px var(--primary);
+	border: 4px solid white;
 }
 
 @keyframes ghost-fade {
