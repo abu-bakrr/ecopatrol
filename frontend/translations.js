@@ -11,6 +11,7 @@ const translations = {
 		balance: 'Balans',
 		cleaned: 'Tozalangan',
 		loading: 'Yuklanmoqda...',
+		back_btn: 'Orqaga',
 		city_clean_title: 'Shahar toza!',
 		city_clean_text:
 			'Hozirda faol arizalar yoʻq. Tozalikka qoʻshgan hissangingiz uchun rahmat! Siz xaritada yangi zararlanishni belgilashingiz mumkin.',
@@ -133,6 +134,7 @@ const translations = {
 		balance: 'Баланс',
 		cleaned: 'Очищено',
 		loading: 'Загрузка...',
+		back_btn: 'Назад',
 		city_clean_title: 'Город чист!',
 		city_clean_text:
 			'На данный момент нет активных заявок. Спасибо за ваш вклад в чистоту! Вы можете отметить новое загрязнение на карте.',
@@ -255,6 +257,7 @@ const translations = {
 		balance: 'Balance',
 		cleaned: 'Cleaned',
 		loading: 'Loading...',
+		back_btn: 'Back',
 		city_clean_title: 'City is clean!',
 		city_clean_text:
 			'There are no active reports at the moment. Thank you for your contribution to cleanliness! You can mark a new pollution on the map.',

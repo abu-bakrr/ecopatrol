@@ -230,9 +230,35 @@ function initBottomSheetDrag() {
 			closeBottomSheet()
 		}
 		sheet.style.transform = ''
-		startY = 0
-		currentY = 0
 	})
+}
+
+// Navigation History for Bottom Sheet
+let sheetHistory = []
+
+function renderSheetPage(html, addToHistory = true) {
+	const content = document.getElementById('sheet-content')
+	if (!content) return
+
+	if (addToHistory && content.innerHTML.trim() !== '') {
+		sheetHistory.push(content.innerHTML)
+	}
+
+	// Apply animation class
+	content.classList.remove('sheet-page-anim')
+	void content.offsetWidth // Force reflow
+	content.classList.add('sheet-page-anim')
+
+	content.innerHTML = html
+}
+
+function goBackInSheet() {
+	if (sheetHistory.length > 0) {
+		const prev = sheetHistory.pop()
+		renderSheetPage(prev, false)
+	} else {
+		closeBottomSheet()
+	}
 }
 
 function checkRegistration() {
@@ -764,6 +790,7 @@ function openBottomSheet() {
 function closeBottomSheet() {
 	document.getElementById('bottom-sheet').classList.remove('active')
 	document.getElementById('overlay').classList.remove('active')
+	sheetHistory = [] // Clear history on close
 }
 
 function togglePollutions() {
@@ -806,18 +833,17 @@ function closeAll() {
 async function showMyReports() {
 	closeSidebar()
 	if (!currentUser) return
-	const content = document.getElementById('sheet-content')
-	content.innerHTML = `
+	const html = `
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-            <h2 style="font-size: 20px; font-weight: 600;">Мои отчеты</h2>
+            <h2 style="font-size: 20px; font-weight: 600;">${window.t('menu_reports')}</h2>
             <div id="reports-loader" class="loader-small" style="display: none;"></div>
         </div>
         <div id="reports-list" class="reports-list">
-            <div style="padding: 20px; text-align: center; opacity: 0.5;">Загрузка...</div>
+            <div style="padding: 20px; text-align: center; opacity: 0.5;">${window.t('loading')}</div>
         </div>
         <div style="height: 20px;"></div>
     `
-	openBottomSheet()
+	renderSheetPage(html)
 
 	try {
 		const response = await fetch(`${API_URL}/pollutions/user/${currentUser.id}`)
@@ -1640,12 +1666,11 @@ async function showLeaderboard() {
 	if (sidebar) sidebar.classList.remove('active')
 
 	tg.HapticFeedback.impactOccurred('light')
-	const content = document.getElementById('sheet-content')
-	content.innerHTML = `
+	const html = `
         <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">${window.t('menu_leaderboard')}</h2>
         <div id="leaderboard-list" class="loading">${window.t('loading')}</div>
     `
-	openBottomSheet()
+	renderSheetPage(html)
 
 	try {
 		const response = await fetch(`${API_URL}/leaderboard`)
@@ -1717,7 +1742,6 @@ function showGhostMarker(lng, lat, level) {
 }
 
 function showReportDetails(r) {
-	const content = document.getElementById('sheet-content')
 	const date = new Date(r.created_at).toLocaleDateString(
 		currentLang === 'uz' ? 'uz-UZ' : 'ru-RU',
 		{
@@ -1749,9 +1773,14 @@ function showReportDetails(r) {
 				.join(', ')
 		:	'---'
 
-	content.innerHTML = `
+	const html = `
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
-            <h2 style="font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0;">${window.t('report_title')}</h2>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button onclick="goBackInSheet()" style="background: var(--bg-secondary); border: 1px solid var(--border); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--text-primary);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <h2 style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin: 0;">${window.t('report_title')}</h2>
+            </div>
             <span class="status-badge ${r.status}" style="padding: 6px 14px; font-weight: 700; border-radius: 12px;">${statusText}</span>
         </div>
         
@@ -1844,5 +1873,5 @@ function showReportDetails(r) {
             </button>
         </div>
     `
-	openBottomSheet()
+	renderSheetPage(html)
 }
