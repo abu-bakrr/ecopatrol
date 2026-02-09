@@ -486,6 +486,16 @@
 		</div>
 
 		<div id="section-users" class="section">
+			<div style="margin-bottom: 16px">
+				<input
+					type="text"
+					id="user-search"
+					class="input-field"
+					placeholder="Search by name, username, or phone..."
+					onkeyup="filterUsers()"
+					style="margin-bottom: 0"
+				/>
+			</div>
 			<div id="users-list"></div>
 		</div>
 
@@ -669,34 +679,97 @@
 					data.total_rewards.toFixed(0) + ' UZS'
 			}
 
+			let allUsers = [] // Store for filtering
+
 			async function loadUsers() {
 				const list = document.getElementById('users-list')
 				list.innerHTML = '<div class="loading">Загрузка...</div>'
 				const users = await apiFetch('/admin/users')
 				if (!users) return
 
+				allUsers = users // Store globally
+				renderUsers(users)
+			}
+
+			function renderUsers(users) {
+				const list = document.getElementById('users-list')
 				list.innerHTML = users
 					.map(
 						u => `
-                <div class="card">
+                <div class="card user-card" data-user-id="${u.id}">
                     <div class="card-header">
                         <div>
                             <div class="card-title">${u.first_name || 'Hero'}</div>
-                            <div class="card-meta">@${u.username || '—'} • ${u.phone || 'Нет номера'}</div>
+                            <div class="card-meta">@${u.username || '—'} • ${u.phone || 'No phone'}</div>
                         </div>
-                        <div style="font-weight:900; color:var(--primary); font-size:18px">${u.balance.toFixed(0)} UZS</div>
+                        <div style="font-weight:800; color:var(--primary); font-size:17px">${u.balance.toFixed(0)} UZS</div>
                     </div>
                     <div class="btn-row">
                         <button class="btn btn-solid" onclick="notifyUser(${u.telegram_id})">
-                             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                             Написать
+                             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                             Message
                         </button>
-                        <button class="btn btn-outline" onclick="editBalance(${u.id}, ${u.balance})">Баланс</button>
+                        <button class="btn btn-outline" onclick="editBalance(${u.id}, ${u.balance})">Balance</button>
+                        <button class="btn btn-danger" onclick="deleteUser(${u.id}, '${u.first_name || 'User'}')">
+                             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                             Delete
+                        </button>
                     </div>
                 </div>
             `,
 					)
 					.join('')
+			}
+
+			function filterUsers() {
+				const search = document
+					.getElementById('user-search')
+					.value.toLowerCase()
+				if (!search) {
+					renderUsers(allUsers)
+					return
+				}
+
+				const filtered = allUsers.filter(u => {
+					const name = (u.first_name || '').toLowerCase()
+					const username = (u.username || '').toLowerCase()
+					const phone = (u.phone || '').toLowerCase()
+					return (
+						name.includes(search) ||
+						username.includes(search) ||
+						phone.includes(search)
+					)
+				})
+
+				renderUsers(filtered)
+			}
+
+			async function deleteUser(userId, userName) {
+				if (
+					!confirm(
+						`Are you sure you want to delete user "${userName}"?\n\nThis will permanently delete:\n- User account\n- All their pollution reports\n- All related photos\n\nThis action cannot be undone.`,
+					)
+				) {
+					return
+				}
+
+				try {
+					const result = await apiFetch(`/admin/users/${userId}`, {
+						method: 'DELETE',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ admin_tg_id: adminTgId }),
+					})
+
+					if (result && result.status === 'ok') {
+						tg.showAlert(`User "${userName}" deleted successfully`)
+						loadUsers() // Refresh list
+					} else {
+						tg.showAlert('Error: ' + (result.message || 'Unknown error'))
+					}
+				} catch (e) {
+					console.error(e)
+					tg.showAlert('Failed to delete user')
+				}
 			}
 
 			async function loadPollutions() {

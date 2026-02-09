@@ -301,6 +301,48 @@ def admin_update_balance(user_id):
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+@app.route('/api/admin/users/<int:user_id>', methods=['DELETE'])
+def admin_delete_user(user_id):
+    data = request.json or {}
+    tg_id = data.get('admin_tg_id') or request.args.get('admin_tg_id', type=int)
+    
+    if tg_id not in ADMIN_IDS:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    user = User.query.get_or_404(user_id)
+    
+    # Prevent deletion of admin accounts
+    if user.telegram_id in ADMIN_IDS:
+        return jsonify({'error': 'Cannot delete admin account'}), 403
+    
+    try:
+        # Store user info for response
+        user_info = {
+            'id': user.id,
+            'telegram_id': user.telegram_id,
+            'username': user.username,
+            'first_name': user.first_name
+        }
+        
+        # Update pollutions cleaned by this user (set cleaner_id to NULL)
+        Pollution.query.filter_by(cleaner_id=user.id).update({'cleaner_id': None})
+        
+        # Delete user's own pollutions (photos will cascade)
+        Pollution.query.filter_by(user_id=user.id).delete()
+        
+        # Delete user
+        db.session.delete(user)
+        db.session.commit()
+        
+        return jsonify({
+            'status': 'ok',
+            'message': f'User {user_info["first_name"]} deleted successfully',
+            'deleted_user': user_info
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 @app.route('/api/admin/pollutions', methods=['GET'])
 def admin_get_pollutions():
     tg_id = request.args.get('admin_tg_id', type=int)
