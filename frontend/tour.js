@@ -18,7 +18,7 @@ const Tour = {
 				},
 				content: {
 					ru: 'Это Экопатруль. Мы вместе делаем город чище. Сейчас я покажу основные функции.',
-					en: "This is EcoPatrol. Together we make the city cleaner. Let me show you the main features.",
+					en: 'This is EcoPatrol. Together we make the city cleaner. Let me show you the main features.',
 					uz: "Bu Eko-patrul. Biz birgalikda shaharni tozaroq qilamiz. Hozir asosiy funksiyalarni ko'rsataman.",
 				},
 				position: 'center',
@@ -32,7 +32,7 @@ const Tour = {
 				},
 				content: {
 					ru: 'Увидели свалку? Нажмите эту кнопку, сделайте фото и укажите место на карте.',
-					en: "Seen a dump? Press this button, take a photo and mark it on the map.",
+					en: 'Seen a dump? Press this button, take a photo and mark it on the map.',
 					uz: "Axlatni ko'rdingizmi? Ushbu tugmani bosing, rasmga oling va uni xaritada belgilang.",
 				},
 				position: 'center',
@@ -46,7 +46,7 @@ const Tour = {
 				},
 				content: {
 					ru: 'Этот виджет показывает состояние воздуха. Зеленый — всё отлично, красный — загрязнение.',
-					en: "This widget shows air quality. Green is great, red is pollution.",
+					en: 'This widget shows air quality. Green is great, red is pollution.',
 					uz: "Ushbu vidjet havo sifatini ko'rsatadi. Yashil - hammasi yaxshi, qizil - ifloslanish.",
 				},
 				position: 'center',
@@ -60,8 +60,8 @@ const Tour = {
 				},
 				content: {
 					ru: 'Здесь хранятся ваши достижения, баланс и история ваших отчетов.',
-					en: "Your achievements, balance, and report history are stored here.",
-					uz: "Bu yerda yutuqlaringiz, balansingiz va hisobotlaringiz tarixi saqlanadi.",
+					en: 'Your achievements, balance, and report history are stored here.',
+					uz: 'Bu yerda yutuqlaringiz, balansingiz va hisobotlaringiz tarixi saqlanadi.',
 				},
 				position: 'center',
 			},
@@ -74,7 +74,7 @@ const Tour = {
 				},
 				content: {
 					ru: 'Получайте коины за помощь городу и обменивайте их на призы от партнеров!',
-					en: "Get coins for helping the city and exchange them for prizes from partners!",
+					en: 'Get coins for helping the city and exchange them for prizes from partners!',
 					uz: "Shaharga yordam borganingiz uchun tangalar oling va ularni sovg'alarga almashtiring!",
 				},
 				position: 'center',
@@ -89,14 +89,11 @@ const Tour = {
 				content: {
 					ru: 'Вы готовы! Тур всегда можно перезапустить из настроек профиля. Удачи!',
 					en: "You're ready! You can always restart the tour from settings. Good luck!",
-					uz: "Siz tayyorsiz! Turni har doim sozlamalardan qayta ishga tushirishingiz mumkin. Omad!",
+					uz: 'Siz tayyorsiz! Turni har doim sozlamalardan qayta ishga tushirishingiz mumkin. Omad!',
 				},
 				position: 'center',
 			},
 		]
-
-		this.createUI()
-	},
 
 		this.createUI()
 	},
