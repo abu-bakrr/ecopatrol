@@ -1143,10 +1143,18 @@ async function showSafetyGuide() {
             </div>
 
             <!-- Glass Specific Rule -->
-            <div class="info-card" style="border-left: 4px solid #ef4444; background: rgba(239, 68, 68, 0.05);">
+            <div class="info-card" style="border-left: 4px solid #ef4444; background: rgba(239, 68, 68, 0.05); margin-bottom: 16px;">
                 <div class="info-tag" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">${data.glass_rule.title}</div>
                 <div class="info-text" style="color: var(--text-primary); font-weight: 500;">
                     ${data.glass_rule.text}
+                </div>
+            </div>
+
+            <!-- Bio-Chem Specific Rule -->
+            <div class="info-card" style="border-left: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.05);">
+                <div class="info-tag" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">${data.bio_chem_rule.title}</div>
+                <div class="info-text" style="color: var(--text-primary); font-weight: 500;">
+                    ${data.bio_chem_rule.text}
                 </div>
             </div>
 
