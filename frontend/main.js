@@ -635,6 +635,18 @@ async function authUser() {
 			console.error('Failed to parse auth response:', responseText)
 			return
 		}
+
+		// Check if user needs registration
+		if (data.needs_registration) {
+			console.log('--- USER NEEDS REGISTRATION ---')
+			// Clear registered flag and show onboarding
+			localStorage.removeItem('registered')
+			isRegistered = false
+			showOnboarding()
+			return
+		}
+
+		// User is fully registered
 		currentUser = data.user
 		updateProfileUI()
 	} catch (e) {
