@@ -1488,7 +1488,7 @@ html {
 	z-index: 2100000 !important;
 }
 
-/* Map Loading Overlay */
+/* Map Loading Overlay - Pure Shimmer */
 .map-loading-overlay {
 	position: absolute;
 	top: 0;
@@ -1500,15 +1500,84 @@ html {
 	align-items: center;
 	justify-content: center;
 	z-index: 1000;
+	overflow: hidden;
 	transition:
-		opacity 0.5s ease,
-		visibility 0.5s;
+		opacity 1s cubic-bezier(0.4, 0, 0.2, 1),
+		visibility 1s;
 }
 
 .map-loading-overlay.hidden {
 	opacity: 0;
 	visibility: hidden;
 	pointer-events: none;
+}
+
+/* Premium Shimmer Wave Animation */
+.shimmer-wave {
+	position: absolute;
+	top: 0;
+	left: -150%;
+	width: 300%;
+	height: 100%;
+	background: linear-gradient(
+		to right,
+		transparent 0%,
+		rgba(255, 255, 255, 0.05) 45%,
+		rgba(255, 255, 255, 0.1) 50%,
+		rgba(255, 255, 255, 0.05) 55%,
+		transparent 100%
+	);
+	animation: shimmer 2s infinite linear;
+}
+
+[data-theme='light'] .shimmer-wave {
+	background: linear-gradient(
+		to right,
+		transparent 0%,
+		rgba(0, 0, 0, 0.03) 45%,
+		rgba(0, 0, 0, 0.06) 50%,
+		rgba(0, 0, 0, 0.03) 55%,
+		transparent 100%
+	);
+}
+
+@keyframes shimmer {
+	0% {
+		transform: translateX(-50%);
+	}
+	100% {
+		transform: translateX(50%);
+	}
+}
+
+/* Ghost Marker (Temporary feedback for cleaned items) */
+.pollution-marker.ghost {
+	pointer-events: none;
+	animation: ghost-fade 3s forwards cubic-bezier(0.4, 0, 0.2, 1);
+	z-index: 50;
+}
+
+@keyframes ghost-fade {
+	0% {
+		transform: scale(0.5);
+		opacity: 0;
+	}
+	15% {
+		transform: scale(1.1);
+		opacity: 0.8;
+	}
+	30% {
+		transform: scale(1);
+		opacity: 0.7;
+	}
+	70% {
+		transform: scale(1);
+		opacity: 0.7;
+	}
+	100% {
+		transform: scale(0.8);
+		opacity: 0;
+	}
 }
 
 .loader-container {

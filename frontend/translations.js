@@ -100,6 +100,11 @@ const translations = {
 		offline_text:
 			'Ilovadan foydalanish uchun internetga ulaning. Aloqa tiklanganda ilova avtomatik ravishable ishga tushadi.',
 		map_loading: 'Xaritani yuklash...',
+		report_title: 'Hisobot tafsilotlari',
+		detail_before_photo: 'Oldin (rasm)',
+		detail_after_photo: 'Keyin (rasm)',
+		detail_comment: 'Izoh',
+		detail_added_at: 'Qoʻshilgan vaqti',
 	},
 	ru: {
 		app_title: 'Экопатруль 🌍',
@@ -202,6 +207,11 @@ const translations = {
 		offline_text:
 			'Для работы приложения требуется подключение к интернету. Приложение заработает автоматически при восстановлении связи.',
 		map_loading: 'Загрузка карты...',
+		report_title: 'Детали отчета',
+		detail_before_photo: 'До (фото)',
+		detail_after_photo: 'После (фото)',
+		detail_comment: 'Комментарий',
+		detail_added_at: 'Дата добавления',
 	},
 	en: {
 		app_title: 'EcoPatrol 🌍',
@@ -304,6 +314,11 @@ const translations = {
 		offline_text:
 			'Internet connection is required to use this app. It will resume automatically once connection is restored.',
 		map_loading: 'Loading map...',
+		report_title: 'Report Details',
+		detail_before_photo: 'Before (photo)',
+		detail_after_photo: 'After (photo)',
+		detail_comment: 'Comment',
+		detail_added_at: 'Added at',
 	},
 }
 

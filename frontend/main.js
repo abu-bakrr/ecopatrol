@@ -837,25 +837,48 @@ async function showMyReports() {
 		}
 
 		list.innerHTML = reports
-			.map(r => {
-				const date = new Date(r.created_at).toLocaleDateString('ru-RU', {
-					day: 'numeric',
-					month: 'short',
-				})
+			.map((r, idx) => {
+				const date = new Date(r.created_at).toLocaleDateString(
+					currentLang === 'uz' ? 'uz-UZ' : 'ru-RU',
+					{
+						day: 'numeric',
+						month: 'short',
+					},
+				)
 				const photo = r.photos[0] || ''
-				const statusText = r.status === 'active' ? 'Активно' : 'Очищено'
+				const statusText =
+					r.status === 'active' ?
+						window.t('status_active')
+					:	window.t('status_cleaned')
+
+				// Use a global array or similar to store reports for the click handler
+				if (!window.currentUserReports) window.currentUserReports = {}
+				window.currentUserReports[r.id] = r
+
 				return `
-                <div class="report-card" onclick="window.flyToReport(${r.lng}, ${r.lat})">
+                <div class="report-card" onclick="handleReportCardClick(${r.lng}, ${r.lat}, ${r.level}, '${r.status}', ${r.id})">
                     <div class="report-thumb" style="background-image: url('${photo}')"></div>
                     <div class="report-info">
                         <div class="report-date">${date}</div>
-                        <div class="report-desc">${r.description || 'Без описания'}</div>
+                        <div class="report-desc">${r.description || (currentLang === 'uz' ? 'Tavsifsiz' : 'Без описания')}</div>
                     </div>
                     <div class="status-badge ${r.status}">${statusText}</div>
                 </div>
             `
 			})
 			.join('')
+
+		// Add global click handler for clarity
+		window.handleReportCardClick = (lng, lat, level, status, id) => {
+			const report = window.currentUserReports[id]
+			// 1. Fly to map and show ghost marker if needed
+			window.flyToReport(lng, lat, level, status)
+
+			// 2. Wait a bit then show details
+			setTimeout(() => {
+				if (report) showReportDetails(report)
+			}, 600) // Wait for sidebar/sheet close animations
+		}
 	} catch (e) {
 		console.error(e)
 		document.getElementById('reports-list').innerHTML = `
@@ -867,12 +890,17 @@ async function showMyReports() {
 }
 
 // Global helper for flying to report
-window.flyToReport = (lng, lat) => {
+window.flyToReport = (lng, lat, level = 1, status = 'active') => {
 	closeBottomSheet()
 
 	// AUTO-SHOW markers if they were hidden
 	if (!pollutionsVisible) {
 		togglePollutions()
+	}
+
+	// If cleaned, show a "ghost" marker temporarily
+	if (status === 'cleaned') {
+		showGhostMarker(lng, lat, level)
 	}
 
 	map.flyTo({ center: [lng, lat], zoom: 17, duration: 1500 })
@@ -1673,4 +1701,120 @@ window.openPhotoViewer = function (url) {
 window.closePhotoViewer = function () {
 	const viewer = document.getElementById('photo-viewer')
 	if (viewer) viewer.classList.remove('active')
+}
+
+// Ghost Marker for cleaned items
+function showGhostMarker(lng, lat, level) {
+	const el = document.createElement('div')
+	el.className = `pollution-marker level-${level || 1} ghost`
+
+	const inner = document.createElement('div')
+	inner.className = 'pollution-marker-inner'
+	el.appendChild(inner)
+
+	const marker = new maplibregl.Marker({ element: el })
+		.setLngLat([lng, lat])
+		.addTo(map)
+
+	// Auto-cleanup after animation ends
+	setTimeout(() => {
+		marker.remove()
+	}, 3500)
+}
+
+function showReportDetails(r) {
+	const content = document.getElementById('sheet-content')
+	// We might need to fetch full data if list doesn't have it, but usually a single pollution object is small enough
+	// For now assume r has everything we need or we can fetch it
+	const date = new Date(r.created_at).toLocaleDateString(
+		currentLang === 'uz' ? 'uz-UZ' : 'ru-RU',
+		{
+			day: 'numeric',
+			month: 'long',
+			year: 'numeric',
+		},
+	)
+
+	const statusText =
+		r.status === 'active' ?
+			window.t('status_active')
+		:	window.t('status_cleaned')
+
+	content.innerHTML = `
+        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">${window.t('report_title')}</h2>
+        
+        <div style="background: var(--bg-secondary); padding: 14px; border-radius: 12px; margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <span style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">${window.t('detail_added_at')}</span>
+                <span class="status-badge ${r.status}" style="margin:0;">${statusText}</span>
+            </div>
+            <div style="font-size: 16px; font-weight: 600; color: var(--text-primary);">${date}</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">${window.t('detail_before_photo')}</label>
+            <div class="photo-grid">
+                ${r.photos
+									.map(
+										url => `
+                    <div class="photo-item" style="background-image: url('${url}')" onclick="openPhotoViewer('${url}')"></div>
+                `,
+									)
+									.join('')}
+            </div>
+        </div>
+
+        ${
+					r.status === 'cleaned' && r.after_photos ?
+						`
+        <div class="form-group">
+            <label class="form-label">${window.t('detail_after_photo')}</label>
+            <div class="photo-grid">
+                ${r.after_photos
+									.map(
+										url => `
+                    <div class="photo-item" style="background-image: url('${url}')" onclick="openPhotoViewer('${url}')"></div>
+                `,
+									)
+									.join('')}
+            </div>
+        </div>
+        `
+					:	''
+				}
+
+        ${
+					r.description ?
+						`
+        <div class="form-group">
+            <label class="form-label">${window.t('add_pollution_desc')}</label>
+            <div style="background: var(--bg-secondary); padding: 12px; border-radius: 12px; color: var(--text-secondary); font-size: 14px; line-height: 1.5;">
+                ${r.description}
+            </div>
+        </div>
+        `
+					:	''
+				}
+
+        ${
+					r.comment ?
+						`
+        <div class="form-group">
+            <label class="form-label">${window.t('detail_comment')}</label>
+            <div style="background: var(--bg-secondary); padding: 12px; border-radius: 12px; color: var(--text-secondary); font-size: 14px; line-height: 1.5; border-left: 3px solid var(--primary);">
+                ${r.comment}
+            </div>
+        </div>
+        `
+					:	''
+				}
+
+        <div style="background: var(--bg-secondary); padding: 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 600; font-size: 14px; color: var(--text-secondary);">${window.t('reward_label')}</span>
+            <span style="font-size: 20px; font-weight: 800; color: var(--primary);">$${r.level || 0}</span>
+        </div>
+        
+        <div style="height: 20px;"></div>
+    `
+	openBottomSheet()
 }
