@@ -1941,13 +1941,19 @@ async function fetchAirQuality() {
 			`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,wind_speed_10m&timezone=auto`,
 		)
 		const weatherData = await weatherRes.json()
+		console.log('🌤️ Weather API Response:', JSON.stringify(weatherData))
 
 		if (weatherData.current) {
 			// FIX: Ensure cityStats exists
 			if (!window.cityStats) window.cityStats = {}
 
-			cityStats.temp = weatherData.current.temperature_2m
-			cityStats.wind = weatherData.current.wind_speed_10m
+			window.cityStats.temp = weatherData.current.temperature_2m
+			window.cityStats.wind = weatherData.current.wind_speed_10m
+			console.log(
+				`✅ Parsed Weather - Temp: ${weatherData.current.temperature_2m}°C, Wind: ${weatherData.current.wind_speed_10m} km/h`,
+			)
+		} else {
+			console.warn('⚠️ weatherData.current is MISSING in API response!')
 		}
 	} catch (e) {
 		console.error('Air Quality Fetch Error:', e)
