@@ -10,7 +10,7 @@
 	--text-secondary: #6b7280;
 	--border: #e5e7eb;
 	--shadow: rgba(0, 0, 0, 0.1);
-	--map-bg: #f0f0f0;
+	--map-bg: #fcfcfc;
 	--bg-page: var(--map-bg);
 }
 
@@ -25,7 +25,7 @@
 	--text-secondary: #9ca3af;
 	--border: #374151;
 	--shadow: rgba(0, 0, 0, 0.3);
-	--map-bg: #1a1a1a;
+	--map-bg: #242f3e;
 	--bg-page: var(--map-bg);
 }
 

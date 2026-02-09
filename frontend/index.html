@@ -25,8 +25,8 @@
 				const savedTheme = localStorage.getItem('theme')
 				const theme = savedTheme || (tg && tg.colorScheme) || 'light'
 				document.documentElement.setAttribute('data-theme', theme)
-				// Set background immediately to prevent flash (match map-bg)
-				const bgColor = theme === 'dark' ? '#1a1a1a' : '#f0f0f0'
+				// Set background immediately to prevent flash (EXACT map-bg match)
+				const bgColor = theme === 'dark' ? '#242f3e' : '#fcfcfc'
 				document.write(
 					'<style>html, body { background: ' +
 						bgColor +
@@ -35,7 +35,7 @@
 			})()
 		</script>
 
-		<link rel="stylesheet" href="style.css?v=921" />
+		<link rel="stylesheet" href="style.css?v=950" />
 		<style>
 			/* Critical styles for startup stability */
 			#debug-console {
@@ -635,7 +635,7 @@
 			console.log('Log system ready v10')
 		</script>
 
-		<script src="translations.js?v=921"></script>
-		<script type="module" src="main.js?v=921"></script>
+		<script src="translations.js?v=950"></script>
+		<script type="module" src="main.js?v=950"></script>
 	</body>
 </html>
