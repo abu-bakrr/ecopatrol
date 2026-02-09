@@ -942,8 +942,7 @@ window.flyToReport = (lng, lat, level = 1, status = 'active') => {
 async function showMyHistory() {
 	closeSidebar()
 	if (!currentUser) return
-	const content = document.getElementById('sheet-content')
-	content.innerHTML = `
+	const html = `
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
             <h2 style="font-size: 20px; font-weight: 600;">История начислений</h2>
             <div id="history-loader" class="loader-small" style="display: none;"></div>
