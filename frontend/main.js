@@ -1901,9 +1901,19 @@ let cityStats = {
 
 async function fetchAirQuality() {
 	try {
-		// Open-Meteo Air Quality API for Tashkent
+		let lat = 41.2646
+		let lng = 69.2163
+
+		// Try to use map center if available, else usage default Tashkent
+		if (typeof map !== 'undefined') {
+			const center = map.getCenter()
+			lat = center.lat
+			lng = center.lng
+		}
+
+		// Open-Meteo Air Quality API
 		const response = await fetch(
-			'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=41.2646&longitude=69.2163&hourly=pm10,pm2_5,european_aqi&current=european_aqi,pm10,pm2_5&timezone=auto',
+			`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lng}&hourly=pm10,pm2_5,european_aqi&current=european_aqi,pm10,pm2_5&timezone=auto`,
 		)
 		const data = await response.json()
 
@@ -1919,7 +1929,7 @@ async function fetchAirQuality() {
 
 		// Also fetch weather
 		const weatherRes = await fetch(
-			'https://api.open-meteo.com/v1/forecast?latitude=41.2646&longitude=69.2163&current=temperature_2m,wind_speed_10m&timezone=auto',
+			`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,wind_speed_10m&timezone=auto`,
 		)
 		const weatherData = await weatherRes.json()
 
@@ -1935,35 +1945,28 @@ async function fetchAirQuality() {
 function updateAirWidget(aqi) {
 	const ticket = document.getElementById('air-widget')
 	const valueEl = ticket.querySelector('.air-value')
-	const labelEl = ticket.querySelector('.air-label') // Use label for text status if needed
 
 	// Determine status
 	let status = 'good'
-	let textKey = 'quality_good'
 
 	if (aqi > 40) {
 		status = 'moderate'
-		textKey = 'quality_moderate'
 	}
 	if (aqi > 80) {
 		status = 'bad'
-		textKey = 'quality_bad'
 	}
 
 	// Remove old classes
 	ticket.classList.remove('air-good', 'air-moderate', 'air-bad')
 	ticket.classList.add(`air-${status}`)
 
-	valueEl.textContent = `AQI ${aqi} • ${window.t(textKey)}`
+	valueEl.textContent = aqi
 }
 
 window.showCityStatus = async () => {
 	closeSidebar()
 
 	const totalPollutions = allPollutions.length // Approximate active
-	// We don't have total cleaned count easily available globally without a fetch,
-	// but we can use a fetch or just show what we have.
-	// For now let's use the sidebar stats if available
 	const cleanedCount =
 		document.getElementById('sidebar-cleaned')?.textContent || '-'
 
@@ -1974,7 +1977,11 @@ window.showCityStatus = async () => {
                 ${window.t('city_status_title')}
             </h2>
 
-            <!-- Air Quality Removed as requested -->
+            <!-- Air Quality Panel (Detailed) -->
+            <div class="aqi-circle">
+                <div class="aqi-number" style="color: var(--text-primary)">${cityStats.aqi}</div>
+                <div class="aqi-text">AQI</div>
+            </div>
             
             <div class="city-stats-grid">
                 <!-- Weather -->
@@ -2024,7 +2031,7 @@ window.showCityStatus = async () => {
 	renderSheetPage(html, false)
 }
 
-// Init Air Quality
-setTimeout(fetchAirQuality, 2000)
-// Update every 10 mins
+// Init Air Quality (Fetch based on map center when moved)
+setTimeout(fetchAirQuality, 3000)
+// Update every 10 mins OR when map moves securely (optional, simple for now)
 setInterval(fetchAirQuality, 600000)
