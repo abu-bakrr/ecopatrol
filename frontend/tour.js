@@ -12,44 +12,30 @@ const Tour = {
 			{
 				target: 'body',
 				title: {
-					ru: '🌿 Добро пожаловать в Экопатруль!',
-					en: '🌿 Welcome to EcoPatrol!',
-					uz: '🌿 Eko-patrulga xush kelibsiz!',
+					ru: '🌿 Добро пожаловать!',
+					en: '🌿 Welcome!',
+					uz: '🌿 Xush kelibsiz!',
 				},
 				content: {
-					ru: 'Мы рады, что вы с нами! Это приложение поможет нам вместе сделать наш город чище. Давайте я покажу, как здесь всё устроено.',
-					en: "We're glad you're here! This app helps us make our city cleaner together. Let me show you how everything works.",
-					uz: "Sizni ko'rib turganimizdan xursandmiz! Ushbu ilova shahrimizni birgalikda tozaroq qilishimizga yordam beradi. Keling, bu yerda hamma narsa qanday ishlashini ko'rsataman.",
+					ru: 'Это Экопатруль. Мы вместе делаем город чище. Сейчас я покажу основные функции.',
+					en: "This is EcoPatrol. Together we make the city cleaner. Let me show you the main features.",
+					uz: "Bu Eko-patrul. Biz birgalikda shaharni tozaroq qilamiz. Hozir asosiy funksiyalarni ko'rsataman.",
 				},
 				position: 'center',
 			},
 			{
-				target: '#map',
-				title: {
-					ru: '📍 Интерактивная карта',
-					en: '📍 Interactive Map',
-					uz: '📍 Interaktiv xarita',
-				},
-				content: {
-					ru: 'Перед вами карта города. Все цветные маркеры — это места, где люди нашли мусор. Вы можете нажимать на них, чтобы узнать подробности или построить маршрут.',
-					en: 'This is the city map. All colored markers are places where people found trash. You can click on them to see details or get directions.',
-					uz: "Bu shahar xaritasi. Barcha rangli belgilar odamlar axlat topgan joylardir. Tafsilotlarni ko'rish yoki yo'nalish olish uchun ularni bosishingiz mumkin.",
-				},
-				position: 'bottom',
-			},
-			{
-				target: '#add-pollution-btn',
+				target: '#add-btn',
 				title: {
 					ru: '📸 Станьте героем!',
 					en: '📸 Become a Hero!',
 					uz: '📸 Qahramonga aylaning!',
 				},
 				content: {
-					ru: 'Увидели свалку? Нажмите эту кнопку! Сделайте фото, добавьте краткое описание, и мы отметим это место на карте, чтобы кто-то мог его убрать.',
-					en: "Seen a dump? Press this button! Take a photo, add a short description, and we'll mark it on the map so someone can clean it up.",
-					uz: "Chiqindixonani ko'rdingizmi? Ushbu tugmani bosing! Rasmga oling, qisqacha tavsif qo'shing va biz uni xaritada belgilaymiz, shunda kimdir uni tozalashi mumkin.",
+					ru: 'Увидели свалку? Нажмите эту кнопку, сделайте фото и укажите место на карте.',
+					en: "Seen a dump? Press this button, take a photo and mark it on the map.",
+					uz: "Axlatni ko'rdingizmi? Ushbu tugmani bosing, rasmga oling va uni xaritada belgilang.",
 				},
-				position: 'top',
+				position: 'center',
 			},
 			{
 				target: '#air-widget',
@@ -59,11 +45,11 @@ const Tour = {
 					uz: '🌬 Havo sifati',
 				},
 				content: {
-					ru: 'Этот виджет показывает состояние воздуха в реальном времени. Если он зеленый — дышите полной грудью, если красный — будьте осторожны.',
-					en: "This widget shows real-time air quality. If it's green, breathe freely; if it's red, be careful.",
-					uz: "Ushbu vidjet havo sifatini real vaqtda ko'rsatadi. Agar u yashil bo'lsa, bemalol nafas oling; agar u qizil bo'lsa, ehtiyot bo'ling.",
+					ru: 'Этот виджет показывает состояние воздуха. Зеленый — всё отлично, красный — загрязнение.',
+					en: "This widget shows air quality. Green is great, red is pollution.",
+					uz: "Ushbu vidjet havo sifatini ko'rsatadi. Yashil - hammasi yaxshi, qizil - ifloslanish.",
 				},
-				position: 'bottom',
+				position: 'center',
 			},
 			{
 				target: '#profile-btn',
@@ -73,11 +59,11 @@ const Tour = {
 					uz: '👤 Sizning filmingiz',
 				},
 				content: {
-					ru: 'Здесь хранятся ваши достижения! Вы можете посмотреть историю своих отчетов, узнать, сколько мусора вы помогли убрать, и сменить настройки.',
-					en: 'Your achievements are stored here! You can view your report history, see how much trash you helped clean, and change settings.',
-					uz: "Yutuqlaringiz shu yerda saqlanadi! Siz hisobotlaringiz tarixini ko'rishingiz, qancha axlatni tozalashga yordam berganingizni bilishingiz va sozlamalarni o'zgartirishingiz mumkin.",
+					ru: 'Здесь хранятся ваши достижения, баланс и история ваших отчетов.',
+					en: "Your achievements, balance, and report history are stored here.",
+					uz: "Bu yerda yutuqlaringiz, balansingiz va hisobotlaringiz tarixi saqlanadi.",
 				},
-				position: 'left',
+				position: 'center',
 			},
 			{
 				target: '.balance-display',
@@ -87,11 +73,11 @@ const Tour = {
 					uz: '💰 Eko-tangalar',
 				},
 				content: {
-					ru: 'За каждый отчет и каждую уборку вы получаете эко-коины. Копите их и обменивайте на ценные призы и бонусы от наших партнеров!',
-					en: 'For every report and cleaning, you receive Eco-Coins. Collect them and exchange for valuable prizes and bonuses from our partners!',
-					uz: "Har bir hisobot va tozalash uchun siz Eko-tangalarni olasiz. Ularni to'plang va hamkorlarimizning qimmatbaho sovg'alari va bonuslariga almashtiring!",
+					ru: 'Получайте коины за помощь городу и обменивайте их на призы от партнеров!',
+					en: "Get coins for helping the city and exchange them for prizes from partners!",
+					uz: "Shaharga yordam borganingiz uchun tangalar oling va ularni sovg'alarga almashtiring!",
 				},
-				position: 'bottom',
+				position: 'center',
 			},
 			{
 				target: 'body',
@@ -101,13 +87,16 @@ const Tour = {
 					uz: '🚀 Ketdik!',
 				},
 				content: {
-					ru: 'Теперь вы готовы помогать городу. Если что-то забудете — тур всегда можно перезапустить из бокового меню. Удачи, Эко-герой!',
-					en: "Now you're ready to help the city. If you forget anything, you can always restart the tour from the sidebar. Good luck, Eco-Hero!",
-					uz: "Endi siz shaharga yordam berishga tayyorsiz. Agar biror narsani unutib qo'ysangiz, tur har doim yon menyudan qayta ishga tushirilishi mumkin. Omad, Eko-qahramon!",
+					ru: 'Вы готовы! Тур всегда можно перезапустить из настроек профиля. Удачи!',
+					en: "You're ready! You can always restart the tour from settings. Good luck!",
+					uz: "Siz tayyorsiz! Turni har doim sozlamalardan qayta ishga tushirishingiz mumkin. Omad!",
 				},
 				position: 'center',
 			},
 		]
+
+		this.createUI()
+	},
 
 		this.createUI()
 	},
@@ -231,10 +220,12 @@ const Tour = {
 
 		this.removeSpotlight()
 
+		// Always keep tooltip centered as requested
+		tooltip.style.left = '50%'
+		tooltip.style.top = '50%'
+		tooltip.style.transform = 'translate(-50%, -50%)'
+
 		if (!targetEl || step.target === 'body') {
-			tooltip.style.left = '50%'
-			tooltip.style.top = '50%'
-			tooltip.style.transform = 'translate(-50%, -50%)'
 			overlay.style.clipPath = 'none'
 			return
 		}
@@ -258,41 +249,6 @@ const Tour = {
             ${r.l}px ${r.t + r.h}px, ${r.l}px 100%, 
             100% 100%, 100% 0%
         )`
-
-		// Tooltip positioning using transform to avoid layout jitter
-		const tooltipWidth = 280
-		const tooltipHeight = tooltip.offsetHeight || 180
-
-		let tx, ty
-
-		if (step.position === 'bottom') {
-			ty = rect.bottom + 20
-			tx = rect.left + rect.width / 2 - tooltipWidth / 2
-		} else if (step.position === 'top') {
-			ty = rect.top - tooltipHeight - 20
-			tx = rect.left + rect.width / 2 - tooltipWidth / 2
-		} else if (step.position === 'left') {
-			ty = rect.top + rect.height / 2 - tooltipHeight / 2
-			tx = rect.left - tooltipWidth - 20
-		} else if (step.position === 'right') {
-			ty = rect.top + rect.height / 2 - tooltipHeight / 2
-			tx = rect.right + 20
-		} else {
-			ty = window.innerHeight / 2 - tooltipHeight / 2
-			tx = window.innerWidth / 2 - tooltipWidth / 2
-		}
-
-		// Boundary checks
-		if (tx < 10) tx = 10
-		if (tx + tooltipWidth > window.innerWidth - 10)
-			tx = window.innerWidth - tooltipWidth - 10
-		if (ty < 10) ty = 10
-		if (ty + tooltipHeight > window.innerHeight - 10)
-			ty = window.innerHeight - tooltipHeight - 10
-
-		tooltip.style.left = '0'
-		tooltip.style.top = '0'
-		tooltip.style.transform = `translate3d(${tx}px, ${ty}px, 0)`
 	},
 
 	addSpotlight(rect) {
