@@ -1642,7 +1642,7 @@ async function showLeaderboard() {
 	tg.HapticFeedback.impactOccurred('light')
 	const content = document.getElementById('sheet-content')
 	content.innerHTML = `
-        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">🏅 ${window.t('menu_leaderboard')}</h2>
+        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">${window.t('menu_leaderboard')}</h2>
         <div id="leaderboard-list" class="loading">${window.t('loading')}</div>
     `
 	openBottomSheet()
@@ -1755,7 +1755,7 @@ function showReportDetails(r) {
         <!-- Before Section -->
         <div class="form-group" style="margin-bottom: 24px;">
             <label class="form-label" style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 18px;">🚩</span> ${window.t('detail_before_photo')}
+                ${window.t('detail_before_photo')}
             </label>
             <div class="photo-grid">
                 ${r.photos
@@ -1769,7 +1769,7 @@ function showReportDetails(r) {
             ${
 							r.description ?
 								`
-            <div style="margin-top: 12px; font-size: 13px; color: var(--text-secondary); background: var(--bg-primary); padding: 12px; border-radius: 12px; border-left: 3px solid #ef4444;">
+            <div style="margin-top: 12px; font-size: 13px; color: var(--text-secondary); background: var(--bg-primary); padding: 12px; border-radius: 12px; border-left: 3px solid var(--primary);">
                 <div style="font-size: 10px; text-transform: uppercase; opacity: 0.6; margin-bottom: 4px;">${window.t('detail_description_label')}</div>
                 ${r.description}
             </div>
@@ -1784,7 +1784,7 @@ function showReportDetails(r) {
 						`
         <div class="form-group" style="margin-bottom: 24px; padding: 16px; background: rgba(16, 185, 129, 0.05); border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.1);">
             <label class="form-label" style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 18px;">✅</span> ${window.t('detail_after_photo')}
+                ${window.t('detail_after_photo')}
             </label>
             <div class="photo-grid">
                 ${
@@ -1817,7 +1817,7 @@ function showReportDetails(r) {
         <!-- Actions -->
         <div style="margin-top: 12px; padding-bottom: 20px;">
             <button class="btn btn-primary" style="width: 100%; height: 54px; font-size: 16px; border-radius: 16px;" onclick="window.flyToReport(${r.lng}, ${r.lat}, ${r.level}, '${r.status}')">
-                📍 ${window.t('show_on_map')}
+                ${window.t('show_on_map')}
             </button>
         </div>
     `

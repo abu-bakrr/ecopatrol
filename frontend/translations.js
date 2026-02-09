@@ -1,6 +1,6 @@
 const translations = {
 	uz: {
-		app_title: 'Eko-patrul 🌍',
+		app_title: 'Eko-patrul',
 		sidebar_footer: 'EcoPatrol v35.0 • Dunyoni tozalaymiz',
 		menu_pollutions: 'Zararlanishlar',
 		menu_reports: 'Mening hisobotlarim',
@@ -110,7 +110,7 @@ const translations = {
 		detail_comment_label: 'Tozalash boʻyicha izoh',
 	},
 	ru: {
-		app_title: 'Экопатруль 🌍',
+		app_title: 'Экопатруль',
 		sidebar_footer: 'EcoPatrol v35.0 • Сделаем мир чище',
 		menu_pollutions: 'Загрязнения',
 		menu_reports: 'Мои отчеты',
@@ -220,7 +220,7 @@ const translations = {
 		detail_comment_label: 'Комментарий к очистке',
 	},
 	en: {
-		app_title: 'EcoPatrol 🌍',
+		app_title: 'EcoPatrol',
 		sidebar_footer: 'EcoPatrol v35.0 • Clean the world',
 		menu_pollutions: 'Pollutions',
 		menu_reports: 'My Reports',
