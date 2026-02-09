@@ -142,6 +142,7 @@ const Tour = {
 		// Prepare content immediately to prevent empty flash
 		this.renderStep()
 
+		document.body.classList.add('tour-active')
 		document.getElementById('tour-overlay').classList.add('active')
 		document.getElementById('tour-tooltip').classList.add('active')
 
@@ -155,6 +156,7 @@ const Tour = {
 
 	stop() {
 		this.isActive = false
+		document.body.classList.remove('tour-active')
 		document.getElementById('tour-overlay').classList.remove('active')
 		document.getElementById('tour-tooltip').classList.remove('active')
 		this.removeSpotlight()

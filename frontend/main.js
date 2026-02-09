@@ -1106,7 +1106,13 @@ async function showSafetyGuide() {
 
             <!-- Pollution Levels -->
             <div style="margin-bottom: 32px;">
-                <div class="info-tag" style="background: rgba(16, 185, 129, 0.1); color: #10b981; margin-bottom: 16px;">Уровни загрязнения</div>
+                <div class="info-tag" style="background: rgba(16, 185, 129, 0.1); color: #10b981; margin-bottom: 16px;">
+                    ${
+											lang === 'ru' ? 'Уровни загрязнения'
+											: lang === 'uz' ? 'Ifloslanish darajalari'
+											: 'Pollution Levels'
+										}
+                </div>
                 ${data.levels
 									.map(
 										(l, i) => `
@@ -1117,7 +1123,11 @@ async function showSafetyGuide() {
                         </div>
                         <p class="safety-level-desc">${l.description}</p>
                         <div class="safety-level-tools">
-                            <strong>Экипировка:</strong> ${l.tools}
+                            <strong>${
+															lang === 'ru' ? 'Экипировка'
+															: lang === 'uz' ? 'Anjomlar'
+															: 'Equipment'
+														}:</strong> ${l.tools}
                         </div>
                     </div>
                 `,
@@ -1127,7 +1137,11 @@ async function showSafetyGuide() {
 
             <!-- General Rules -->
             <div class="info-card">
-                <div class="info-tag">Основные правила</div>
+                <div class="info-tag">${
+									lang === 'ru' ? 'Основные правила'
+									: lang === 'uz' ? 'Asosiy qoidalar'
+									: 'General Rules'
+								}</div>
                 <div class="info-list">
                     ${data.rules
 											.map(
@@ -1151,15 +1165,76 @@ async function showSafetyGuide() {
             </div>
 
             <!-- Bio-Chem Specific Rule -->
-            <div class="info-card" style="border-left: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.05);">
+            <div class="info-card" style="border-left: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.05); margin-bottom: 16px;">
                 <div class="info-tag" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">${data.bio_chem_rule.title}</div>
                 <div class="info-text" style="color: var(--text-primary); font-weight: 500;">
                     ${data.bio_chem_rule.text}
                 </div>
             </div>
 
+            <!-- Sun/Heat Rule -->
+            <div class="info-card" style="border-left: 4px solid #3b82f6; background: rgba(59, 130, 246, 0.05); margin-bottom: 16px;">
+                <div class="info-tag" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">${data.sun_rule.title}</div>
+                <div class="info-text" style="color: var(--text-primary); font-weight: 500;">
+                    ${data.sun_rule.text}
+                </div>
+            </div>
+
+            <!-- Physical Safety Rule -->
+            <div class="info-card" style="border-left: 4px solid #8b5cf6; background: rgba(139, 92, 246, 0.05); margin-bottom: 24px;">
+                <div class="info-tag" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">${data.physical_rule.title}</div>
+                <div class="info-text" style="color: var(--text-primary); font-weight: 500;">
+                    ${data.physical_rule.text}
+                </div>
+            </div>
+
+            <!-- Emergency Contacts -->
+            <div style="margin-bottom: 32px;">
+                <div class="info-tag" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; margin-bottom: 16px;">
+                    ${
+											lang === 'ru' ? 'Экстренные контакты'
+											: lang === 'uz' ? 'Favqulodda raqamlar'
+											: 'Emergency Contacts'
+										}
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                    ${data.emergency_contacts
+											.map(
+												c => `
+                        <div style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 16px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;">
+                            <div style="display: flex; align-items: center; gap: 14px;">
+                                <span style="font-size: 24px;">${c.icon}</span>
+                                <div style="display: flex; flex-direction: column;">
+                                    <span style="font-size: 14px; font-weight: 700;">${c.name}</span>
+                                    <span style="font-size: 13px; color: var(--text-secondary);">${
+																			lang === 'ru' ? 'Звонок бесплатный'
+																			: lang === 'uz' ? 'Qo‘ng‘iroq bepul'
+																			: 'Free call'
+																		}</span>
+                                </div>
+                            </div>
+                            <a href="tel:${c.phone}" style="background: #ef4444; color: white; padding: 8px 16px; border-radius: 10px; font-weight: 800; text-decoration: none; font-size: 14px;">
+                                ${c.phone}
+                            </a>
+                        </div>
+                    `,
+											)
+											.join('')}
+                </div>
+            </div>
+
             <div style="text-align: center; margin-top: 32px; opacity: 0.5; font-size: 13px;">
-                Ваша безопасность — наш главный приоритет.<br>Берегите себя и природу!
+                ${
+									lang === 'ru' ? 'Ваша безопасность — наш приоритет.'
+									: lang === 'uz' ?
+										'Sizning xavfsizligingiz – bizning ustuvor vazifamiz.'
+									:	'Your safety is our top priority.'
+								}
+                <br>${
+									lang === 'ru' ? 'Берегите себя и природу!'
+									: lang === 'uz' ? 'O‘zingizni va tabiatni asrang!'
+									: 'Protect yourself and nature!'
+								}
             </div>
         </div>
         <div style="height: 40px;"></div>

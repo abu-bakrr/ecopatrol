@@ -5,39 +5,53 @@ const safetyContent = {
 			{
 				label: 'Past daraja (Yashil)',
 				description:
-					'Muntazam maishiy chiqindilar: qogʻoz, plastik idishlar, qadoqlash materiallari. Inson salomatligi uchun bevosita xavf tugʻdirmaydi.',
+					'Muntazam maishiy chiqindilar: qogʻoz, plastik idishlar, qadoqlash materiallari. Inson salomatligi uchun bevosita xavf tugʻdirmaydi, ammo gigiyena qoidalariga rioya qilish shart.',
 				tools: 'Oddiy toʻqimali qoʻlqoplar, axlat qoplari.',
 			},
 			{
 				label: 'Oʻrtacha daraja (Sariq)',
 				description:
-					'Qurilish chiqindilari, singan shishalar, oʻtkir metall buyumlar, eski maishiy texnika qismlari.',
+					'Qurilish chiqindilari, singan shishalar, oʻtkir metall buyumlar, eski maishiy texnika qismlari va zanglagan konstruksiyalar.',
 				tools:
-					'Zich rezina yoki charm qoʻlqoplar, yopiq poyabzal, singan shishalar uchun choʻtka va belkurak.',
+					'Zich rezina yoki charm qoʻlqoplar, yopiq qalin poyabzal, singan shishalar uchun choʻtka va belkurak.',
 			},
 			{
 				label: 'Yuqori daraja (Qizil)',
 				description:
-					'Zaharli va xavfli chiqindilar: kimyoviy moddalar, batareyalar, elektronika, tibbiy chiqindilar (shpritslar, dori-darmonlar), shuningdek, ko‘p miqdordagi chirigan oziq-ovqat qoldiqlari.',
+					'Zaharli va xavfli chiqindilar: kimyoviy moddalar, batareyalar, elektronika, tibbiy chiqindilar (shpritslar, noma’lum dori-darmonlar), shuningdek, ko‘p miqdordagi chirigan oziq-ovqat qoldiqlari.',
 				tools:
-					'Respirator, germetik rezina qo‘lqoplar, himoya ko‘zoynaklari va maxsus qisqichlar. Noma’lum moddalarga MUTLAQO tegmang!',
+					'Respirator (FFP2/FFP3), germetik rezina qoʻlqoplar, himoya koʻzoynaklari va maxsus qisqichlar. Noma’lum moddalarga MUTLAQO tegmang!',
 			},
 		],
 		rules: [
 			'Hech qachon axlatga (ayniqsa shisha va metallga) yalangʻoch qoʻl bilan tegmang.',
-			'Noma’lum suyuqliklar va idishlarni ochmang yoki hidlamang.',
+			'Noma’lum suyuqliklar, flakonlar va yopiq idishlarni ochmang yoki hidlamang.',
 			'Singan shishalarni tozalashda faqat qalin qoʻlqop va vositalardan (belkurak, qisqich) foydalaning.',
 			'Agar chiqindi xavfli koʻrinsa (tibbiy, kimyoviy), uni oʻzingiz tozalashga urinmang, mutaxassislarni chaqiring.',
 			'Tozalashdan soʻng qoʻlingizni yaxshilab yuving yoki antiseptik bilan ishlov bering.',
+			'Har doim yopiq poyabzalda ishlang – sirt ostida shisha yoki mixlar bo‘lishi mumkin.',
 		],
 		glass_rule: {
-			title: 'Shisha bilan ishlash qoidalari',
-			text: 'Shisha parchalarini qoʻl bilan yigʻmang. Faqat belkurak va choʻtkadan foydalaning. Singan shishalarni oddiy paketga solmang (teshib oʻtishi mumkin), karton quti yoki qalin materialdan foydalaning.',
+			title: 'Shisha bilan ishlash',
+			text: 'Shisha parchalarini hech qachon qoʻl bilan yigʻmang. Faqat belkurak va choʻtkadan foydalaning. Singan shishalarni oddiy plastik paketga solmang (teshib oʻtishi mumkin), karton quti yoki qalin chelakdan foydalaning. Shisha yig‘ilgan idishni "Xavfli: Shisha" deb belgilash tavsiya etiladi.',
 		},
 		bio_chem_rule: {
 			title: 'Kimyoviy va biologik xavf',
-			text: 'Kimyoviy chiqindilar (bo‘yoqlar, erituvchilar, kislotalar, ishqorlar) nafaqat tabiatni zaharlaydi, balki kiyimingizni eritib yuborishi yoki teringizda qattiq kuyish hosil qilishi mumkin. Batareyalar, akkumulyatorlar va lyuminessent lampalar tarkibida simob, kadmiy va qo‘rg‘oshin kabi o‘ta zaharli metallar bor — ularni oddiy axlat bilan aralashtirmang. \n\nOziq-ovqat qoldiqlari (organika) chiriganda xavfli gazlar ajratib chiqaradi va patogen bakteriyalar, mog‘or hamda kemiruvchilar (kalamushlar) uchun oziqlanish joyi hisoblanadi. Bunday joylarni tozalashda NIQOB (respirator) taqish shart, chunki mog‘or sporalari o‘pkaga zarar yetkazishi mumkin. Organikani yig‘ishda qo‘l bilan emas, faqat belkurakdan foydalaning va ularni qalin, germetik paketlarga soling.',
+			text: 'Kimyoviy chiqindilar (bo‘yoqlar, erituvchilar, kislotalar) nafaqat tabiatni zaharlaydi, balki kiyimingizni eritib yuborishi yoki teringizda qattiq kuyish hosil qilishi mumkin. Batareyalar va lyuminessent lampalarda simob va qo‘rg‘oshin bor. Chirigan organika o‘pkaga zarar yetkazuvchi mog‘or sporalari va bakteriyalar manbai hisoblanadi. Bunday joylarda NIQOB (respirator) taqish shart!',
 		},
+		sun_rule: {
+			title: 'Issiq urishi va quyoshdan saqlanish',
+			text: 'Tozalash ishlarini kunning salqin vaqtida (ertalab soat 10:00 gacha yoki kechki 18:00 dan keyin) bajaring. O‘zingiz bilan kamida 1.5 litr ichimlik suvi oling. Har doim bosh kiyim (kepka, panama) kiying. Agar boshingiz aylansa yoki ko‘nglingiz aynisa, darrov soyaga o‘ting va suv iching.',
+		},
+		physical_rule: {
+			title: 'Jismoniy xavfsizlik',
+			text: 'Og‘ir qoplarni ko‘tarayotganda belingizni emas, balki tizzalaringizni buking (o‘tirgan holda ko‘taring). Juda og‘ir yuklarni yolg‘iz ko‘tarmang, boshqa ko‘ngillilarni yordamga chaqiring. Kuchingizni to‘g‘ri taqsimlang, har 20-30 daqiqada dam oling.',
+		},
+		emergency_contacts: [
+			{ name: 'Tez yordam', phone: '103', icon: '🚑' },
+			{ name: 'FVV (MChS)', phone: '1050', icon: '🚨' },
+			{ name: 'Yong‘indan saqlash', phone: '101', icon: '🚒' },
+		],
 	},
 	ru: {
 		title: 'Руководство по безопасности',
@@ -45,39 +59,53 @@ const safetyContent = {
 			{
 				label: 'Низкий уровень (Зеленый)',
 				description:
-					'Обычный бытовой мусор: бумага, пластиковые бутылки, упаковки. Не представляет прямой угрозы здоровью.',
+					'Обычный бытовой мусор: бумага, пластиковые бутылки, упаковки. Не представляет прямой угрозы здоровью, но требует соблюдения гигиены.',
 				tools: 'Обычные тканевые перчатки, пакеты для мусора.',
 			},
 			{
 				label: 'Средний уровень (Желтый)',
 				description:
-					'Строительные отходы, разбитое стекло, острые металлические предметы, части старой техники.',
+					'Строительные отходы, разбитое стекло, острые металлические предметы, части старой техники и ржавые конструкции.',
 				tools:
-					'Плотные прорезиненные или кожаные перчатки, закрытая обувь, совок и щетка для осколков.',
+					'Плотные прорезиненные или кожаные перчатки, закрытая обувь с толстой подошвой, совок и щетка.',
 			},
 			{
 				label: 'Высокий уровень (Красный)',
 				description:
-					'Токсичные и опасные отходы: химикаты, батарейки, ртутные лампы, электроника, медицинские отходы (шприцы), а также гниющая органика в больших количествах.',
+					'Токсичные и опасные отходы: химикаты, батарейки, ртутные лампы, медотходы (шприцы), а также большие скопления гниющей органики.',
 				tools:
-					'Респиратор или маска, герметичные резиновые перчатки, защитные очки и щипцы. Не трогайте неизвестные вещества!',
+					'Респиратор (FFP2/FFP3), герметичные перчатки, защитные очки и щипцы. К неизвестным веществам НЕ прикасаться!',
 			},
 		],
 		rules: [
 			'Никогда не трогайте мусор (особенно стекло и металл) голыми руками.',
 			'Не открывайте и не нюхайте неизвестные флаконы и емкости.',
 			'При уборке стекла используйте только толстые перчатки и инвентарь (совок, щипцы).',
-			'Если отходы выглядят опасно (медицинские, химические), не пытайтесь убрать их сами, вызовите специалистов.',
+			'Если отходы выглядят опасно (медицинские, химические), не убирайте их сами, вызовите специалистов.',
 			'После уборки обязательно вымойте руки с мылом или обработайте антисептиком.',
+			'Работайте только в закрытой обуви — под слоем мусора могут быть гвозди или битое стекло.',
 		],
 		glass_rule: {
 			title: 'Работа со стеклом',
-			text: 'Не собирайте осколки руками. Используйте только веник и совок. Не кладите стекло в обычные пакеты (они проткнутся), используйте коробки или плотную тару.',
+			text: 'Не собирайте осколки руками. Используйте веник и совок. Не кладите стекло в обычные пакеты — они проткнутся. Используйте коробки или плотные ведра. Рекомендуется пометить тару надписью "Опасно: Стекло".',
 		},
 		bio_chem_rule: {
 			title: 'Химическая и био-угроза',
-			text: 'Химические отходы (краски, растворители, кислоты, щелочи) могут не только отравить почву, но и разъесть одежду или вызвать сильные химические ожоги. Батарейки, аккумуляторы и люминесцентные лампы содержат ртуть, кадмий и свинец — их нельзя выбрасывать с общим мусором. \n\nПищевые отходы (органика) при гниении выделяют опасные газы и становятся рассадником болезнетворных бактерий, плесени и грызунов. При уборке таких мест обязательно использование РЕСПИРАТОРА, так как споры плесени могут попасть в легкие. Используйте лопаты вместо рук и упаковывайте органику в плотные, герметичные пакеты.',
+			text: 'Химикаты (растворители, кислоты, щелочи) могут разъесть одежду или вызвать ожоги. Батарейки и лампы содержат ртуть и свинец. Гниющая органика — источник спор плесени, которые могут попасть в легкие и вызвать аллергию или инфекцию. Использование РЕСПИРАТОРА в таких местах обязательно!',
 		},
+		sun_rule: {
+			title: 'Жара и защита от солнца',
+			text: 'Старайтесь проводить уборку в прохладное время (до 10:00 или после 18:00). С собой должно быть не менее 1.5 литров воды. Обязательно ношение головного убора. При головокружении немедленно уйдите в тень.',
+		},
+		physical_rule: {
+			title: 'Физическая безопасность',
+			text: 'При подъеме тяжелых мешков сгибайте колени, а не спину (поднимайте "ногами"). Не поднимайте слишком тяжелые объекты в одиночку. Делайте перерывы каждые 20-30 минут физической работы.',
+		},
+		emergency_contacts: [
+			{ name: 'Скорая помощь', phone: '103', icon: '🚑' },
+			{ name: 'МЧС (Служба спасения)', phone: '1050', icon: '🚨' },
+			{ name: 'Пожарная служба', phone: '101', icon: '🚒' },
+		],
 	},
 	en: {
 		title: 'Safety Guide',
@@ -85,39 +113,53 @@ const safetyContent = {
 			{
 				label: 'Low Level (Green)',
 				description:
-					'Common household waste: paper, plastic bottles, packaging. Does not pose a direct threat to health.',
+					'Common household waste: paper, plastic bottles, packaging. Does not pose a direct threat, but basic hygiene is required.',
 				tools: 'Regular textile gloves, trash bags.',
 			},
 			{
 				label: 'Medium Level (Yellow)',
 				description:
-					'Construction waste, broken glass, sharp metal objects, parts of old machinery.',
+					'Construction waste, broken glass, sharp metal objects, old machinery parts, and rusty structures.',
 				tools:
-					'Thick rubber-coated or leather gloves, closed shoes, dustpan and brush for shards.',
+					'Thick rubber-coated or leather gloves, closed sturdy shoes, dustpan and brush.',
 			},
 			{
 				label: 'High Level (Red)',
 				description:
-					'Toxic and hazardous waste: chemicals, batteries, mercury lamps, electronics, medical waste (syringes), and large amounts of rotting organic food waste.',
+					'Toxic and hazardous waste: chemicals, batteries, mercury lamps, medical waste (syringes), and large piles of rotting organics.',
 				tools:
-					'Respirator or mask, airtight rubber gloves, safety goggles, and tongs. Do not touch unknown substances!',
+					'Respirator (FFP2/FFP3), airtight gloves, safety goggles, and tongs. Do NOT touch unknown substances!',
 			},
 		],
 		rules: [
 			'Never touch trash (especially glass and metal) with bare hands.',
 			'Do not open or smell unknown bottles or containers.',
-			'When cleaning glass, use only thick gloves and tools (dustpan, tongs).',
-			'If waste looks hazardous (medical, chemical), do not attempt to clean it yourself, call professionals.',
-			'After cleaning, be sure to wash your hands with soap or use antiseptic.',
+			'When cleaning glass, use only thick gloves and proper tools (dustpan, tongs).',
+			'If waste looks hazardous, do not clean it yourself, call professionals.',
+			'Wash hands thoroughly with soap or use antiseptic after cleaning.',
+			'Always wear closed-toe shoes — glass or nails may be hidden under the surface.',
 		],
 		glass_rule: {
 			title: 'Handling Glass',
-			text: 'Do not pick up shards with your hands. Use only a broom and dustpan. Do not put glass in regular bags (they will puncture), use boxes or thick containers.',
+			text: 'Never pick up shards with hands. Use only a broom and dustpan. Do not put glass in regular bags as they will puncture. Use boxes or thick buckets. Label the container "Danger: Glass".',
 		},
 		bio_chem_rule: {
 			title: 'Chemical & Bio-Hazards',
-			text: 'Chemical waste (paints, solvents, acids, alkalis) can not only poison the soil but also corrode clothing or cause severe chemical burns. Batteries, accumulators, and fluorescent lamps contain mercury, cadmium, and lead — they must not be mixed with general waste. \n\nFood waste (organics) releases hazardous gases during decomposition and becomes a breeding ground for pathogenic bacteria, mold, and rodents. When cleaning such areas, a RESPIRATOR is mandatory, as mold spores can Enter the lungs. Use shovels instead of hands and pack organics into thick, airtight bags.',
+			text: 'Chemicals (solvents, acids) can corrode clothing or cause burns. Batteries contain mercury and lead. Rotting food waste is a source of mold spores and bacteria; using a RESPIRATOR in such areas is mandatory!',
 		},
+		sun_rule: {
+			title: 'Heat & Sun Protection',
+			text: 'Plan cleanups for cooler times (before 10 AM or after 6 PM). Bring at least 1.5 liters of water. Always wear a hat. If you feel dizzy, move to the shade immediately.',
+		},
+		physical_rule: {
+			title: 'Physical Safety',
+			text: 'When lifting heavy bags, bend your knees, not your back. Do not lift heavy objects alone. Take breaks every 20-30 minutes of physical labor.',
+		},
+		emergency_contacts: [
+			{ name: 'Ambulance', phone: '103', icon: '🚑' },
+			{ name: 'Emergency Services', phone: '1050', icon: '🚨' },
+			{ name: 'Fire Department', phone: '101', icon: '🚒' },
+		],
 	},
 }
 

@@ -1790,9 +1790,18 @@ html {
 	z-index: 10001;
 	border-radius: 12px;
 	box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4);
-	pointer-events: none;
+	pointer-events: auto; /* Changed from none to block clicks to target */
 	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 	border: 2px solid var(--primary);
+}
+/* Ensure nothing else is clickable when tour is active */
+body.tour-active {
+	pointer-events: none;
+}
+body.tour-active #tour-overlay,
+body.tour-active #tour-tooltip,
+body.tour-active .tour-spotlight {
+	pointer-events: auto;
 }
 .tour-tooltip {
 	position: fixed;
