@@ -675,7 +675,13 @@ html {
 	text-align: center;
 	font-size: 11px;
 	color: var(--text-secondary);
-	opacity: 0.5;
+	opacity: 0.8;
+}
+
+#sidebar-userid {
+	color: var(--text-primary);
+	font-weight: 600;
+	opacity: 0.7;
 }
 
 /* Theme Toggle */

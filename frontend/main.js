@@ -1066,8 +1066,7 @@ async function showExchange() {
 
 async function showAboutInfo() {
 	closeSidebar()
-	const content = document.getElementById('sheet-content')
-	content.innerHTML = `
+	const html = `
         <div class="info-sheet">
             <div class="info-header-img">🏛️</div>
             
