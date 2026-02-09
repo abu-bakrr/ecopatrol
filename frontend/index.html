@@ -25,8 +25,8 @@
 				const savedTheme = localStorage.getItem('theme')
 				const theme = savedTheme || (tg && tg.colorScheme) || 'light'
 				document.documentElement.setAttribute('data-theme', theme)
-				// Set background immediately to prevent flash
-				const bgColor = theme === 'dark' ? '#111827' : '#f9fafb'
+				// Set background immediately to prevent flash (match map-bg)
+				const bgColor = theme === 'dark' ? '#1a1a1a' : '#f0f0f0'
 				document.write(
 					'<style>html, body { background: ' +
 						bgColor +
