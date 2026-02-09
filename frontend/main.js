@@ -1968,16 +1968,29 @@ window.showCityStatus = async () => {
 		console.log('--- showCityStatus STARTED ---')
 		if (typeof closeSidebar === 'function') closeSidebar()
 
-		// Force fetch if data is missing, but don't blocking-wait for it (let UI show '--' then update)
-		if (
+		// FIX: Use Strict Check for missing data (0 is valid!)
+		const isAqiMissing =
 			!window.cityStats ||
-			!window.cityStats.aqi ||
+			window.cityStats.aqi === undefined ||
+			window.cityStats.aqi === null ||
 			window.cityStats.aqi === '--'
-		) {
-			console.log('Data missing, triggering background fetch...')
-			fetchAirQuality().then(() => {
-				// Re-render if sheet is still open (optimization)
-				if (document.querySelector('.aqi-circle')) showCityStatus()
+
+		// FIX: Use locking to prevent infinite loops / vibration
+		if (isAqiMissing && !window._isFetchingCityStatus) {
+			console.log(
+				'Data missing (aqi=' +
+					window.cityStats?.aqi +
+					'), triggering background fetch...',
+			)
+			window._isFetchingCityStatus = true
+
+			fetchAirQuality().finally(() => {
+				window._isFetchingCityStatus = false
+				// Only re-render if the sheet is actually open
+				if (document.querySelector('.aqi-circle')) {
+					console.log('Data fetched, updating UI...')
+					showCityStatus()
+				}
 			})
 		}
 
