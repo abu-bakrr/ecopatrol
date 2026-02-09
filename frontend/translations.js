@@ -105,6 +105,7 @@ const translations = {
 		detail_after_photo: 'Keyin (rasm)',
 		detail_comment: 'Izoh',
 		detail_added_at: 'Qoʻshilgan vaqti',
+		show_on_map: 'Xaritada koʻrsatish',
 	},
 	ru: {
 		app_title: 'Экопатруль 🌍',
@@ -212,6 +213,7 @@ const translations = {
 		detail_after_photo: 'После (фото)',
 		detail_comment: 'Комментарий',
 		detail_added_at: 'Дата добавления',
+		show_on_map: 'Показать на карте',
 	},
 	en: {
 		app_title: 'EcoPatrol 🌍',
@@ -319,6 +321,7 @@ const translations = {
 		detail_after_photo: 'After (photo)',
 		detail_comment: 'Comment',
 		detail_added_at: 'Added at',
+		show_on_map: 'Show on Map',
 	},
 }
 

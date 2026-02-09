@@ -192,7 +192,9 @@ def get_user_pollutions(user_id):
             'description': p.description,
             'status': p.status,
             'created_at': p.created_at.isoformat(),
-            'photos': [ph.url for ph in p.photos if ph.type == 'before']
+            'photos': [ph.url for ph in p.photos if ph.type == 'before'],
+            'after_photos': [ph.url for ph in p.photos if ph.type == 'after'],
+            'comment': p.clean_comment
         })
     return jsonify(result)
 

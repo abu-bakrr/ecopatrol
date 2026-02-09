@@ -871,13 +871,7 @@ async function showMyReports() {
 		// Add global click handler for clarity
 		window.handleReportCardClick = (lng, lat, level, status, id) => {
 			const report = window.currentUserReports[id]
-			// 1. Fly to map and show ghost marker if needed
-			window.flyToReport(lng, lat, level, status)
-
-			// 2. Wait a bit then show details
-			setTimeout(() => {
-				if (report) showReportDetails(report)
-			}, 600) // Wait for sidebar/sheet close animations
+			if (report) showReportDetails(report)
 		}
 	} catch (e) {
 		console.error(e)
@@ -1809,10 +1803,14 @@ function showReportDetails(r) {
 					:	''
 				}
 
-        <div style="background: var(--bg-secondary); padding: 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="background: var(--bg-secondary); padding: 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <span style="font-weight: 600; font-size: 14px; color: var(--text-secondary);">${window.t('reward_label')}</span>
             <span style="font-size: 20px; font-weight: 800; color: var(--primary);">$${r.level || 0}</span>
         </div>
+
+        <button class="btn btn-primary" style="width: 100%;" onclick="window.flyToReport(${r.lng}, ${r.lat}, ${r.level}, '${r.status}')">
+            ${window.t('show_on_map')}
+        </button>
         
         <div style="height: 20px;"></div>
     `
