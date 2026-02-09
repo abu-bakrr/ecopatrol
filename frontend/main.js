@@ -495,7 +495,7 @@ function initMap(initialCenter = null) {
 	map.touchZoomRotate.disableRotation()
 
 	// Set background color to match map to avoid gray flashes
-	tg.setBackgroundColor(theme === 'dark' ? '#242f3e' : '#fcfcfc') // Approximate map colors
+	tg.setBackgroundColor(theme === 'dark' ? '#0e0e0e' : '#fbf8f3') // Exact map colors
 
 	// Add Geolocate Control
 	const geolocate = new maplibregl.GeolocateControl({
