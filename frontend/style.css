@@ -1744,7 +1744,7 @@ html {
 .tour-tooltip {
 	position: fixed;
 	z-index: 10002;
-	width: 280px;
+	width: 300px; /* Increased from 280px */
 	left: 50%;
 	top: 50%;
 	transform: translate(-50%, -50%);
@@ -1823,10 +1823,8 @@ html {
 .btn-tour-solid,
 .btn-tour-outline {
 	white-space: nowrap;
-	flex: 0 1 auto; /* Allow shrinking */
+	flex: 0 0 auto; /* Do not shrink */
 	min-width: 0;
-	overflow: hidden;
-	text-overflow: ellipsis;
 }
 .btn-tour-solid {
 	background: var(--primary);
