@@ -1915,16 +1915,21 @@ async function fetchAirQuality() {
 		const response = await fetch(
 			`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lng}&hourly=pm10,pm2_5,european_aqi&current=european_aqi,pm10,pm2_5&timezone=auto`,
 		)
+
 		const data = await response.json()
+		console.log('🌍 Air Quality API Response:', JSON.stringify(data))
 
 		if (data.current) {
 			const aqi = data.current.european_aqi
 			const pm10 = data.current.pm10
 
-			cityStats.aqi = aqi
-			cityStats.pm10 = pm10
+			console.log(`✅ Parsed AQI: ${aqi}, PM10: ${pm10}`)
+			window.cityStats.aqi = aqi
+			window.cityStats.pm10 = pm10
 
 			updateAirWidget(aqi)
+		} else {
+			console.warn('⚠️ data.current is MISSING in API response!')
 		}
 
 		// Also fetch weather
