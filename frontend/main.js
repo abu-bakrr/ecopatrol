@@ -1964,57 +1964,63 @@ function updateAirWidget(aqi) {
 }
 
 window.showCityStatus = async () => {
-	closeSidebar()
+	try {
+		console.log('--- showCityStatus STARTED ---')
+		if (typeof closeSidebar === 'function') closeSidebar()
 
-	const totalPollutions = allPollutions.length // Approximate active
-	const cleanedCount =
-		document.getElementById('sidebar-cleaned')?.textContent || '-'
+		// Safety: Ensure cityStats exists
+		const stats = window.cityStats || {}
+		const aqi = stats.aqi !== undefined ? stats.aqi : '--'
+		const temp = stats.temp !== undefined ? stats.temp : '--'
+		const wind = stats.wind !== undefined ? stats.wind : '--'
 
-	const html = `
+		// Safety: Pollutions
+		const totalPollutions =
+			Array.isArray(window.allPollutions) ? window.allPollutions.length : 0
+		const cleanedEl = document.getElementById('sidebar-cleaned')
+		const cleanedCount = cleanedEl ? cleanedEl.textContent : '-'
+
+		// Safety: Translation
+		const t = k => (window.t ? window.t(k) : k)
+
+		const html = `
         <div class="info-sheet">
             <div class="info-header-img" style="font-size: 48px; margin-bottom: 10px;">🏙️</div>
             <h2 style="text-align: center; font-size: 20px; font-weight: 700; margin-bottom: 24px;">
-                ${window.t('city_status_title')}
+                ${t('city_status_title')}
             </h2>
 
-            <!-- Air Quality Panel (Detailed) -->
+            <!-- Air Quality Panel -->
             <div class="aqi-circle">
-                <div class="aqi-number" style="color: var(--text-primary)">${cityStats.aqi}</div>
+                <div class="aqi-number" style="color: var(--text-primary)">${aqi}</div>
                 <div class="aqi-text">AQI</div>
             </div>
             
             <div class="city-stats-grid">
-                <!-- Weather -->
                 <div class="stat-card">
                     <div class="stat-card-icon">🌡️</div>
-                    <div class="stat-card-label">${window.t('weather')}</div>
-                    <div class="stat-card-value">${cityStats.temp}°C</div>
+                    <div class="stat-card-label">${t('weather')}</div>
+                    <div class="stat-card-value">${temp}°C</div>
                 </div>
-                
-                <!-- Wind -->
                  <div class="stat-card">
                     <div class="stat-card-icon">💨</div>
-                    <div class="stat-card-label">${window.t('wind')}</div>
-                    <div class="stat-card-value">${cityStats.wind} km/h</div>
+                    <div class="stat-card-label">${t('wind')}</div>
+                    <div class="stat-card-value">${wind} km/h</div>
                 </div>
-
-                <!-- Radiation (Simulated) -->
                 <div class="stat-card">
                     <div class="stat-card-icon">☢️</div>
-                    <div class="stat-card-label">${window.t('radiation')}</div>
+                    <div class="stat-card-label">${t('radiation')}</div>
                     <div class="stat-card-value" style="color: #10b981;">0.12 µSv</div>
                 </div>
-                
-                <!-- Active Pollutions -->
                 <div class="stat-card">
                     <div class="stat-card-icon">⚠️</div>
-                    <div class="stat-card-label">${window.t('menu_pollutions')}</div>
+                    <div class="stat-card-label">${t('menu_pollutions')}</div>
                     <div class="stat-card-value" style="color: #ef4444;">${totalPollutions}</div>
                 </div>
             </div>
             
             <div class="info-card">
-                 <div class="info-tag" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">${window.t('cleaned')}</div>
+                 <div class="info-tag" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">${t('cleaned')}</div>
                  <div style="font-size: 32px; font-weight: 800; text-align: center; margin: 12px 0;">
                     ${cleanedCount}
                  </div>
@@ -2022,13 +2028,21 @@ window.showCityStatus = async () => {
                     Загрязнений ликвидировано волонтерами
                  </div>
             </div>
-
             <div style="height: 20px;"></div>
         </div>
-    `
+        `
 
-	sheetHistory = []
-	renderSheetPage(html, false)
+		if (typeof renderSheetPage === 'function') {
+			sheetHistory = []
+			renderSheetPage(html, false)
+		} else {
+			console.error('renderSheetPage function missing!')
+			tg.showAlert('Internal Error: renderSheetPage missing')
+		}
+	} catch (e) {
+		console.error('showCityStatus CRASH:', e)
+		tg.showAlert('Error showing status: ' + e.message)
+	}
 }
 
 // Init Air Quality (Fetch based on map center when moved)
