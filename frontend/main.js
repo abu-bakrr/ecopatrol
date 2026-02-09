@@ -1963,6 +1963,14 @@ async function fetchAirQuality() {
 function updateAirWidget(aqi) {
 	const ticket = document.getElementById('air-widget')
 	const valueEl = ticket.querySelector('.air-value')
+	const spinner = ticket.querySelector('.air-spinner')
+
+	// Hide spinner, show value
+	if (spinner) spinner.style.display = 'none'
+	if (valueEl) {
+		valueEl.style.display = 'block'
+		valueEl.textContent = aqi
+	}
 
 	// Determine status
 	let status = 'good'
@@ -2061,16 +2069,31 @@ window.showCityStatus = async () => {
         <div class="info-sheet">
             <!-- Modern Header -->
             <div style="text-align: center; margin-bottom: 24px;">
-                <div style="width: 60px; height: 60px; background: rgba(16, 185, 129, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: #10b981;">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l8-4 8 4v14M13 10a2 2 0 1 1-4 0 2 2 0 0 1 4 0z"/></svg>
+                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(59, 130, 246, 0.15)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="url(#cityGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <defs>
+                            <linearGradient id="cityGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M3 21h18"/>
+                        <path d="M6 21V10h4v11"/>
+                        <path d="M10 21V6h4v15"/>
+                        <path d="M14 21V3h4v18"/>
+                        <circle cx="8" cy="14" r="0.5" fill="currentColor"/>
+                        <circle cx="12" cy="10" r="0.5" fill="currentColor"/>
+                        <circle cx="16" cy="7" r="0.5" fill="currentColor"/>
+                    </svg>
                 </div>
                 <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin: 0;">${t('city_status_title')}</h2>
             </div>
 
-            <!-- Central AQI Display -->
-            <div class="aqi-circle" style="margin: 0 auto 24px;">
-                <div class="aqi-number" style="color: var(--text-primary)">${aqi}</div>
-                <div class="aqi-text">AQI</div>
+            <!-- Central AQI Display with Glow -->
+            <div class="aqi-circle-enhanced" style="margin: 0 auto 24px;">
+                <div class="aqi-glow"></div>
+                <div class="aqi-number" style="color: var(--text-primary); font-size: 48px; font-weight: 900; line-height: 1;">${aqi}</div>
+                <div class="aqi-text" style="font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-secondary); font-weight: 600;">AQI</div>
             </div>
             
             <!-- Bento Grid Stats -->
@@ -2083,7 +2106,13 @@ window.showCityStatus = async () => {
                  <div class="stat-card">
                     <div class="stat-card-icon">${iconWind}</div>
                     <div class="stat-card-label">${t('wind')}</div>
-                    <div class="stat-card-value">${wind} <span style="font-size:12px; font-weight:400; color:var(--text-secondary)">km/h</span></div>
+                    	<div id="air-widget" class="air-widget" title="Air Quality">
+		<svg class="air-spinner" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+			<circle cx="12" cy="12" r="10" stroke-opacity="0.25"/>
+			<path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/>
+		</svg>
+		<div class="air-value" style="display: none; font-size: 16px; font-weight: 700; color: var(--text-primary);"></div>
+	</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-card-icon">${iconRadiation}</div>
