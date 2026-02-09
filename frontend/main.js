@@ -250,6 +250,7 @@ function renderSheetPage(html, addToHistory = true) {
 	content.classList.add('sheet-page-anim')
 
 	content.innerHTML = html
+	openBottomSheet()
 }
 
 function goBackInSheet() {
@@ -650,7 +651,7 @@ function updateProfileUI() {
 	document.getElementById('sidebar-userid').textContent =
 		`ID: ${currentUser.telegram_id}`
 	document.getElementById('sidebar-balance').textContent =
-		`$${currentUser.balance.toFixed(2)}`
+		`${currentUser.balance.toFixed(0)} ${window.t('currency')}`
 	setProfileAvatar(fullName)
 }
 
