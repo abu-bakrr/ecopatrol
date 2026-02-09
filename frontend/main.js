@@ -1668,7 +1668,7 @@ async function showLeaderboard() {
                     <div style="font-weight: 600; color: var(--text-primary);">${u.first_name}</div>
                     <div style="font-size: 11px; color: var(--text-secondary);">${u.cleaned_count} ${window.t('cleaned')}</div>
                 </div>
-                <div style="font-weight: 700; color: var(--primary);">$${u.balance}</div>
+                <div style="font-weight: 700; color: var(--primary);">${u.balance} ${window.t('currency')}</div>
             </div>
         `,
 			)
@@ -1732,6 +1732,23 @@ function showReportDetails(r) {
 			window.t('status_active')
 		:	window.t('status_cleaned')
 
+	// Map level to text
+	let levelText = window.t('level_low')
+	if (r.level === 2) levelText = window.t('level_medium')
+	if (r.level === 3) levelText = window.t('level_high')
+
+	// Map types to translated text
+	const translatedTypes =
+		r.types ?
+			r.types
+				.map(t => {
+					const key = `type_${t.toLowerCase()}`
+					const translated = window.t(key)
+					return translated !== key ? translated : t
+				})
+				.join(', ')
+		:	'---'
+
 	content.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
             <h2 style="font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0;">${window.t('report_title')}</h2>
@@ -1746,15 +1763,15 @@ function showReportDetails(r) {
             </div>
             <div style="background: var(--bg-secondary); padding: 16px; border-radius: 20px; border: 1px solid var(--border); text-align: right;">
                 <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">${window.t('reward_label')}</div>
-                <div style="font-size: 20px; font-weight: 800; color: var(--primary);">$${r.level || 0}</div>
+                <div style="font-size: 20px; font-weight: 800; color: var(--primary);">${r.level || 0} ${window.t('currency')}</div>
             </div>
             <div style="background: var(--bg-secondary); padding: 16px; border-radius: 20px; border: 1px solid var(--border);">
                 <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">${window.t('detail_level_label')}</div>
-                <div style="font-size: 15px; font-weight: 700; color: var(--primary);">Level ${r.level || 1}</div>
+                <div style="font-size: 15px; font-weight: 700; color: var(--primary);">${levelText}</div>
             </div>
             <div style="background: var(--bg-secondary); padding: 16px; border-radius: 20px; border: 1px solid var(--border); text-align: right;">
                 <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">${window.t('detail_types_label')}</div>
-                <div style="font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${r.types ? r.types.join(', ') : '---'}</div>
+                <div style="font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${translatedTypes}</div>
             </div>
         </div>
 
