@@ -1976,6 +1976,7 @@ window.showCityStatus = async () => {
 			window.cityStats.aqi === '--'
 
 		// FIX: Use locking to prevent infinite loops / vibration
+		// Only trigger fetch if missing, and ONLY recurse if fetch was successful
 		if (isAqiMissing && !window._isFetchingCityStatus) {
 			console.log(
 				'Data missing (aqi=' +
@@ -1986,10 +1987,27 @@ window.showCityStatus = async () => {
 
 			fetchAirQuality().finally(() => {
 				window._isFetchingCityStatus = false
-				// Only re-render if the sheet is actually open
-				if (document.querySelector('.aqi-circle')) {
-					console.log('Data fetched, updating UI...')
-					showCityStatus()
+
+				// CRITICAL FIX: Check if we actually GOT data before re-rendering
+				const newStats = window.cityStats || {}
+				if (
+					newStats.aqi !== undefined &&
+					newStats.aqi !== null &&
+					newStats.aqi !== '--'
+				) {
+					console.log(
+						'✅ Data fetched successfully (AQI ' +
+							newStats.aqi +
+							'), updating UI...',
+					)
+					// Only re-render if the sheet is actually open
+					if (document.querySelector('.aqi-circle')) {
+						showCityStatus()
+					}
+				} else {
+					console.warn(
+						'⚠️ Fetch finished but AQI is still missing! Stopping recursion to prevent loop.',
+					)
 				}
 			})
 		}
