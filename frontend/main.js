@@ -1,5 +1,4 @@
-// EcoPatrol - Onboarding Edition (v960-DEPLOY-CHECK)
-console.log('--- EcoPatrol main.js LOADED (v960) ---')
+// EcoPatrol - Onboarding Edition
 const tg = window.Telegram.WebApp
 const API_URL = window.location.origin + '/api'
 
