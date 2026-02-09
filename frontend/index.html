@@ -35,7 +35,7 @@
 			})()
 		</script>
 
-		<link rel="stylesheet" href="style.css?v=1250" />
+		<link rel="stylesheet" href="style.css?v=1270" />
 		<style>
 			/* Critical styles for startup stability */
 			#debug-console {
@@ -540,9 +540,24 @@
 		<div class="bottom-vignette"></div>
 		<div class="overlay" id="overlay"></div>
 
-		<!-- AIR QUALITY WIDGET (Floating Circle) -->
-		<div id="air-widget" class="air-widget">
-			<div class="air-value">...</div>
+		<!-- AIR QUALITY WIDGET		<!-- Air Quality Widget Button -->
+		<div id="air-widget" class="air-widget" title="Air Quality">
+			<svg
+				class="air-spinner"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2.5"
+			>
+				<circle cx="12" cy="12" r="10" stroke-opacity="0.25" />
+				<path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round" />
+			</svg>
+			<div
+				class="air-value"
+				style="display: none; font-size: 14px; font-weight: 700"
+			></div>
 		</div>
 
 		<!-- Photo Viewer (Lightbox) -->
@@ -647,7 +662,7 @@
 			console.log('Log system ready v1060')
 		</script>
 
-		<script src="translations.js?v=1250"></script>
-		<script type="module" src="main.js?v=1250"></script>
+		<script src="translations.js?v=1270"></script>
+		<script type="module" src="main.js?v=1270"></script>
 	</body>
 </html>

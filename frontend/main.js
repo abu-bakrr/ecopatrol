@@ -2070,20 +2070,19 @@ window.showCityStatus = async () => {
             <!-- Modern Header -->
             <div style="text-align: center; margin-bottom: 24px;">
                 <div style="width: 60px; height: 60px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(59, 130, 246, 0.15)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="url(#cityGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="url(#buildingGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <defs>
-                            <linearGradient id="cityGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <linearGradient id="buildingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
                                 <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
                             </linearGradient>
                         </defs>
                         <path d="M3 21h18"/>
-                        <path d="M6 21V10h4v11"/>
-                        <path d="M10 21V6h4v15"/>
-                        <path d="M14 21V3h4v18"/>
-                        <circle cx="8" cy="14" r="0.5" fill="currentColor"/>
-                        <circle cx="12" cy="10" r="0.5" fill="currentColor"/>
-                        <circle cx="16" cy="7" r="0.5" fill="currentColor"/>
+                        <path d="M5 21V7l8-4 8 4v14"/>
+                        <rect x="9" y="9" width="2" height="2" fill="currentColor" opacity="0.5"/>
+                        <rect x="13" y="9" width="2" height="2" fill="currentColor" opacity="0.5"/>
+                        <rect x="9" y="13" width="2" height="2" fill="currentColor" opacity="0.5"/>
+                        <rect x="13" y="13" width="2" height="2" fill="currentColor" opacity="0.5"/>
                     </svg>
                 </div>
                 <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin: 0;">${t('city_status_title')}</h2>
@@ -2106,13 +2105,7 @@ window.showCityStatus = async () => {
                  <div class="stat-card">
                     <div class="stat-card-icon">${iconWind}</div>
                     <div class="stat-card-label">${t('wind')}</div>
-                    	<div id="air-widget" class="air-widget" title="Air Quality">
-		<svg class="air-spinner" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-			<circle cx="12" cy="12" r="10" stroke-opacity="0.25"/>
-			<path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/>
-		</svg>
-		<div class="air-value" style="display: none; font-size: 16px; font-weight: 700; color: var(--text-primary);"></div>
-	</div>
+                    <div class="stat-card-value">${wind} <span style="font-size:12px; font-weight:400; color:var(--text-secondary)">km/h</span></div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-card-icon">${iconRadiation}</div>

@@ -442,6 +442,20 @@ html {
 	backdrop-filter: blur(12px);
 }
 
+/* Air Widget Spinner Animation */
+.air-spinner {
+	animation: spinAir 1s linear infinite;
+}
+
+@keyframes spinAir {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
 .sidebar.active {
 	transform: translateX(0);
 }
