@@ -920,7 +920,8 @@ async function showMyReports() {
 
 // Global helper for flying to report
 window.flyToReport = (lng, lat, level = 1, status = 'active') => {
-	closeBottomSheet()
+	sheetHistory = [] // Force clear history so we actually close the entire sheet
+	closeAll()
 
 	// AUTO-SHOW markers if they were hidden
 	if (!pollutionsVisible) {
