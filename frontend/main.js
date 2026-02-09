@@ -861,6 +861,12 @@ async function showMyReports() {
 // Global helper for flying to report
 window.flyToReport = (lng, lat) => {
 	closeBottomSheet()
+
+	// AUTO-SHOW markers if they were hidden
+	if (!pollutionsVisible) {
+		togglePollutions()
+	}
+
 	map.flyTo({ center: [lng, lat], zoom: 17, duration: 1500 })
 	tg.HapticFeedback.impactOccurred('medium')
 }
