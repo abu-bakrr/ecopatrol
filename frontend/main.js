@@ -268,7 +268,6 @@ function checkRegistration() {
 
 		authUser()
 		setupEventListeners()
-		loadPollutions()
 
 		// Check permissions/update location in background
 		checkLocationStatus()
@@ -531,8 +530,17 @@ function initMap(initialCenter = null) {
 	map.addControl(geolocate)
 
 	map.on('load', () => {
-		// Trigger geolocation on load
+		// 1. Hide the loading overlay
+		const loader = document.getElementById('map-loading-overlay')
+		if (loader) loader.classList.add('hidden')
+
+		// 2. Load markers only after map is ready
+		loadPollutions()
+
+		// 3. Trigger geolocation
 		geolocate.trigger()
+
+		console.log('Map fully ready: overlay hidden, markers loaded')
 	})
 
 	// Handle map movement

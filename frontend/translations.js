@@ -99,6 +99,7 @@ const translations = {
 		offline_title: 'Internet yoʻq',
 		offline_text:
 			'Ilovadan foydalanish uchun internetga ulaning. Aloqa tiklanganda ilova avtomatik ravishable ishga tushadi.',
+		map_loading: 'Xaritani yuklash...',
 	},
 	ru: {
 		app_title: 'Экопатруль 🌍',
@@ -200,6 +201,7 @@ const translations = {
 		offline_title: 'Нет интернета',
 		offline_text:
 			'Для работы приложения требуется подключение к интернету. Приложение заработает автоматически при восстановлении связи.',
+		map_loading: 'Загрузка карты...',
 	},
 	en: {
 		app_title: 'EcoPatrol 🌍',
@@ -301,6 +303,7 @@ const translations = {
 		offline_title: 'No Internet',
 		offline_text:
 			'Internet connection is required to use this app. It will resume automatically once connection is restored.',
+		map_loading: 'Loading map...',
 	},
 }
 

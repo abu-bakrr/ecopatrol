@@ -1487,3 +1487,59 @@ html {
 #offline-overlay {
 	z-index: 2100000 !important;
 }
+
+/* Map Loading Overlay */
+.map-loading-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: var(--map-bg);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+	transition:
+		opacity 0.5s ease,
+		visibility 0.5s;
+}
+
+.map-loading-overlay.hidden {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.loader-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 16px;
+}
+
+.premium-spinner {
+	width: 48px;
+	height: 48px;
+	border: 4px solid var(--border);
+	border-top: 4px solid var(--primary);
+	border-radius: 50%;
+	animation: spin 1s linear infinite;
+	box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+}
+
+.loading-text {
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--text-secondary);
+	letter-spacing: 0.5px;
+}
+
+@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}

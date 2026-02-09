@@ -35,7 +35,7 @@
 			})()
 		</script>
 
-		<link rel="stylesheet" href="style.css?v=970" />
+		<link rel="stylesheet" href="style.css?v=975" />
 		<style>
 			/* Critical styles for startup stability */
 			#debug-console {
@@ -244,7 +244,15 @@
 		</div>
 
 		<!-- Map -->
-		<div id="map"></div>
+		<div id="map">
+			<!-- Map Loading Overlay (Sleek Spinner) -->
+			<div id="map-loading-overlay" class="map-loading-overlay">
+				<div class="loader-container">
+					<div class="premium-spinner"></div>
+					<div class="loading-text" data-t="map_loading">Загрузка карты...</div>
+				</div>
+			</div>
+		</div>
 
 		<!-- Center Marker -->
 		<div class="center-marker" id="center-marker">
@@ -635,7 +643,7 @@
 			console.log('Log system ready v10')
 		</script>
 
-		<script src="translations.js?v=970"></script>
-		<script type="module" src="main.js?v=970"></script>
+		<script src="translations.js?v=975"></script>
+		<script type="module" src="main.js?v=975"></script>
 	</body>
 </html>
