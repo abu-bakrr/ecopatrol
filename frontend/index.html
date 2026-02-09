@@ -35,7 +35,7 @@
 			})()
 		</script>
 
-		<link rel="stylesheet" href="style.css?v=1100" />
+		<link rel="stylesheet" href="style.css?v=1120" />
 		<style>
 			/* Critical styles for startup stability */
 			#debug-console {
@@ -415,14 +415,7 @@
 					</div>
 				</div>
 
-				<!-- AIR QUALITY WIDGET -->
-				<div id="air-widget" class="air-widget" onclick="showCityStatus()">
-					<div class="air-icon">🍃</div>
-					<div class="air-info">
-						<div class="air-label" data-t="air_quality">Air Quality</div>
-						<div class="air-value">...</div>
-					</div>
-				</div>
+				<!-- AIR QUALITY WIDGET MOVED TO ROOT -->
 
 				<!-- Language Switcher Section -->
 				<div class="language-switcher">
@@ -547,6 +540,15 @@
 		<div class="bottom-vignette"></div>
 		<div class="overlay" id="overlay"></div>
 
+		<!-- AIR QUALITY WIDGET (Floating) -->
+		<div id="air-widget" class="air-widget" onclick="showCityStatus()">
+			<div class="air-icon">🍃</div>
+			<div class="air-info">
+				<div class="air-label" data-t="air_quality">Air Quality</div>
+				<div class="air-value">...</div>
+			</div>
+		</div>
+
 		<!-- Photo Viewer (Lightbox) -->
 		<div
 			id="photo-viewer"
@@ -649,7 +651,7 @@
 			console.log('Log system ready v1060')
 		</script>
 
-		<script src="translations.js?v=1100"></script>
-		<script type="module" src="main.js?v=1100"></script>
+		<script src="translations.js?v=1120"></script>
+		<script type="module" src="main.js?v=1120"></script>
 	</body>
 </html>

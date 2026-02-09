@@ -1974,11 +1974,7 @@ window.showCityStatus = async () => {
                 ${window.t('city_status_title')}
             </h2>
 
-            <!-- Air Quality Big Circle -->
-            <div class="aqi-circle">
-                <div class="aqi-number" style="color: var(--text-primary)">${cityStats.aqi}</div>
-                <div class="aqi-text">AQI</div>
-            </div>
+            <!-- Air Quality Removed as requested -->
             
             <div class="city-stats-grid">
                 <!-- Weather -->
