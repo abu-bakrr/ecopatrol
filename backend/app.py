@@ -47,23 +47,21 @@ def init_user():
         return jsonify({'status': 'error', 'message': f'Database error: {e}'}), 500
 
     if not user:
-        print(f"Creating new user: {tg_id}")
-        try:
-            user = User(
-                telegram_id=tg_id,
-                username=data.get('username'),
-                first_name=data.get('first_name'),
-                last_name=data.get('last_name'),
-                age=data.get('age'),
-                phone=data.get('phone')
-            )
-            db.session.add(user)
-            db.session.commit()
-            print("User created successfully")
-        except Exception as e:
-            db.session.rollback()
-            print(f"User creation error: {e}")
-            return jsonify({'status': 'error', 'message': f'Creation failed: {e}'}), 500
+        print(f"User {tg_id} not found - needs registration")
+        return jsonify({
+            'status': 'ok',
+            'needs_registration': True,
+            'telegram_id': tg_id
+        })
+    
+    # If user exists but has no phone (incomplete registration), require re-registration
+    if not user.phone:
+        print(f"User {tg_id} exists but has no phone - needs registration")
+        return jsonify({
+            'status': 'ok',
+            'needs_registration': True,
+            'telegram_id': tg_id
+        })
     
     # Safely get language to avoid 500 if column is missing
     user_lang = 'ru'
@@ -75,6 +73,7 @@ def init_user():
     print(f"--- INIT API RESPONSE --- user_id: {user.id}, lang: {user_lang}")
     return jsonify({
         'status': 'ok',
+        'needs_registration': False,
         'user': {
             'id': user.id,
             'telegram_id': user.telegram_id,
