@@ -852,6 +852,8 @@ async function showMyReports() {
         </div>
         <div style="height: 20px;"></div>
     `
+	// Clear history so this becomes the new "root" of the sheet
+	sheetHistory = []
 	renderSheetPage(html)
 
 	try {
@@ -952,6 +954,7 @@ async function showMyHistory() {
         <div style="height: 20px;"></div>
     `
 	openBottomSheet()
+	sheetHistory = [] // Clear history logic
 
 	try {
 		const response = await fetch(`${API_URL}/history/user/${currentUser.id}`)
@@ -1007,6 +1010,8 @@ async function showExchange() {
             <div class="skeleton" style="height: 100px; border-radius: 20px;"></div>
         </div>
     `
+	// Clear history so this becomes the new "root" of the sheet
+	sheetHistory = []
 	openBottomSheet()
 
 	try {
@@ -1113,6 +1118,8 @@ async function showAboutInfo() {
         </div>
         <div style="height: 20px;"></div>
     `
+	// Clear history so this becomes the new "root" of the sheet
+	sheetHistory = []
 	openBottomSheet()
 }
 
@@ -1680,6 +1687,8 @@ async function showLeaderboard() {
         <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">${window.t('menu_leaderboard')}</h2>
         <div id="leaderboard-list" class="loading">${window.t('loading')}</div>
     `
+	// Clear history so this becomes the new "root" of the sheet
+	sheetHistory = []
 	renderSheetPage(html)
 
 	try {

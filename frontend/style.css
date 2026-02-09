@@ -765,7 +765,7 @@ html {
 }
 
 .sheet-page-anim {
-	animation: sheet-page-in 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+	animation: sheet-page-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @keyframes sheet-page-in {
