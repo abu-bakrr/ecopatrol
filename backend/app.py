@@ -306,6 +306,11 @@ def admin_delete_user(user_id):
     data = request.json or {}
     tg_id = data.get('admin_tg_id') or request.args.get('admin_tg_id', type=int)
     
+    # Debug logging
+    print(f"DELETE user {user_id}: received tg_id={tg_id} (type: {type(tg_id)})")
+    print(f"ADMIN_IDS: {ADMIN_IDS}")
+    print(f"tg_id in ADMIN_IDS: {tg_id in ADMIN_IDS}")
+    
     if tg_id not in ADMIN_IDS:
         return jsonify({'error': 'Unauthorized'}), 403
     

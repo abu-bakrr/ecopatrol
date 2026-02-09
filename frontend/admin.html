@@ -753,6 +753,13 @@
 					return
 				}
 
+				console.log('Delete user:', {
+					userId,
+					userName,
+					adminTgId,
+					adminTgIdType: typeof adminTgId,
+				})
+
 				try {
 					const res = await fetch(
 						`${API_URL}/admin/users/${userId}?admin_tg_id=${adminTgId}`,
@@ -763,12 +770,16 @@
 						},
 					)
 
+					console.log('Delete response status:', res.status)
+
 					if (!res.ok) {
 						const error = await res.json()
+						console.error('Delete error response:', error)
 						throw new Error(error.error || 'Delete failed')
 					}
 
 					const result = await res.json()
+					console.log('Delete success:', result)
 					tg.showAlert(`User "${userName}" deleted successfully`)
 					tg.HapticFeedback.notificationOccurred('success')
 					loadUsers() // Refresh list
