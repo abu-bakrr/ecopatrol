@@ -462,6 +462,11 @@ async function handleRegistration() {
 		tg.HapticFeedback.notificationOccurred('success')
 		tg.showAlert(window.t('reg_success') || 'Регистрация успешна!')
 
+		// START TOUR AUTOMATICALLY AFTER REGISTRATION
+		if (window.Tour) {
+			setTimeout(() => Tour.start(), 1500)
+		}
+
 		// Now check location specifically for the app access
 		checkLocationStatus()
 	} catch (e) {

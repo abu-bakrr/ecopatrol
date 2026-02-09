@@ -1,6 +1,7 @@
 /**
  * EcoPatrol Interactive Tour System
  */
+const tg = window.Telegram ? window.Telegram.WebApp : null
 const Tour = {
 	steps: [],
 	currentStep: 0,
