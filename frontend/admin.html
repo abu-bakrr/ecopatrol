@@ -563,7 +563,7 @@
 			tg.expand()
 			const API_URL = window.location.origin + '/api'
 			const urlParams = new URLSearchParams(window.location.search)
-			const adminTgId = urlParams.get('admin_tg_id')
+			const adminTgId = parseInt(urlParams.get('admin_tg_id'), 10)
 
 			const TYPE_LABELS = {
 				plastic: 'Пластик',
