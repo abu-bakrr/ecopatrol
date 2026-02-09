@@ -808,6 +808,7 @@ function closeSidebar() {
 	document.getElementById('sidebar').classList.remove('active')
 	document.getElementById('overlay').classList.remove('active')
 }
+window.closeSidebar = closeSidebar
 
 function openBottomSheet() {
 	document.getElementById('bottom-sheet').classList.add('active')
