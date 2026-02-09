@@ -1968,11 +1968,24 @@ window.showCityStatus = async () => {
 		console.log('--- showCityStatus STARTED ---')
 		if (typeof closeSidebar === 'function') closeSidebar()
 
+		// Force fetch if data is missing, but don't blocking-wait for it (let UI show '--' then update)
+		if (
+			!window.cityStats ||
+			!window.cityStats.aqi ||
+			window.cityStats.aqi === '--'
+		) {
+			console.log('Data missing, triggering background fetch...')
+			fetchAirQuality().then(() => {
+				// Re-render if sheet is still open (optimization)
+				if (document.querySelector('.aqi-circle')) showCityStatus()
+			})
+		}
+
 		// Safety: Ensure cityStats exists
 		const stats = window.cityStats || {}
 		const aqi = stats.aqi !== undefined ? stats.aqi : '--'
-		const temp = stats.temp !== undefined ? stats.temp : '--'
-		const wind = stats.wind !== undefined ? stats.wind : '--'
+		const temp = stats.temp !== undefined ? Math.round(stats.temp) : '--' // Round temp
+		const wind = stats.wind !== undefined ? Math.round(stats.wind) : '--' // Round wind
 
 		// Safety: Pollutions
 		const totalPollutions =
@@ -1983,52 +1996,76 @@ window.showCityStatus = async () => {
 		// Safety: Translation
 		const t = k => (window.t ? window.t(k) : k)
 
+		// Icons (SVGs)
+		const iconThermometer =
+			'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>'
+		const iconWind =
+			'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>'
+		const iconRadiation =
+			'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5 10 10 0 0 0-10 10 4 4 0 0 1-5-5 4 4 0 0 1 5-5z"/><path d="M12 12a2 2 0 1 0 2 2 2 2 0 0 0-2-2z"/></svg>' // Simplified "Radio" feel
+		const iconAlert =
+			'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+		const iconShield =
+			'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'
+
 		const html = `
         <div class="info-sheet">
-            <div class="info-header-img" style="font-size: 48px; margin-bottom: 10px;">🏙️</div>
-            <h2 style="text-align: center; font-size: 20px; font-weight: 700; margin-bottom: 24px;">
-                ${t('city_status_title')}
-            </h2>
+            <!-- Modern Header -->
+            <div style="text-align: center; margin-bottom: 24px;">
+                <div style="width: 60px; height: 60px; background: rgba(16, 185, 129, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: #10b981;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l8-4 8 4v14M13 10a2 2 0 1 1-4 0 2 2 0 0 1 4 0z"/></svg>
+                </div>
+                <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin: 0;">${t('city_status_title')}</h2>
+            </div>
 
-            <!-- Air Quality Panel -->
-            <div class="aqi-circle">
+            <!-- Central AQI Display -->
+            <div class="aqi-circle" style="margin: 0 auto 24px;">
                 <div class="aqi-number" style="color: var(--text-primary)">${aqi}</div>
                 <div class="aqi-text">AQI</div>
             </div>
             
+            <!-- Bento Grid Stats -->
             <div class="city-stats-grid">
                 <div class="stat-card">
-                    <div class="stat-card-icon">🌡️</div>
+                    <div class="stat-card-icon">${iconThermometer}</div>
                     <div class="stat-card-label">${t('weather')}</div>
                     <div class="stat-card-value">${temp}°C</div>
                 </div>
                  <div class="stat-card">
-                    <div class="stat-card-icon">💨</div>
+                    <div class="stat-card-icon">${iconWind}</div>
                     <div class="stat-card-label">${t('wind')}</div>
-                    <div class="stat-card-value">${wind} km/h</div>
+                    <div class="stat-card-value">${wind} <span style="font-size:12px; font-weight:400; color:var(--text-secondary)">km/h</span></div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-card-icon">☢️</div>
+                    <div class="stat-card-icon">${iconRadiation}</div>
                     <div class="stat-card-label">${t('radiation')}</div>
                     <div class="stat-card-value" style="color: #10b981;">0.12 µSv</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-card-icon">⚠️</div>
+                    <div class="stat-card-icon">${iconAlert}</div>
                     <div class="stat-card-label">${t('menu_pollutions')}</div>
                     <div class="stat-card-value" style="color: #ef4444;">${totalPollutions}</div>
                 </div>
             </div>
             
-            <div class="info-card">
-                 <div class="info-tag" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">${t('cleaned')}</div>
-                 <div style="font-size: 32px; font-weight: 800; text-align: center; margin: 12px 0;">
-                    ${cleanedCount}
+            <!-- Cleaned Status -->
+            <div class="info-card" style="margin-top: 12px; background: var(--bg-secondary); border: 1px solid var(--border);">
+                 <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                    ${iconShield}
+                    <span style="font-weight: 600; font-size: 15px; color: var(--text-primary);">${t('cleaned')}</span>
                  </div>
-                 <div style="text-align: center; font-size: 13px; opacity: 0.6;">
-                    Загрязнений ликвидировано волонтерами
+                 
+                 <div style="display: flex; align-items: baseline; gap: 8px;">
+                     <div style="font-size: 32px; font-weight: 800; color: var(--text-primary);">
+                        ${cleanedCount}
+                     </div>
+                     <div style="font-size: 13px; color: var(--text-secondary);">
+                        ликвидировано волонтерами
+                     </div>
                  </div>
             </div>
-            <div style="height: 20px;"></div>
+
+            <div style="height: 32px;"></div>
         </div>
         `
 
