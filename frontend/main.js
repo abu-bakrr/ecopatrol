@@ -1919,14 +1919,15 @@ async function fetchAirQuality() {
 		const data = await response.json()
 		console.log('🌍 Air Quality API Response:', JSON.stringify(data))
 
+		if (data.current) {
 			const aqi = data.current.european_aqi
 			const pm10 = data.current.pm10
 
 			console.log(`✅ Parsed AQI: ${aqi}, PM10: ${pm10}`)
-			
+
 			// FIX: Ensure cityStats exists
 			if (!window.cityStats) window.cityStats = {}
-			
+
 			window.cityStats.aqi = aqi
 			window.cityStats.pm10 = pm10
 
@@ -1944,7 +1945,7 @@ async function fetchAirQuality() {
 		if (weatherData.current) {
 			// FIX: Ensure cityStats exists
 			if (!window.cityStats) window.cityStats = {}
-			
+
 			cityStats.temp = weatherData.current.temperature_2m
 			cityStats.wind = weatherData.current.wind_speed_10m
 		}
