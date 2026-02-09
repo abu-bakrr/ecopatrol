@@ -258,7 +258,8 @@ function goBackInSheet() {
 		const prev = sheetHistory.pop()
 		renderSheetPage(prev, false)
 	} else {
-		closeBottomSheet()
+		// If we are already at the bottom of history, we can't go back further
+		// But in our current logic, closeBottomSheet handles this.
 	}
 }
 
@@ -789,6 +790,13 @@ function openBottomSheet() {
 }
 
 function closeBottomSheet() {
+	// SMART NAVIGATION: If there is history (e.g. we are in details and came from list),
+	// go back to previous page instead of closing the entire sheet.
+	if (sheetHistory.length > 0) {
+		goBackInSheet()
+		return
+	}
+
 	document.getElementById('bottom-sheet').classList.remove('active')
 	document.getElementById('overlay').classList.remove('active')
 	sheetHistory = [] // Clear history on close
@@ -1776,12 +1784,7 @@ function showReportDetails(r) {
 
 	const html = `
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <button onclick="goBackInSheet()" style="background: var(--bg-secondary); border: 1px solid var(--border); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--text-primary);">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-                </button>
-                <h2 style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin: 0;">${window.t('report_title')}</h2>
-            </div>
+            <h2 style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin: 0;">${window.t('report_title')}</h2>
             <span class="status-badge ${r.status}" style="padding: 6px 14px; font-weight: 700; border-radius: 12px;">${statusText}</span>
         </div>
         
