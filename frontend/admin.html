@@ -235,9 +235,9 @@
 				border: 1px solid var(--border);
 			}
 			.btn-danger {
-				background: #fee2e2;
-				color: #ef4444;
-				border: 1px solid #fecaca;
+				background: #ef4444;
+				color: white;
+				border: 1px solid #ef4444;
 			}
 			[data-theme='dark'] .btn-danger {
 				background: rgba(220, 38, 38, 0.2);
@@ -754,21 +754,28 @@
 				}
 
 				try {
-					const result = await apiFetch(`/admin/users/${userId}`, {
-						method: 'DELETE',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ admin_tg_id: adminTgId }),
-					})
+					const res = await fetch(
+						`${API_URL}/admin/users/${userId}?admin_tg_id=${adminTgId}`,
+						{
+							method: 'DELETE',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({ admin_tg_id: adminTgId }),
+						},
+					)
 
-					if (result && result.status === 'ok') {
-						tg.showAlert(`User "${userName}" deleted successfully`)
-						loadUsers() // Refresh list
-					} else {
-						tg.showAlert('Error: ' + (result.message || 'Unknown error'))
+					if (!res.ok) {
+						const error = await res.json()
+						throw new Error(error.error || 'Delete failed')
 					}
+
+					const result = await res.json()
+					tg.showAlert(`User "${userName}" deleted successfully`)
+					tg.HapticFeedback.notificationOccurred('success')
+					loadUsers() // Refresh list
 				} catch (e) {
-					console.error(e)
-					tg.showAlert('Failed to delete user')
+					console.error('Delete error:', e)
+					tg.showAlert('Error: ' + e.message)
+					tg.HapticFeedback.notificationOccurred('error')
 				}
 			}
 
