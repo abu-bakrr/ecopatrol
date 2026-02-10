@@ -47,6 +47,10 @@ window.t = function (key) {
 			return key // Fallback to key name
 		}
 	}
+	// Dynamic Version Replacement
+	if (typeof result === 'string' && result.includes('%VERSION%')) {
+		return result.replace('%VERSION%', window.APP_VERSION || 'v2.x')
+	}
 	return result
 }
 
@@ -1264,7 +1268,7 @@ async function showAboutInfo() {
             </div>
             
             <div style="text-align: center; margin-top: 24px; opacity: 0.4; font-size: 12px; font-weight: 500;">
-                ${window.t('about_version_prefix')} v2.2<br>
+                ${window.t('about_version_prefix')} ${window.APP_VERSION}<br>
                 Алмазарский район, г. Ташкент
             </div>
         </div>

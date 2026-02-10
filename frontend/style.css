@@ -1983,3 +1983,63 @@ body.tour-active .tour-spotlight {
 	border-radius: 50%;
 	animation: spin 0.8s linear infinite;
 }
+
+/* --- SMOOTH ANIMATIONS v2.2 --- */
+
+/* Bottom Sheet Animation */
+.bottom-sheet {
+	transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+	will-change: transform;
+}
+
+/* Sidebar Animation - ensure it matches */
+.sidebar {
+	transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+	will-change: transform;
+}
+
+/* Overlays (Global) */
+.overlay,
+.tour-overlay,
+.photo-viewer,
+.onboarding,
+.global-overlay {
+	transition:
+		opacity 0.3s ease,
+		visibility 0.3s ease;
+	will-change: opacity, visibility;
+}
+
+/* Ensure they are hidden correctly without display:none if possible, 
+   but main.js might toggle active class which sets opacity/vis */
+.overlay:not(.active),
+.tour-overlay:not(.active),
+.photo-viewer:not(.active) {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.overlay.active,
+.tour-overlay.active,
+.photo-viewer.active {
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+}
+
+/* Button Press Effects */
+button,
+.btn,
+.menu-item,
+.action-btn {
+	transition:
+		transform 0.1s ease,
+		background-color 0.2s ease;
+}
+button:active,
+.btn:active,
+.menu-item:active,
+.action-btn:active {
+	transform: scale(0.96);
+}
