@@ -898,9 +898,9 @@ function getAqiColor(aqi) {
 
 function getAqiLabel(aqi) {
 	if (!aqi || isNaN(aqi)) return '---'
-	if (aqi <= 50) return window.t('aqi_good')
-	if (aqi <= 100) return window.t('aqi_moderate')
-	return window.t('aqi_bad')
+	if (aqi <= 50) return window.t('quality_good')
+	if (aqi <= 100) return window.t('quality_moderate')
+	return window.t('quality_bad')
 }
 
 window.showCityStatus = async function showCityStatus() {
@@ -948,13 +948,20 @@ window.showCityStatus = async function showCityStatus() {
                     <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Tashkent, Uzbekistan</div>
                 </div>
 
-                <div class="aqi-circle" style="border-color: ${isLoading ? 'var(--border)' : getAqiColor(aqi)}; margin: 0 auto 24px;">
-                    <div class="aqi-number ${isLoading ? 'skeleton' : ''}" style="color: ${getAqiColor(aqi)}; min-width: 60px; min-height: 40px; border-radius: 8px;">
-                        ${isLoading ? '' : aqi || '-'}
+                <div style="background: linear-gradient(135deg, ${isLoading ? 'var(--bg-secondary)' : getAqiColor(aqi) + '10'}, var(--bg-secondary)); border-radius: 20px; padding: 24px; border: 1px solid ${isLoading ? 'var(--border)' : getAqiColor(aqi) + '30'}; margin-bottom: 20px; text-align: center;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${isLoading ? 'var(--text-secondary)' : getAqiColor(aqi)}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/></svg>
+                        <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary);">${t('air_quality')}</span>
                     </div>
-                    <div class="aqi-text ${isLoading ? 'skeleton' : ''}" style="min-width: 80px; min-height: 14px; border-radius: 4px; margin-top: 4px;">
-                        ${isLoading ? '' : getAqiLabel(aqi)}
+                    <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 48px; font-weight: 900; min-height: 56px; border-radius: 8px; color: ${isLoading ? 'var(--text-secondary)' : getAqiColor(aqi)}; line-height: 1; letter-spacing: -2px;">
+                        ${isLoading ? '' : aqi || '--'}
                     </div>
+                    <div style="margin-top: 10px;">
+                        <span class="${isLoading ? 'skeleton' : ''}" style="display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; min-width: 60px; min-height: 22px; background: ${isLoading ? 'var(--bg-secondary)' : getAqiColor(aqi) + '18'}; color: ${isLoading ? 'var(--text-secondary)' : getAqiColor(aqi)}; border: 1px solid ${isLoading ? 'var(--border)' : getAqiColor(aqi) + '25'};">
+                            ${isLoading ? '' : getAqiLabel(aqi)}
+                        </span>
+                    </div>
+                    <div style="font-size: 10px; color: var(--text-secondary); margin-top: 8px; opacity: 0.6;">European AQI</div>
                 </div>
 
                 <div class="city-stats-grid" style="grid-template-columns: 1fr 1fr;">
