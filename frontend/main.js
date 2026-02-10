@@ -838,7 +838,41 @@ function closeBottomSheet() {
 	sheetHistory = [] // Clear history on close
 }
 
-async function showCityStatus() {
+// --- CITY PASSPORT STATE ---
+let cityStats = {
+	aqi: '-',
+	pm10: '-',
+	temp: '-',
+	wind: '-',
+	radiation: '0.11 мкЗв/ч',
+}
+let aqiData = {}
+let adminStats = {}
+
+async function fetchAdminStats() {
+	try {
+		const res = await fetch(`${API_URL}/admin/stats`)
+		if (res.ok) adminStats = await res.json()
+	} catch (e) {
+		console.error('Failed to fetch admin stats', e)
+	}
+}
+
+function getAqiColor(aqi) {
+	if (!aqi || isNaN(aqi)) return 'var(--text-secondary)'
+	if (aqi <= 50) return '#10b981'
+	if (aqi <= 100) return '#f59e0b'
+	return '#ef4444'
+}
+
+function getAqiLabel(aqi) {
+	if (!aqi || isNaN(aqi)) return '---'
+	if (aqi <= 50) return window.t('aqi_good')
+	if (aqi <= 100) return window.t('aqi_moderate')
+	return window.t('aqi_bad')
+}
+
+window.showCityStatus = async function showCityStatus() {
 	// 1. Render Skeleton FIRST to prevent jump
 	const skeletonHtml = `
         <div class="sheet-min-height">
@@ -881,17 +915,14 @@ async function showCityStatus() {
     `
 	renderSheetPage(skeletonHtml, false)
 
-	// 2. Fetch Data (Parallel if possible)
-	await fetchAirQuality()
-	await Promise.all([fetchAdminStats(), loadPollutions()]) // Refresh local pollution count too
+	// 2. Fetch Data (Parallel)
+	await Promise.all([fetchAirQuality(), fetchAdminStats(), loadPollutions()])
 
 	// 3. Render Real Data
-	// Calculate stats
 	const totalReports = markers.length || 0
-	const cleanedReports = markers.filter(m => {
-		const el = m.getElement()
-		return el.classList.contains('cleaned')
-	}).length
+	const cleanedReports = markers.filter(m =>
+		m.getElement().classList.contains('cleaned'),
+	).length
 
 	const html = `
         <div class="sheet-min-height">
@@ -900,9 +931,9 @@ async function showCityStatus() {
                 <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Tashkent, Uzbekistan</div>
             </div>
 
-            <div class="aqi-circle" style="border-color: var(--aqi-color);">
-                <div class="aqi-value">${aqiData.aqi || 'N/A'}</div>
-                <div class="aqi-label">${aqiData.category || 'N/A'}</div>
+            <div class="aqi-circle" style="border-color: ${getAqiColor(cityStats.aqi)};">
+                <div class="aqi-value" style="color: ${getAqiColor(cityStats.aqi)}">${cityStats.aqi || '-'}</div>
+                <div class="aqi-label">${getAqiLabel(cityStats.aqi)}</div>
             </div>
 
             <div class="city-stats-grid">
@@ -2167,138 +2198,6 @@ function showReportDetails(r) {
 	renderSheetPage(html)
 }
 
-// --- CITY PASSPORT & AIR QUALITY ---
-
-// --- CITY PASSPORT & AIR QUALITY ---
-
-let cityStats = {
-	aqi: '-',
-	pm10: '-',
-	temp: '-',
-	wind: '-',
-	radiation: '0.11 мкЗв/ч',
-}
-
-let aqiData = {}
-let adminStats = {}
-
-// Fetch Admin Stats for the passport
-async function fetchAdminStats() {
-	try {
-		const res = await fetch(`${API_URL}/admin/stats`)
-		if (res.ok) {
-			adminStats = await res.json()
-		}
-	} catch (e) {
-		console.error('Failed to fetch admin stats for passport', e)
-	}
-}
-
-async function showCityStatus() {
-	// 1. Render Skeleton FIRST
-	const skeletonHtml = `
-        <div class="sheet-min-height">
-            <div style="text-align: center; margin-bottom: 24px;">
-                <h2 style="font-size: 20px; font-weight: 600;">${window.t('menu_pollutions')}</h2>
-                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Tashkent, Uzbekistan</div>
-            </div>
-
-            <!-- AQI Skeleton -->
-            <div class="aqi-circle" style="border-color: var(--border);">
-                 <div class="skeleton" style="width: 50px; height: 32px; margin-bottom: 4px;"></div>
-                 <div class="skeleton" style="width: 30px; height: 12px;"></div>
-            </div>
-
-            <!-- Stats Grid Skeleton -->
-            <div class="city-stats-grid">
-                <div class="stat-card">
-                    <div class="skeleton skeleton-text" style="width: 50%"></div>
-                    <div class="skeleton skeleton-title" style="width: 80%"></div>
-                </div>
-                <div class="stat-card">
-                    <div class="skeleton skeleton-text" style="width: 50%"></div>
-                    <div class="skeleton skeleton-title" style="width: 80%"></div>
-                </div>
-                 <div class="stat-card">
-                    <div class="skeleton skeleton-text" style="width: 50%"></div>
-                    <div class="skeleton skeleton-title" style="width: 80%"></div>
-                </div>
-                <div class="stat-card">
-                    <div class="skeleton skeleton-text" style="width: 50%"></div>
-                    <div class="skeleton skeleton-title" style="width: 80%"></div>
-                </div>
-            </div>
-        </div>
-    `
-	renderSheetPage(skeletonHtml, false)
-
-	// 2. Fetch Data
-	await fetchAirQuality()
-	await Promise.all([fetchAdminStats(), loadPollutions()])
-
-	// 3. Render Real Data
-	const totalReports = markers.length || 0
-	const cleanedReports = markers.filter(m =>
-		m.getElement().classList.contains('cleaned'),
-	).length
-
-	const html = `
-        <div class="sheet-min-height">
-            <div style="text-align: center; margin-bottom: 24px;">
-                <h2 style="font-size: 20px; font-weight: 600;">${window.t('menu_pollutions')}</h2>
-                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Tashkent, Uzbekistan</div>
-            </div>
-
-            <div class="aqi-circle" style="border-color: ${getAqiColor(cityStats.aqi)};">
-                <div class="aqi-number" style="color: ${getAqiColor(cityStats.aqi)}">${cityStats.aqi || '-'}</div>
-                <div class="aqi-text">${getAqiLabel(cityStats.aqi)}</div>
-            </div>
-
-            <div class="city-stats-grid">
-                <div class="stat-card">
-                    <div class="stat-card-icon">📍</div>
-                    <div class="stat-card-label">${window.t('stat_on_map')}</div>
-                    <div class="stat-card-value">${totalReports}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-card-icon">✨</div>
-                    <div class="stat-card-label">${window.t('stat_cleaned')}</div>
-                    <div class="stat-card-value">${cleanedReports}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-card-icon">👥</div>
-                    <div class="stat-card-label">${window.t('stat_users')}</div>
-                    <div class="stat-card-value">${adminStats.total_users || '-'}</div>
-                </div>
-                 <div class="stat-card">
-                    <div class="stat-card-icon">🎁</div>
-                    <div class="stat-card-label">${window.t('stat_rewards')}</div>
-                    <div class="stat-card-value">${adminStats.total_rewards_paid || 0}</div>
-                </div>
-            </div>
-            
-             <div class="info-card" style="margin-top: 20px; text-align: center; opacity: 0.7;">
-                 <div style="font-size: 12px;">${window.t('city_passport_desc')}</div>
-            </div>
-        </div>
-    `
-	renderSheetPage(html, false)
-}
-
-function getAqiColor(aqi) {
-	if (!aqi || isNaN(aqi)) return 'var(--text-secondary)'
-	if (aqi <= 50) return '#10b981'
-	if (aqi <= 100) return '#f59e0b'
-	return '#ef4444'
-}
-
-function getAqiLabel(aqi) {
-	if (!aqi || isNaN(aqi)) return '---'
-	if (aqi <= 50) return window.t('aqi_good')
-	if (aqi <= 100) return window.t('aqi_moderate')
-	return window.t('aqi_bad')
-}
-
 async function fetchAirQuality() {
 	try {
 		let lat = 41.2646
@@ -2334,11 +2233,9 @@ async function fetchAirQuality() {
 
 			console.log(`✅ Parsed AQI: ${aqi}, PM10: ${pm10}`)
 
-			// FIX: Ensure cityStats exists
-			if (!window.cityStats) window.cityStats = {}
-
-			window.cityStats.aqi = aqi
-			window.cityStats.pm10 = pm10
+			// Update global city stats
+			cityStats.aqi = aqi
+			cityStats.pm10 = pm10
 
 			updateAirWidget(aqi)
 		} else {
@@ -2361,11 +2258,8 @@ async function fetchAirQuality() {
 		console.log('🌤️ Weather API Response:', JSON.stringify(weatherData))
 
 		if (weatherData.current) {
-			// FIX: Ensure cityStats exists
-			if (!window.cityStats) window.cityStats = {}
-
-			window.cityStats.temp = weatherData.current.temperature_2m
-			window.cityStats.wind = weatherData.current.wind_speed_10m
+			cityStats.temp = weatherData.current.temperature_2m
+			cityStats.wind = weatherData.current.wind_speed_10m
 			console.log(
 				`✅ Parsed Weather - Temp: ${weatherData.current.temperature_2m}°C, Wind: ${weatherData.current.wind_speed_10m} km/h`,
 			)
@@ -2422,180 +2316,6 @@ function updateAirWidget(aqi) {
 	ticket.classList.add(`air-${status}`)
 
 	valueEl.textContent = aqi
-}
-
-window.showCityStatus = async () => {
-	try {
-		console.log('--- showCityStatus STARTED ---')
-		if (typeof closeSidebar === 'function') closeSidebar()
-
-		// FIX: Use Strict Check for missing data (0 is valid!)
-		const isAqiMissing =
-			!window.cityStats ||
-			window.cityStats.aqi === undefined ||
-			window.cityStats.aqi === null ||
-			window.cityStats.aqi === '--'
-
-		// FIX: Use locking to prevent infinite loops / vibration
-		// Only trigger fetch if missing, and ONLY recurse if fetch was successful
-		if (isAqiMissing && !window._isFetchingCityStatus) {
-			console.log(
-				'Data missing (aqi=' +
-					window.cityStats?.aqi +
-					'), triggering background fetch...',
-			)
-			window._isFetchingCityStatus = true
-
-			fetchAirQuality().finally(() => {
-				window._isFetchingCityStatus = false
-
-				// CRITICAL FIX: Check if we actually GOT data before re-rendering
-				const newStats = window.cityStats || {}
-				if (
-					newStats.aqi !== undefined &&
-					newStats.aqi !== null &&
-					newStats.aqi !== '--'
-				) {
-					console.log(
-						'✅ Data fetched successfully (AQI ' +
-							newStats.aqi +
-							'), updating UI...',
-					)
-					// Only re-render if the sheet is actually open
-					if (document.querySelector('.aqi-circle')) {
-						showCityStatus()
-					}
-				} else {
-					console.warn(
-						'⚠️ Fetch finished but AQI is still missing! Stopping recursion to prevent loop.',
-					)
-				}
-			})
-		}
-
-		// Safety: Ensure cityStats exists
-		const stats = window.cityStats || {}
-		const aqi = stats.aqi !== undefined ? stats.aqi : '--'
-		const temp = stats.temp !== undefined ? Math.round(stats.temp) : '--' // Round temp
-		const wind = stats.wind !== undefined ? Math.round(stats.wind) : '--' // Round wind
-
-		// Safety: Pollutions
-		const totalPollutions =
-			Array.isArray(window.allPollutions) ? window.allPollutions.length : 0
-		const cleanedEl = document.getElementById('sidebar-cleaned')
-		const cleanedCount = cleanedEl ? cleanedEl.textContent : '-'
-
-		// Safety: Translation
-		const t = k => (window.t ? window.t(k) : k)
-
-		// Icons (SVGs)
-		const iconThermometer =
-			'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>'
-		const iconWind =
-			'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>'
-		const iconRadiation =
-			'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5 10 10 0 0 0-10 10 4 4 0 0 1-5-5 4 4 0 0 1 5-5z"/><path d="M12 12a2 2 0 1 0 2 2 2 2 0 0 0-2-2z"/></svg>' // Simplified "Radio" feel
-		const iconAlert =
-			'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
-		const iconShield =
-			'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'
-
-		const html = `
-        <div class="info-sheet">
-            <!-- Modern Header -->
-            <div style="text-align: center; margin-bottom: 24px;">
-                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(59, 130, 246, 0.15)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="buildingGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
-                            </linearGradient>
-                        </defs>
-                        <!-- Skyline silhouette -->
-                        <rect x="3" y="10" width="4" height="11" fill="url(#buildingGradient2)" rx="0.5"/>
-                        <rect x="8" y="6" width="4" height="15" fill="url(#buildingGradient2)" rx="0.5"/>
-                        <rect x="13" y="8" width="4" height="13" fill="url(#buildingGradient2)" rx="0.5"/>
-                        <rect x="18" y="4" width="3" height="17" fill="url(#buildingGradient2)" rx="0.5"/>
-                        <!-- Windows -->
-                        <rect x="9" y="8" width="1" height="1" fill="white" opacity="0.6"/>
-                        <rect x="11" y="8" width="1" height="1" fill="white" opacity="0.6"/>
-                        <rect x="9" y="11" width="1" height="1" fill="white" opacity="0.6"/>
-                        <rect x="11" y="11" width="1" height="1" fill="white" opacity="0.6"/>
-                        <rect x="14" y="10" width="1" height="1" fill="white" opacity="0.6"/>
-                        <rect x="16" y="10" width="1" height="1" fill="white" opacity="0.6"/>
-                        <rect x="14" y="13" width="1" height="1" fill="white" opacity="0.6"/>
-                        <rect x="16" y="13" width="1" height="1" fill="white" opacity="0.6"/>
-                        <!-- Base line -->
-                        <line x1="2" y1="21" x2="22" y2="21" stroke="url(#buildingGradient2)" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin: 0;">${t('city_status_title')}</h2>
-            </div>
-
-            <!-- Central AQI Display with Glow -->
-            <div class="aqi-circle-enhanced" style="margin: 0 auto 24px;">
-                <div class="aqi-glow"></div>
-                <div class="aqi-number" style="color: var(--text-primary); font-size: 48px; font-weight: 900; line-height: 1;">${aqi}</div>
-                <div class="aqi-text" style="font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-secondary); font-weight: 600;">AQI</div>
-            </div>
-            
-            <!-- Bento Grid Stats -->
-            <div class="city-stats-grid">
-                <div class="stat-card">
-                    <div class="stat-card-icon">${iconThermometer}</div>
-                    <div class="stat-card-label">${t('weather')}</div>
-                    <div class="stat-card-value">${temp}°C</div>
-                </div>
-                 <div class="stat-card">
-                    <div class="stat-card-icon">${iconWind}</div>
-                    <div class="stat-card-label">${t('wind')}</div>
-                    <div class="stat-card-value">${wind} <span style="font-size:12px; font-weight:400; color:var(--text-secondary)">km/h</span></div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-card-icon">${iconRadiation}</div>
-                    <div class="stat-card-label">${t('radiation')}</div>
-                    <div class="stat-card-value" style="color: #10b981;">0.12 µSv</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-card-icon">${iconAlert}</div>
-                    <div class="stat-card-label">${t('menu_pollutions')}</div>
-                    <div class="stat-card-value" style="color: #ef4444;">${totalPollutions}</div>
-                </div>
-            </div>
-            
-            <!-- Cleaned Status -->
-            <div class="info-card" style="margin-top: 12px; background: var(--bg-secondary); border: 1px solid var(--border);">
-                 <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                    ${iconShield}
-                    <span style="font-weight: 600; font-size: 15px; color: var(--text-primary);">${t('cleaned')}</span>
-                 </div>
-                 
-                 <div style="display: flex; align-items: baseline; gap: 8px;">
-                     <div style="font-size: 32px; font-weight: 800; color: var(--text-primary);">
-                        ${cleanedCount}
-                     </div>
-                     <div style="font-size: 13px; color: var(--text-secondary);">
-                        ${t('city_cleaned_label')}
-                     </div>
-                 </div>
-            </div>
-
-            <div style="height: 32px;"></div>
-        </div>
-        `
-
-		if (typeof renderSheetPage === 'function') {
-			sheetHistory = []
-			renderSheetPage(html, false)
-		} else {
-			console.error('renderSheetPage function missing!')
-			tg.showAlert('Internal Error: renderSheetPage missing')
-		}
-	} catch (e) {
-		console.error('showCityStatus CRASH:', e)
-		tg.showAlert('Error showing status: ' + e.message)
-	}
 }
 
 // Init Air Quality (Fetch based on map center when moved)
