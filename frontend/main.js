@@ -898,8 +898,8 @@ async function showMyReports() {
 			list.innerHTML = `
                 <div style="padding: 40px 20px; text-align: center;">
                     <div style="font-size: 48px; margin-bottom: 16px;">📄</div>
-                    <div style="font-size: 16px; font-weight: 500; color: var(--text-primary);">У вас пока нет отчетов</div>
-                    <div style="font-size: 14px; color: var(--text-secondary); margin-top: 4px;">Отметьте первое загрязнение на карте!</div>
+                    <div style="font-size: 16px; font-weight: 500; color: var(--text-primary);">${window.t('reports_empty_title')}</div>
+                    <div style="font-size: 14px; color: var(--text-secondary); margin-top: 4px;">${window.t('reports_empty_text')}</div>
                 </div>
             `
 			return
@@ -998,8 +998,8 @@ async function showMyHistory() {
 			list.innerHTML = `
                 <div style="padding: 40px 20px; text-align: center;">
                     <div style="font-size: 48px; margin-bottom: 16px;">💰</div>
-                    <div style="font-size: 16px; font-weight: 500; color: var(--text-primary);">У вас пока нет начислений</div>
-                    <div style="font-size: 14px; color: var(--text-secondary); margin-top: 4px;">Очищайте территорию, чтобы зарабатывать!</div>
+                    <div style="font-size: 16px; font-weight: 500; color: var(--text-primary);">${window.t('history_empty_title')}</div>
+                    <div style="font-size: 14px; color: var(--text-secondary); margin-top: 4px;">${window.t('history_empty_text')}</div>
                 </div>
             `
 			return
@@ -1264,7 +1264,7 @@ async function showAboutInfo() {
             </div>
             
             <div style="text-align: center; margin-top: 24px; opacity: 0.4; font-size: 12px; font-weight: 500;">
-                EcoPatrol Institutional Edition v36.0<br>
+                ${window.t('about_version_prefix')} v2.2<br>
                 Алмазарский район, г. Ташкент
             </div>
         </div>
