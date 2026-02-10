@@ -56,7 +56,7 @@ const Tour = {
 				title: {
 					ru: '👤 Ваш профиль',
 					en: '👤 Your Profile',
-					uz: '👤 Sizning filmingiz',
+					uz: '👤 Profilingiz',
 				},
 				content: {
 					ru: 'Здесь хранятся ваши достижения, баланс и история ваших отчетов.',
@@ -75,7 +75,7 @@ const Tour = {
 				content: {
 					ru: 'Получайте коины за помощь городу и обменивайте их на призы от партнеров!',
 					en: 'Get coins for helping the city and exchange them for prizes from partners!',
-					uz: "Shaharga yordam borganingiz uchun tangalar oling va ularni sovg'alarga almashtiring!",
+					uz: "Shaharga yordam berganingiz uchun tangalar oling va ularni sovg'alarga almashtiring!",
 				},
 				position: 'center',
 			},
@@ -195,13 +195,17 @@ const Tour = {
 
 		nextBtn.innerText =
 			this.currentStep === this.steps.length - 1 ?
-				lang === 'ru' ?
-					'Завершить'
-				:	'Finish'
+				lang === 'ru' ? 'Завершить'
+				: lang === 'uz' ? 'Tugatish'
+				: 'Finish'
 			: lang === 'ru' ? 'Далее'
+			: lang === 'uz' ? 'Davom etish'
 			: 'Next'
 		prevBtn.style.visibility = this.currentStep === 0 ? 'hidden' : 'visible'
-		prevBtn.innerText = lang === 'ru' ? 'Назад' : 'Back'
+		prevBtn.innerText =
+			lang === 'ru' ? 'Назад'
+			: lang === 'uz' ? 'Orqaga'
+			: 'Back'
 
 		// Update Dots
 		const dots = document.getElementById('tour-progress')
