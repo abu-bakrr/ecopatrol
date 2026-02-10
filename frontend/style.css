@@ -1930,10 +1930,10 @@ body.tour-active .tour-spotlight {
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	padding: 40px 20px;
+	padding: 60px 20px;
 	text-align: center;
-	flex: 1; /* Take up available space in the sheet */
-	min-height: 300px;
+	flex: 1;
+	min-height: 300px; /* Force panel to stay a bit taller even if empty */
 }
 
 .empty-icon {

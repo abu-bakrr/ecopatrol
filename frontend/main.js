@@ -251,42 +251,48 @@ let sheetHistory = []
 
 function renderSheetPage(html, addToHistory = true) {
 	const content = document.getElementById('sheet-content')
-	if (!content) return
+	const sheet = document.getElementById('bottom-sheet')
+	if (!content || !sheet) return
 
 	if (addToHistory && content.innerHTML.trim() !== '') {
 		sheetHistory.push(content.innerHTML)
 	}
 
-	// 1. Measure current height
+	// 1. Check if sheet is currently OPEN
+	const isCurrentlyOpen = sheet.classList.contains('active')
 	const beforeH = content.offsetHeight
 
 	// 2. Prep for new content
 	content.classList.remove('sheet-page-anim')
-	if (beforeH > 0) content.style.minHeight = beforeH + 'px'
+
+	// Only lock height if we are ALREADY open (switching pages)
+	if (isCurrentlyOpen && beforeH > 0) {
+		content.style.minHeight = beforeH + 'px'
+	} else {
+		content.style.minHeight = '0'
+	}
 
 	// 3. Swap content
 	content.innerHTML = html
 
 	// 4. Measure new height
 	content.style.height = 'auto'
-	content.style.minHeight = '0'
 	const afterH = content.scrollHeight || 300
 
-	// 5. Apply smooth expansion/contraction
-	if (beforeH > 0) {
+	// 5. Apply smooth transition if internal switch
+	if (isCurrentlyOpen && beforeH > 0) {
 		void content.offsetHeight // force reflow
 		content.style.minHeight = afterH + 'px'
-	} else {
-		// New sheet opening
-		content.style.minHeight = '300px'
-	}
 
-	// 6. Cleanup after transition
-	setTimeout(() => {
-		if (content.innerHTML === html) {
-			content.style.minHeight = 'auto' // Release lock
-		}
-	}, 400)
+		setTimeout(() => {
+			if (content.innerHTML === html) {
+				content.style.minHeight = 'auto'
+			}
+		}, 400)
+	} else {
+		// Fresh open: No min-height lock, let the natural height drive the animation
+		content.style.minHeight = '0'
+	}
 
 	content.classList.add('sheet-page-anim')
 	openBottomSheet()
@@ -906,137 +912,139 @@ window.showCityStatus = async function showCityStatus() {
 	try {
 		if (typeof closeSidebar === 'function') closeSidebar()
 
-		// 1. Render Skeleton FIRST
-		const skeletonHtml = `
-            <div style="text-align: center; margin-bottom: 24px; opacity: 0.5;">
-                <div class="skeleton" style="width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 16px;"></div>
-                <div class="skeleton" style="width: 140px; height: 24px; margin: 0 auto;"></div>
-            </div>
-            <div class="aqi-circle" style="border-color: var(--border); opacity: 0.5;">
-                 <div class="skeleton" style="width: 50px; height: 32px; margin-bottom: 4px;"></div>
-                 <div class="skeleton" style="width: 30px; height: 12px;"></div>
-            </div>
-            <div class="city-stats-grid">
-                <div class="stat-card"><div class="skeleton" style="height:60px;"></div></div>
-                <div class="stat-card"><div class="skeleton" style="height:60px;"></div></div>
-                <div class="stat-card"><div class="skeleton" style="height:60px;"></div></div>
-                <div class="stat-card"><div class="skeleton" style="height:60px;"></div></div>
+		// 1. Translation Helper
+		const t = window.t || (k => k)
+
+		// 2. Prepare Icons once
+		const iconMap =
+			'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'
+		const iconClean =
+			'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+		const iconRad =
+			'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2v20"/><path d="M2 12h20"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>'
+
+		const getTemplate = (
+			aqi,
+			temp,
+			wind,
+			rad,
+			total,
+			cleaned,
+			isLoading = false,
+		) => `
+            <div class="info-sheet">
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <div style="width: 60px; height: 60px; background: var(--bg-secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border: 1px solid var(--border);">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="buildingGradFinal" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:var(--primary);stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:var(--primary);stop-opacity:0.6" />
+                                </linearGradient>
+                            </defs>
+                            <rect x="3" y="10" width="4" height="11" fill="url(#buildingGradFinal)" rx="0.5"/>
+                            <rect x="8" y="6" width="4" height="15" fill="url(#buildingGradFinal)" rx="0.5"/>
+                            <rect x="13" y="8" width="4" height="13" fill="url(#buildingGradFinal)" rx="0.5"/>
+                            <rect x="18" y="4" width="3" height="17" fill="url(#buildingGradFinal)" rx="0.5"/>
+                            <line x1="2" y1="21" x2="22" y2="21" stroke="var(--border)" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin: 0;">${t('city_status_title')}</h2>
+                    <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Tashkent, Uzbekistan</div>
+                </div>
+
+                <div class="aqi-circle" style="border-color: ${isLoading ? 'var(--border)' : getAqiColor(aqi)}; margin: 0 auto 24px;">
+                    <div class="aqi-number ${isLoading ? 'skeleton' : ''}" style="color: ${getAqiColor(aqi)}; min-width: 60px; min-height: 40px; border-radius: 8px;">
+                        ${isLoading ? '' : aqi || '-'}
+                    </div>
+                    <div class="aqi-text ${isLoading ? 'skeleton' : ''}" style="min-width: 80px; min-height: 14px; border-radius: 4px; margin-top: 4px;">
+                        ${isLoading ? '' : getAqiLabel(aqi)}
+                    </div>
+                </div>
+
+                <div class="city-stats-grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="stat-card">
+                        <div class="stat-card-icon" style="color: var(--primary);">${iconMap}</div>
+                        <div class="stat-card-label">${t('stat_on_map')}</div>
+                        <div class="stat-card-value ${isLoading ? 'skeleton' : ''}" style="min-width: 30px; min-height: 20px; border-radius: 4px; margin-top: 4px;">
+                            ${isLoading ? '' : total}
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-icon" style="color: var(--primary);">${iconClean}</div>
+                        <div class="stat-card-label">${t('stat_cleaned')}</div>
+                        <div class="stat-card-value ${isLoading ? 'skeleton' : ''}" style="min-width: 30px; min-height: 20px; border-radius: 4px; margin-top: 4px;">
+                            ${isLoading ? '' : cleaned}
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: var(--bg-secondary); border-radius: 20px; padding: 20px; border: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px;">
+                     <div style="text-align: center;">
+                        <div style="color: var(--text-secondary); opacity: 0.6; margin-bottom: 8px;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+                        </div>
+                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 16px; font-weight: 700; min-height: 20px; border-radius: 4px;">
+                            ${isLoading ? '' : `${temp}°`}
+                        </div>
+                        <div style="font-size: 9px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px;">${t('weather_temp')}</div>
+                     </div>
+                     <div style="text-align: center; border-left: 1px solid var(--border); border-right: 1px solid var(--border);">
+                        <div style="color: var(--text-secondary); opacity: 0.6; margin-bottom: 8px;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
+                        </div>
+                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 16px; font-weight: 700; min-height: 20px; border-radius: 4px;">
+                            ${isLoading ? '' : `${wind} <small style="font-size: 10px; font-weight: 400;">km/h</small>`}
+                        </div>
+                        <div style="font-size: 9px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px;">${t('weather_wind')}</div>
+                     </div>
+                     <div style="text-align: center;">
+                        <div style="color: #f59e0b; opacity: 0.8; margin-bottom: 8px;">
+                            ${iconRad}
+                        </div>
+                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 16px; font-weight: 700; min-height: 20px; border-radius: 4px;">
+                            ${isLoading ? '' : `${rad} <small style="font-size: 10px; font-weight: 400;">uSv</small>`}
+                        </div>
+                        <div style="font-size: 9px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px;">${t('weather_radiation')}</div>
+                     </div>
+                </div>
+
+                 <div style="text-align: center; opacity: 0.5; padding: 0 10px;">
+                     <div style="font-size: 11px; line-height: 1.4;">${t('city_passport_desc')}</div>
+                </div>
             </div>
         `
-		renderSheetPage(skeletonHtml, false)
 
-		// 2. Fetch Data
+		// 3. Render STATIC skeleton (Immediate)
+		renderSheetPage(getTemplate(0, 0, 0, '0', 0, 0, true), false)
+
+		// 4. Fetch actual data
 		await Promise.all([fetchAirQuality(), fetchAdminStats(), loadPollutions()])
 
-		// Safety: Ensure cityStats exists
 		const stats = window.cityStats || {}
 		const aqi = stats.aqi !== undefined ? stats.aqi : '--'
 		const temp = stats.temp !== undefined ? Math.round(stats.temp) : '--'
 		const wind = stats.wind !== undefined ? Math.round(stats.wind) : '--'
 		const radiation = stats.radiation || '0.11'
 
-		// Safety: Pollutions
 		const totalReports = markers.length || 0
 		const cleanedReports = markers.filter(m =>
 			m.getElement().classList.contains('cleaned'),
 		).length
 
-		// Translation
-		const t = window.t || (k => k)
-
-		// Icons (Professional SVGs)
-		const iconMap =
-			'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'
-		const iconClean =
-			'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
-		const iconUsers =
-			'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
-		const iconReward =
-			'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>'
-
-		const iconRad =
-			'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2v20"/><path d="M2 12h20"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>'
-
-		const html = `
-        <div class="info-sheet">
-            <div style="text-align: center; margin-bottom: 24px;">
-                <div style="width: 60px; height: 60px; background: var(--bg-secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border: 1px solid var(--border);">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="buildingGradPro" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:var(--primary);stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:var(--primary);stop-opacity:0.6" />
-                            </linearGradient>
-                        </defs>
-                        <rect x="3" y="10" width="4" height="11" fill="url(#buildingGradPro)" rx="0.5"/>
-                        <rect x="8" y="6" width="4" height="15" fill="url(#buildingGradPro)" rx="0.5"/>
-                        <rect x="13" y="8" width="4" height="13" fill="url(#buildingGradPro)" rx="0.5"/>
-                        <rect x="18" y="4" width="3" height="17" fill="url(#buildingGradPro)" rx="0.5"/>
-                        <line x1="2" y1="21" x2="22" y2="21" stroke="var(--border)" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin: 0;">${t('city_status_title')}</h2>
-                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Tashkent, Uzbekistan</div>
-            </div>
-
-            <div class="aqi-circle" style="border-color: ${getAqiColor(aqi)}; margin: 0 auto 24px;">
-                <div class="aqi-number" style="color: ${getAqiColor(aqi)}">${aqi || '-'}</div>
-                <div class="aqi-text">${getAqiLabel(aqi)}</div>
-            </div>
-
-            <div class="city-stats-grid">
-                <div class="stat-card">
-                    <div class="stat-card-icon" style="color: var(--primary);">${iconMap}</div>
-                    <div class="stat-card-label">${t('stat_on_map')}</div>
-                    <div class="stat-card-value">${totalReports}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-card-icon" style="color: var(--primary);">${iconClean}</div>
-                    <div class="stat-card-label">${t('stat_cleaned')}</div>
-                    <div class="stat-card-value">${cleanedReports}</div>
-                </div>
-                 <div class="stat-card">
-                    <div class="stat-card-icon" style="color: var(--primary); opacity: 0.8;">${iconUsers}</div>
-                    <div class="stat-card-label">${t('stat_users')}</div>
-                    <div class="stat-card-value">${adminStats.total_users || '-'}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-card-icon" style="color: #f59e0b;">${iconReward}</div>
-                    <div class="stat-card-label">${t('stat_rewards')}</div>
-                    <div class="stat-card-value">$${adminStats.total_rewards_paid || 0}</div>
-                </div>
-            </div>
-            
-            <div style="background: var(--bg-secondary); border-radius: 20px; padding: 20px; border: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px;">
-                 <div style="text-align: center;">
-                    <div style="color: var(--text-secondary); opacity: 0.6; margin-bottom: 8px;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
-                    </div>
-                    <div style="font-size: 16px; font-weight: 700;">${temp}°</div>
-                    <div style="font-size: 9px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px;">${t('weather_temp')}</div>
-                 </div>
-                 <div style="text-align: center; border-left: 1px solid var(--border); border-right: 1px solid var(--border);">
-                    <div style="color: var(--text-secondary); opacity: 0.6; margin-bottom: 8px;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
-                    </div>
-                    <div style="font-size: 16px; font-weight: 700;">${wind} <small style="font-size: 10px; font-weight: 400;">km/h</small></div>
-                    <div style="font-size: 9px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px;">${t('weather_wind')}</div>
-                 </div>
-                 <div style="text-align: center;">
-                    <div style="color: #f59e0b; opacity: 0.8; margin-bottom: 8px;">
-                        ${iconRad}
-                    </div>
-                    <div style="font-size: 16px; font-weight: 700;">${radiation} <small style="font-size: 10px; font-weight: 400;">uSv</small></div>
-                    <div style="font-size: 9px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px;">${t('weather_radiation')}</div>
-                 </div>
-            </div>
-
-             <div style="text-align: center; opacity: 0.5; padding: 0 10px;">
-                 <div style="font-size: 11px; line-height: 1.4;">${t('city_passport_desc')}</div>
-            </div>
-        </div>
-    `
-		renderSheetPage(html, false)
+		// 5. Render FINAL content (Smooth switch)
+		renderSheetPage(
+			getTemplate(
+				aqi,
+				temp,
+				wind,
+				radiation,
+				totalReports,
+				cleanedReports,
+				false,
+			),
+			false,
+		)
 	} catch (e) {
 		console.error('showCityStatus failed', e)
 	}
@@ -1118,7 +1126,9 @@ async function showMyReports() {
 		if (reports.length === 0) {
 			const emptyHtml = `
                 <div class="empty-state">
-                    <div class="empty-icon">📄</div>
+                    <div class="empty-icon" style="color: var(--text-secondary); opacity: 0.4;">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    </div>
                     <div class="empty-title">${window.t('reports_empty_title')}</div>
                     <div class="empty-text">${window.t('reports_empty_text')}</div>
                 </div>
@@ -1232,7 +1242,9 @@ async function showMyHistory() {
 		if (history.length === 0) {
 			const emptyHtml = `
                 <div class="empty-state">
-                    <div class="empty-icon">💰</div>
+                    <div class="empty-icon" style="color: var(--text-secondary); opacity: 0.4;">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
                     <div class="empty-title">${window.t('history_empty_title')}</div>
                     <div class="empty-text">${window.t('history_empty_text')}</div>
                 </div>
@@ -1306,7 +1318,9 @@ async function showExchange() {
 		if (activePollutions.length === 0) {
 			const emptyHtml = `
                 <div class="empty-state">
-                    <div class="empty-icon">🌟</div>
+                    <div class="empty-icon" style="color: var(--text-secondary); opacity: 0.4;">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                    </div>
                     <div class="empty-title">${window.t('city_clean_title')}</div>
                     <div class="empty-text">${window.t('city_clean_text')}</div>
                 </div>
