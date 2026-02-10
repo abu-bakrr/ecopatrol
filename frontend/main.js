@@ -33,7 +33,8 @@ let currentPollution = null
 let isDragging = false
 let isRegistered = false
 let uploadingCount = 0 // Global state for optimistic UI
-let currentLang = 'ru' // Default
+window.currentLang = localStorage.getItem('language') || 'ru'
+let currentLang = window.currentLang // keep local ref for compatibility if needed, but better to use window.currentLang everywhere
 
 // Translation Helper
 window.t = function (key) {
@@ -53,6 +54,7 @@ window.setLanguage = async function (lang) {
 	if (!['uz', 'ru', 'en'].includes(lang)) return
 	console.log('--- SETTING LANGUAGE ---', lang)
 	currentLang = lang
+	window.currentLang = lang
 	localStorage.setItem('language', lang)
 
 	// Mark active in UI
