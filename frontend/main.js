@@ -1019,15 +1019,27 @@ window.showCityStatus = async function showCityStatus() {
 		renderSheetPage(getTemplate('--', '--', '--', '--', 0, 0, true), false)
 
 		// 4. Fetch actual data
+		console.log('🚀 Starting data fetch...')
 		await Promise.all([fetchAirQuality(), fetchAdminStats(), loadPollutions()])
+		console.log('✅ All fetches complete')
 
+		console.log('🔍 window.cityStats:', window.cityStats)
 		const stats = window.cityStats || {}
-		console.log('🔍 cityStats after fetch:', stats)
+		console.log('📦 stats variable:', stats)
+
 		const aqi = stats.aqi !== undefined ? stats.aqi : '--'
 		const temp = stats.temp !== undefined ? Math.round(stats.temp) : '--'
 		const wind = stats.wind !== undefined ? Math.round(stats.wind) : '--'
 		const radiation = stats.radiation || '0.11'
-		console.log('📊 Final values:', { aqi, temp, wind, radiation })
+
+		console.log('📊 Final values being passed to template:', {
+			aqi,
+			temp,
+			wind,
+			radiation,
+			'typeof temp': typeof temp,
+			'typeof wind': typeof wind,
+		})
 
 		const totalReports = markers.length || 0
 		const cleanedReports = markers.filter(m =>
