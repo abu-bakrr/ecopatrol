@@ -34,7 +34,14 @@ let isDragging = false
 let isRegistered = false
 let uploadingCount = 0 // Global state for optimistic UI
 window.currentLang = localStorage.getItem('language') || 'ru'
-let currentLang = window.currentLang // keep local ref for compatibility if needed, but better to use window.currentLang everywhere
+let currentLang = window.currentLang
+window.cityStats = {
+	aqi: null,
+	temp: null,
+	wind: null,
+	radiation: '0.11 мкЗв/ч',
+}
+window.adminStats = { total_users: 0, total_rewards_paid: 0 }
 
 // Translation Helper
 window.t = function (key) {
@@ -250,35 +257,36 @@ function renderSheetPage(html, addToHistory = true) {
 		sheetHistory.push(content.innerHTML)
 	}
 
-	// --- SMOOTH HEIGHT Logic ---
 	// 1. Measure current height
 	const beforeH = content.offsetHeight
 
-	// 2. Apply animation class
+	// 2. Prep for new content
 	content.classList.remove('sheet-page-anim')
+	if (beforeH > 0) content.style.minHeight = beforeH + 'px'
 
 	// 3. Swap content
 	content.innerHTML = html
 
 	// 4. Measure new height
+	content.style.height = 'auto'
 	content.style.minHeight = '0'
-	const afterH = content.scrollHeight || 300 // Fallback
+	const afterH = content.scrollHeight || 300
 
-	// 5. Apply smooth expansion
+	// 5. Apply smooth expansion/contraction
 	if (beforeH > 0) {
-		content.style.minHeight = beforeH + 'px'
-		void content.offsetHeight // Force reflow
+		void content.offsetHeight // force reflow
 		content.style.minHeight = afterH + 'px'
 	} else {
-		content.style.minHeight = '50vh'
+		// New sheet opening
+		content.style.minHeight = '300px'
 	}
 
-	// 6. Reset after transition
+	// 6. Cleanup after transition
 	setTimeout(() => {
 		if (content.innerHTML === html) {
-			content.style.minHeight = '50vh'
+			content.style.minHeight = 'auto' // Release lock
 		}
-	}, 500)
+	}, 400)
 
 	content.classList.add('sheet-page-anim')
 	openBottomSheet()
@@ -288,9 +296,6 @@ function goBackInSheet() {
 	if (sheetHistory.length > 0) {
 		const prev = sheetHistory.pop()
 		renderSheetPage(prev, false)
-	} else {
-		// If we are already at the bottom of history, we can't go back further
-		// But in our current logic, closeBottomSheet handles this.
 	}
 }
 
@@ -876,10 +881,10 @@ let adminStats = {}
 
 async function fetchAdminStats() {
 	try {
-		const res = await fetch(`${API_URL}/admin/stats`)
+		const res = await fetch(`${API_URL}/stats/public`)
 		if (res.ok) adminStats = await res.json()
 	} catch (e) {
-		console.error('Failed to fetch admin stats', e)
+		console.error('Failed to fetch stats', e)
 	}
 }
 
@@ -903,21 +908,19 @@ window.showCityStatus = async function showCityStatus() {
 
 		// 1. Render Skeleton FIRST
 		const skeletonHtml = `
-            <div class="sheet-min-height">
-                <div style="text-align: center; margin-bottom: 24px; opacity: 0.5;">
-                    <div class="skeleton" style="width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 16px;"></div>
-                    <div class="skeleton" style="width: 140px; height: 24px; margin: 0 auto;"></div>
-                </div>
-                <div class="aqi-circle" style="border-color: var(--border); opacity: 0.5;">
-                     <div class="skeleton" style="width: 50px; height: 32px; margin-bottom: 4px;"></div>
-                     <div class="skeleton" style="width: 30px; height: 12px;"></div>
-                </div>
-                <div class="city-stats-grid">
-                    <div class="stat-card"><div class="skeleton" style="height:60px;"></div></div>
-                    <div class="stat-card"><div class="skeleton" style="height:60px;"></div></div>
-                    <div class="stat-card"><div class="skeleton" style="height:60px;"></div></div>
-                    <div class="stat-card"><div class="skeleton" style="height:60px;"></div></div>
-                </div>
+            <div style="text-align: center; margin-bottom: 24px; opacity: 0.5;">
+                <div class="skeleton" style="width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 16px;"></div>
+                <div class="skeleton" style="width: 140px; height: 24px; margin: 0 auto;"></div>
+            </div>
+            <div class="aqi-circle" style="border-color: var(--border); opacity: 0.5;">
+                 <div class="skeleton" style="width: 50px; height: 32px; margin-bottom: 4px;"></div>
+                 <div class="skeleton" style="width: 30px; height: 12px;"></div>
+            </div>
+            <div class="city-stats-grid">
+                <div class="stat-card"><div class="skeleton" style="height:60px;"></div></div>
+                <div class="stat-card"><div class="skeleton" style="height:60px;"></div></div>
+                <div class="stat-card"><div class="skeleton" style="height:60px;"></div></div>
+                <div class="stat-card"><div class="skeleton" style="height:60px;"></div></div>
             </div>
         `
 		renderSheetPage(skeletonHtml, false)
@@ -930,7 +933,7 @@ window.showCityStatus = async function showCityStatus() {
 		const aqi = stats.aqi !== undefined ? stats.aqi : '--'
 		const temp = stats.temp !== undefined ? Math.round(stats.temp) : '--'
 		const wind = stats.wind !== undefined ? Math.round(stats.wind) : '--'
-		const radiation = stats.radiation || '0.11 мкЗв/ч'
+		const radiation = stats.radiation || '0.11'
 
 		// Safety: Pollutions
 		const totalReports = markers.length || 0
@@ -938,93 +941,98 @@ window.showCityStatus = async function showCityStatus() {
 			m.getElement().classList.contains('cleaned'),
 		).length
 
-		// Safety: Translation
+		// Translation
 		const t = window.t || (k => k)
 
-		// Icons (SVGs)
-		const iconThermometer =
-			'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>'
-		const iconWind =
-			'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>'
+		// Icons (Professional SVGs)
+		const iconMap =
+			'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'
+		const iconClean =
+			'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+		const iconUsers =
+			'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
+		const iconReward =
+			'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>'
+
+		const iconRad =
+			'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2v20"/><path d="M2 12h20"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>'
 
 		const html = `
         <div class="info-sheet">
-            <!-- Modern Header -->
             <div style="text-align: center; margin-bottom: 24px;">
-                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(59, 130, 246, 0.15)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                <div style="width: 60px; height: 60px; background: var(--bg-secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border: 1px solid var(--border);">
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <defs>
-                            <linearGradient id="buildingGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+                            <linearGradient id="buildingGradPro" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:var(--primary);stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:var(--primary);stop-opacity:0.6" />
                             </linearGradient>
                         </defs>
-                        <rect x="3" y="10" width="4" height="11" fill="url(#buildingGradient2)" rx="0.5"/>
-                        <rect x="8" y="6" width="4" height="15" fill="url(#buildingGradient2)" rx="0.5"/>
-                        <rect x="13" y="8" width="4" height="13" fill="url(#buildingGradient2)" rx="0.5"/>
-                        <rect x="18" y="4" width="3" height="17" fill="url(#buildingGradient2)" rx="0.5"/>
-                        <rect x="9" y="8" width="1" height="1" fill="white" opacity="0.6"/>
-                        <rect x="11" y="8" width="1" height="1" fill="white" opacity="0.6"/>
-                        <rect x="14" y="10" width="1" height="1" fill="white" opacity="0.6"/>
-                        <rect x="16" y="10" width="1" height="1" fill="white" opacity="0.6"/>
-                        <line x1="2" y1="21" x2="22" y2="21" stroke="url(#buildingGradient2)" stroke-width="1.5" stroke-linecap="round"/>
+                        <rect x="3" y="10" width="4" height="11" fill="url(#buildingGradPro)" rx="0.5"/>
+                        <rect x="8" y="6" width="4" height="15" fill="url(#buildingGradPro)" rx="0.5"/>
+                        <rect x="13" y="8" width="4" height="13" fill="url(#buildingGradPro)" rx="0.5"/>
+                        <rect x="18" y="4" width="3" height="17" fill="url(#buildingGradPro)" rx="0.5"/>
+                        <line x1="2" y1="21" x2="22" y2="21" stroke="var(--border)" stroke-width="1.5" stroke-linecap="round"/>
                     </svg>
                 </div>
                 <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin: 0;">${t('city_status_title')}</h2>
                 <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Tashkent, Uzbekistan</div>
             </div>
 
-            <!-- Central AQI Display -->
             <div class="aqi-circle" style="border-color: ${getAqiColor(aqi)}; margin: 0 auto 24px;">
                 <div class="aqi-number" style="color: ${getAqiColor(aqi)}">${aqi || '-'}</div>
                 <div class="aqi-text">${getAqiLabel(aqi)}</div>
             </div>
 
-            <!-- Stats Grid -->
             <div class="city-stats-grid">
                 <div class="stat-card">
-                    <div class="stat-card-icon">📍</div>
+                    <div class="stat-card-icon" style="color: var(--primary);">${iconMap}</div>
                     <div class="stat-card-label">${t('stat_on_map')}</div>
                     <div class="stat-card-value">${totalReports}</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-card-icon">✨</div>
+                    <div class="stat-card-icon" style="color: var(--primary);">${iconClean}</div>
                     <div class="stat-card-label">${t('stat_cleaned')}</div>
                     <div class="stat-card-value">${cleanedReports}</div>
                 </div>
                  <div class="stat-card">
-                    <div class="stat-card-icon">👥</div>
+                    <div class="stat-card-icon" style="color: var(--primary); opacity: 0.8;">${iconUsers}</div>
                     <div class="stat-card-label">${t('stat_users')}</div>
                     <div class="stat-card-value">${adminStats.total_users || '-'}</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-card-icon">🎁</div>
+                    <div class="stat-card-icon" style="color: #f59e0b;">${iconReward}</div>
                     <div class="stat-card-label">${t('stat_rewards')}</div>
-                    <div class="stat-card-value">${adminStats.total_rewards_paid || 0}</div>
+                    <div class="stat-card-value">$${adminStats.total_rewards_paid || 0}</div>
                 </div>
             </div>
             
-            <!-- Weather Details -->
-            <div style="background: var(--bg-secondary); border-radius: 20px; padding: 16px; border: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 24px;">
+            <div style="background: var(--bg-secondary); border-radius: 20px; padding: 20px; border: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px;">
                  <div style="text-align: center;">
-                    <div style="color: var(--primary); margin-bottom: 4px;">${iconThermometer}</div>
-                    <div style="font-size: 14px; font-weight: 700;">${temp}°</div>
-                    <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">${t('weather_temp')}</div>
+                    <div style="color: var(--text-secondary); opacity: 0.6; margin-bottom: 8px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+                    </div>
+                    <div style="font-size: 16px; font-weight: 700;">${temp}°</div>
+                    <div style="font-size: 9px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px;">${t('weather_temp')}</div>
                  </div>
                  <div style="text-align: center; border-left: 1px solid var(--border); border-right: 1px solid var(--border);">
-                    <div style="color: var(--primary); margin-bottom: 4px;">${iconWind}</div>
-                    <div style="font-size: 14px; font-weight: 700;">${wind} <small>км/ч</small></div>
-                    <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">${t('weather_wind')}</div>
+                    <div style="color: var(--text-secondary); opacity: 0.6; margin-bottom: 8px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
+                    </div>
+                    <div style="font-size: 16px; font-weight: 700;">${wind} <small style="font-size: 10px; font-weight: 400;">km/h</small></div>
+                    <div style="font-size: 9px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px;">${t('weather_wind')}</div>
                  </div>
                  <div style="text-align: center;">
-                    <div style="color: #f59e0b; margin-bottom: 4px;">☢️</div>
-                    <div style="font-size: 14px; font-weight: 700;">${radiation}</div>
-                    <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">${t('weather_radiation')}</div>
+                    <div style="color: #f59e0b; opacity: 0.8; margin-bottom: 8px;">
+                        ${iconRad}
+                    </div>
+                    <div style="font-size: 16px; font-weight: 700;">${radiation} <small style="font-size: 10px; font-weight: 400;">uSv</small></div>
+                    <div style="font-size: 9px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px;">${t('weather_radiation')}</div>
                  </div>
             </div>
 
-             <div class="info-card" style="text-align: center; opacity: 0.7;">
-                 <div style="font-size: 12px;">${t('city_passport_desc')}</div>
+             <div style="text-align: center; opacity: 0.5; padding: 0 10px;">
+                 <div style="font-size: 11px; line-height: 1.4;">${t('city_passport_desc')}</div>
             </div>
         </div>
     `

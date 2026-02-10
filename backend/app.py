@@ -139,6 +139,18 @@ def get_pollutions():
         })
     return jsonify(result)
 
+@app.route('/api/stats/public', methods=['GET'])
+def get_public_stats():
+    """Returns general city statistics available to everyone."""
+    total_users = User.query.count()
+    cleaned_count = Pollution.query.filter_by(status='cleaned').count()
+    total_rewards = db.session.query(db.func.sum(Pollution.reward)).filter_by(status='cleaned').scalar() or 0
+    return jsonify({
+        'total_users': total_users,
+        'cleaned_count': cleaned_count,
+        'total_rewards_paid': total_rewards
+    })
+
 @app.route('/api/pollutions', methods=['POST'])
 def create_pollution():
     data = request.json

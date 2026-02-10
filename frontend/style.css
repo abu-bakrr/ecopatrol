@@ -1915,12 +1915,12 @@ body.tour-active .tour-spotlight {
 
 /* Fix Bottom Sheet Jitter */
 .sheet-content {
-	min-height: 50vh;
+	min-height: 100px;
 	width: 100%;
 	position: relative;
 	display: flex;
 	flex-direction: column;
-	transition: min-height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+	transition: min-height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 	will-change: min-height;
 }
 
