@@ -1109,11 +1109,7 @@ async function showSafetyGuide() {
             <!-- Pollution Levels -->
             <div style="margin-bottom: 32px;">
                 <div class="info-tag" style="background: rgba(16, 185, 129, 0.1); color: #10b981; margin-bottom: 16px;">
-                    ${
-											lang === 'ru' ? 'Уровни загрязнения'
-											: lang === 'uz' ? 'Ifloslanish darajalari'
-											: 'Pollution Levels'
-										}
+                    ${t('safety_levels_title')}
                 </div>
                 ${data.levels
 									.map(
@@ -1125,11 +1121,7 @@ async function showSafetyGuide() {
                         </div>
                         <p class="safety-level-desc">${l.description}</p>
                         <div class="safety-level-tools">
-                            <strong>${
-															lang === 'ru' ? 'Экипировка'
-															: lang === 'uz' ? 'Anjomlar'
-															: 'Equipment'
-														}:</strong> ${l.tools}
+                            <strong>${t('safety_equipment')}:</strong> ${l.tools}
                         </div>
                     </div>
                 `,
@@ -1139,11 +1131,7 @@ async function showSafetyGuide() {
 
             <!-- General Rules -->
             <div class="info-card">
-                <div class="info-tag">${
-									lang === 'ru' ? 'Основные правила'
-									: lang === 'uz' ? 'Asosiy qoidalar'
-									: 'General Rules'
-								}</div>
+                <div class="info-tag">${t('safety_rules_title')}</div>
                 <div class="info-list">
                     ${data.rules
 											.map(
@@ -1193,11 +1181,7 @@ async function showSafetyGuide() {
             <!-- Emergency Contacts -->
             <div style="margin-bottom: 32px;">
                 <div class="info-tag" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; margin-bottom: 16px;">
-                    ${
-											lang === 'ru' ? 'Экстренные контакты'
-											: lang === 'uz' ? 'Favqulodda raqamlar'
-											: 'Emergency Contacts'
-										}
+                    ${t('safety_contacts_title')}
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
                     ${data.emergency_contacts
@@ -1208,11 +1192,7 @@ async function showSafetyGuide() {
                                 <span style="font-size: 24px;">${c.icon}</span>
                                 <div style="display: flex; flex-direction: column;">
                                     <span style="font-size: 14px; font-weight: 700;">${c.name}</span>
-                                    <span style="font-size: 13px; color: var(--text-secondary);">${
-																			lang === 'ru' ? 'Звонок бесплатный'
-																			: lang === 'uz' ? 'Qo‘ng‘iroq bepul'
-																			: 'Free call'
-																		}</span>
+                                    <span style="font-size: 13px; color: var(--text-secondary);">${t('safety_free_call')}</span>
                                 </div>
                             </div>
                             <a href="tel:${c.phone}" style="background: #ef4444; color: white; padding: 8px 16px; border-radius: 10px; font-weight: 800; text-decoration: none; font-size: 14px;">
@@ -1226,17 +1206,8 @@ async function showSafetyGuide() {
             </div>
 
             <div style="text-align: center; margin-top: 32px; opacity: 0.5; font-size: 13px;">
-                ${
-									lang === 'ru' ? 'Ваша безопасность — наш приоритет.'
-									: lang === 'uz' ?
-										'Sizning xavfsizligingiz – bizning ustuvor vazifamiz.'
-									:	'Your safety is our top priority.'
-								}
-                <br>${
-									lang === 'ru' ? 'Берегите себя и природу!'
-									: lang === 'uz' ? 'O‘zingizni va tabiatni asrang!'
-									: 'Protect yourself and nature!'
-								}
+                ${t('safety_footer_msg')}
+                <br>${t('safety_footer_care')}
             </div>
         </div>
         <div style="height: 40px;"></div>
@@ -2358,7 +2329,7 @@ window.showCityStatus = async () => {
                         ${cleanedCount}
                      </div>
                      <div style="font-size: 13px; color: var(--text-secondary);">
-                        ликвидировано волонтерами
+                        ${t('city_cleaned_label')}
                      </div>
                  </div>
             </div>

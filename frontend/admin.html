@@ -8,6 +8,7 @@
 		/>
 		<title>Eco Admin</title>
 		<script src="https://telegram.org/js/telegram-web-app.js"></script>
+		<script src="translations.js?v=1290"></script>
 		<style>
 			:root {
 				--primary: #10b981;
@@ -70,6 +71,27 @@
 				justify-content: center;
 				cursor: pointer;
 				color: var(--text-main);
+			}
+
+			.lang-switcher-admin {
+				display: flex;
+				gap: 4px;
+				margin-right: 12px;
+			}
+			.lang-btn-admin {
+				padding: 4px 8px;
+				border-radius: 8px;
+				border: 1px solid var(--border);
+				background: var(--bg-card);
+				color: var(--text-main);
+				font-size: 11px;
+				font-weight: 700;
+				cursor: pointer;
+			}
+			.lang-btn-admin.active {
+				background: var(--primary);
+				color: white;
+				border-color: var(--primary);
 			}
 
 			.tabs {
@@ -356,9 +378,22 @@
 				>
 					<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
 				</svg>
-				Eco Admin
+				<span data-t="admin_title">Eco Admin</span>
 			</h1>
-			<div class="btn-icon" onclick="toggleTheme()" id="theme-btn">
+
+			<div style="display: flex; align-items: center">
+				<div class="lang-switcher-admin" id="lang-switcher-admin">
+					<button class="lang-btn-admin" onclick="setAdminLanguage('uz')">
+						UZ
+					</button>
+					<button class="lang-btn-admin" onclick="setAdminLanguage('ru')">
+						RU
+					</button>
+					<button class="lang-btn-admin" onclick="setAdminLanguage('en')">
+						EN
+					</button>
+				</div>
+				<div class="btn-icon" onclick="toggleTheme()" id="theme-btn">
 				<svg
 					id="sun-icon"
 					style="display: none"
@@ -398,21 +433,7 @@
 		</div>
 
 		<div class="tabs">
-			<button class="tab-btn active" onclick="switchTab('dashboard', this)">
-				<svg
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<rect x="3" y="3" width="7" height="7" />
-					<rect x="14" y="3" width="7" height="7" />
-					<rect x="14" y="14" width="7" height="7" />
-					<rect x="3" y="14" width="7" height="7" />
-				</svg>
-				<span>Обзор</span>
+				<span data-t="admin_tab_overview">Обзор</span>
 			</button>
 			<button class="tab-btn" onclick="switchTab('users', this)">
 				<svg
@@ -428,7 +449,7 @@
 					<path d="M23 21v-2a4 4 0 0 0-3-3.87" />
 					<path d="M16 3.13a4 4 0 0 1 0 7.75" />
 				</svg>
-				<span>Люди</span>
+				<span data-t="admin_tab_users">Люди</span>
 			</button>
 			<button class="tab-btn" onclick="switchTab('pollutions', this)">
 				<svg
@@ -442,45 +463,35 @@
 					<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
 					<circle cx="12" cy="10" r="3" />
 				</svg>
-				<span>Список</span>
+				<span data-t="admin_tab_list">Список</span>
 			</button>
-			<button class="tab-btn" onclick="switchTab('settings', this)">
-				<svg
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<circle cx="12" cy="12" r="3" />
 					<path
 						d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
 					/>
 				</svg>
-				<span>Настройки</span>
+				<span data-t="admin_tab_settings">Настройки</span>
 			</button>
 		</div>
 
 		<!-- SECTIONS -->
 		<div id="section-dashboard" class="section active">
-			<div id="stats-loader" class="loading">Загрузка статистики...</div>
+			<div id="stats-loader" class="loading" data-t="admin_stats_loading">Загрузка статистики...</div>
 			<div id="stats-content" class="stats-grid" style="display: none">
 				<div class="stat-card">
-					<span class="stat-label">Люди</span
-					><span class="stat-value" id="st-users">0</span>
+					<span class="stat-label" data-t="admin_tab_users">Люди</span>
+					<span class="stat-value" id="st-users">0</span>
 				</div>
 				<div class="stat-card">
-					<span class="stat-label">На карте</span
-					><span class="stat-value" id="st-active">0</span>
+					<span class="stat-label" data-t="status_active">На карте</span>
+					<span class="stat-value" id="st-active">0</span>
 				</div>
 				<div class="stat-card">
-					<span class="stat-label">Очищено</span
-					><span class="stat-value" id="st-cleaned">0</span>
+					<span class="stat-label" data-t="status_cleaned">Очищено</span>
+					<span class="stat-value" id="st-cleaned">0</span>
 				</div>
 				<div class="stat-card">
-					<span class="stat-label">Выплаты</span
-					><span class="stat-value" id="st-rewards">0 UZS</span>
+					<span class="stat-label" data-t="admin_stat_rewards">Выплаты</span>
+					<span class="stat-value" id="st-rewards">0 UZS</span>
 				</div>
 			</div>
 		</div>
@@ -492,6 +503,7 @@
 					id="user-search"
 					class="input-field"
 					placeholder="Search by name, username, or phone..."
+					data-t-placeholder="admin_search_placeholder"
 					onkeyup="filterUsers()"
 					style="margin-bottom: 0"
 				/>
@@ -506,15 +518,15 @@
 		<div id="section-settings" class="section">
 			<div class="settings-card">
 				<div class="input-group">
-					<label class="input-label">Награда Уровень 1</label>
+					<label class="input-label" data-t="admin_settings_reward_l1">Награда Уровень 1</label>
 					<input type="number" id="set-1" class="input-field" />
 				</div>
 				<div class="input-group">
-					<label class="input-label">Награда Уровень 2</label>
+					<label class="input-label" data-t="admin_settings_reward_l2">Награда Уровень 2</label>
 					<input type="number" id="set-2" class="input-field" />
 				</div>
 				<div class="input-group">
-					<label class="input-label">Награда Уровень 3</label>
+					<label class="input-label" data-t="admin_settings_reward_l3">Награда Уровень 3</label>
 					<input type="number" id="set-3" class="input-field" />
 				</div>
 				<label
@@ -534,6 +546,7 @@
 					/>
 					<span
 						style="font-weight: 700; color: var(--text-main); font-size: 14px"
+						data-t="admin_settings_debug"
 						>Включить кнопку логов (Debug)</span
 					>
 				</label>
@@ -541,6 +554,7 @@
 					class="btn btn-solid"
 					onclick="saveSettings()"
 					style="margin-top: 10px"
+					data-t="admin_settings_save"
 				>
 					Сохранить настройки
 				</button>
@@ -565,34 +579,71 @@
 			const urlParams = new URLSearchParams(window.location.search)
 			const adminTgId = parseInt(urlParams.get('admin_tg_id'), 10)
 
-			const TYPE_LABELS = {
-				plastic: 'Пластик',
-				glass: 'Стекло',
-				paper: 'Бумага',
-				metal: 'Металл',
-				organic: 'Органика',
-				construction: 'Стройотходы',
-				electronic: 'Электроника',
-				tires: 'Шины',
-				hazardous: 'Опасные отходы',
-				bulky: 'Крупногабаритный мусор',
-				chemical: 'Химические отходы',
-				other: 'Прочее',
-				trash: 'Прочее',
+			// i18n Logic
+			let currentLang = localStorage.getItem('language') || 'ru'
+
+			function t(key) {
+				const lang = currentLang || 'ru'
+				return (
+					(window.translations &&
+						window.translations[lang] &&
+						window.translations[lang][key]) ||
+					key
+				)
+			}
+
+			function translateAdminUI() {
+				// Translate static text
+				document.querySelectorAll('[data-t]').forEach(el => {
+					const key = el.getAttribute('data-t')
+					el.innerText = t(key)
+				})
+				// Translate placeholders
+				document.querySelectorAll('[data-t-placeholder]').forEach(el => {
+					const key = el.getAttribute('data-t-placeholder')
+					el.placeholder = t(key)
+				})
+
+				// Update active button state
+				document.querySelectorAll('.lang-btn-admin').forEach(btn => {
+					btn.classList.toggle(
+						'active',
+						btn.innerText.toLowerCase() === currentLang,
+					)
+				})
+			}
+
+			window.setAdminLanguage = function (lang) {
+				currentLang = lang
+				localStorage.setItem('language', lang)
+				translateAdminUI()
+				tg.HapticFeedback.impactOccurred('light')
+				// Re-render current tab to update dynamic content
+				const activeTabBtn = document.querySelector('.tab-btn.active')
+				if (activeTabBtn) {
+					const tab = activeTabBtn
+						.getAttribute('onclick')
+						.match(/'(\w+)'/)[1]
+					if (tab === 'dashboard') loadStats()
+					if (tab === 'users') loadUsers()
+					if (tab === 'pollutions') loadPollutions()
+					if (tab === 'settings') loadSettings()
+				}
 			}
 
 			function getLocalizedTypes(types) {
-				if (!types) return '<i>Тип не указан</i>'
+				if (!types) return `<i>${t('admin_type_not_specified')}</i>`
+				const allTypes =
+					window.translations[currentLang]?.types || window.translations['ru'].types
 				if (typeof types === 'string') {
-					// Handle comma separated string if that's what backend sends
 					return types
 						.split(',')
 						.map(t => t.trim())
-						.map(t => TYPE_LABELS[t] || t)
+						.map(t => allTypes[t] || t)
 						.join(', ')
 				}
 				if (Array.isArray(types)) {
-					return types.map(t => TYPE_LABELS[t] || t).join(', ')
+					return types.map(t => allTypes[t] || t).join(', ')
 				}
 				return types
 			}
@@ -648,7 +699,6 @@
 
 			async function apiFetch(path, options = {}) {
 				try {
-					// Ensure options.body is handled if present
 					const fetchOptions = { ...options }
 					const res = await fetch(
 						API_URL +
@@ -661,7 +711,7 @@
 					return await res.json()
 				} catch (e) {
 					console.error(e)
-					tg.showAlert('Ошибка: проверьте консоль')
+					tg.showAlert(t('submit_error'))
 					return null
 				}
 			}
@@ -679,15 +729,15 @@
 					data.total_rewards.toFixed(0) + ' UZS'
 			}
 
-			let allUsers = [] // Store for filtering
+			let allUsers = []
 
 			async function loadUsers() {
 				const list = document.getElementById('users-list')
-				list.innerHTML = '<div class="loading">Загрузка...</div>'
+				list.innerHTML = `<div class="loading">${t('loading')}</div>`
 				const users = await apiFetch('/admin/users')
 				if (!users) return
 
-				allUsers = users // Store globally
+				allUsers = users
 				renderUsers(users)
 			}
 
@@ -700,19 +750,19 @@
                     <div class="card-header">
                         <div>
                             <div class="card-title">${u.first_name || 'Hero'}</div>
-                            <div class="card-meta">@${u.username || '—'} • ${u.phone || 'No phone'}</div>
+                            <div class="card-meta">@${u.username || '—'} • ${u.phone || '—'}</div>
                         </div>
                         <div style="font-weight:800; color:var(--primary); font-size:17px">${u.balance.toFixed(0)} UZS</div>
                     </div>
                     <div class="btn-row">
                         <button class="btn btn-solid" onclick="notifyUser(${u.telegram_id})">
                              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                             Message
+                             ${t('admin_btn_message')}
                         </button>
-                        <button class="btn btn-outline" onclick="editBalance(${u.id}, ${u.balance})">Balance</button>
+                        <button class="btn btn-outline" onclick="editBalance(${u.id}, ${u.balance})">${t('admin_btn_balance')}</button>
                         <button class="btn btn-danger" onclick="deleteUser(${u.id}, '${u.first_name || 'User'}')">
                              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-                             Delete
+                             ${t('admin_btn_delete')}
                         </button>
                     </div>
                 </div>
@@ -745,20 +795,8 @@
 			}
 
 			async function deleteUser(userId, userName) {
-				if (
-					!confirm(
-						`Are you sure you want to delete user "${userName}"?\n\nThis will permanently delete:\n- User account\n- All their pollution reports\n- All related photos\n\nThis action cannot be undone.`,
-					)
-				) {
+				if (!confirm(t('admin_delete_confirm').replace('{userName}', userName)))
 					return
-				}
-
-				console.log('Delete user:', {
-					userId,
-					userName,
-					adminTgId,
-					adminTgIdType: typeof adminTgId,
-				})
 
 				try {
 					const res = await fetch(
@@ -769,48 +807,36 @@
 							body: JSON.stringify({ admin_tg_id: adminTgId }),
 						},
 					)
-
-					console.log('Delete response status:', res.status)
-
-					if (!res.ok) {
-						const error = await res.json()
-						console.error('Delete error response:', error)
-						throw new Error(error.error || 'Delete failed')
-					}
-
-					const result = await res.json()
-					console.log('Delete success:', result)
-					tg.showAlert(`User "${userName}" deleted successfully`)
+					if (!res.ok) throw new Error('Delete failed')
+					tg.showAlert(t('submit_success'))
 					tg.HapticFeedback.notificationOccurred('success')
-					loadUsers() // Refresh list
+					loadUsers()
 				} catch (e) {
-					console.error('Delete error:', e)
-					tg.showAlert('Error: ' + e.message)
+					tg.showAlert(t('submit_error'))
 					tg.HapticFeedback.notificationOccurred('error')
 				}
 			}
 
 			async function loadPollutions() {
 				const list = document.getElementById('pollutions-list')
-				list.innerHTML = '<div class="loading">Загрузка...</div>'
+				list.innerHTML = `<div class="loading">${t('loading')}</div>`
 				const pollutions = await apiFetch('/admin/pollutions')
-				if (!pollutions) {
-					list.innerHTML = '<div class="loading">Нет данных</div>'
+				if (!pollutions || pollutions.length === 0) {
+					list.innerHTML = `<div class="loading">${t('city_clean_title')}</div>`
 					return
 				}
 
-				list.innerHTML =
-					pollutions
-						.map(
-							p => `
+				list.innerHTML = pollutions
+					.map(
+						p => `
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; margin-bottom:8px">
-                        <span style="font-weight:800; font-size:13px; color:var(--text-muted)">МЕТКА #${p.id}</span>
-                        <span class="status-badge ${p.status === 'active' ? 'status-active' : 'status-cleaned'}">${p.status}</span>
+                        <span style="font-weight:800; font-size:13px; color:var(--text-muted)">#${p.id}</span>
+                        <span class="status-badge ${p.status === 'active' ? 'status-active' : 'status-cleaned'}">${t('status_' + p.status)}</span>
                     </div>
                     
                     <div class="user-link">
-                        <span>Автор:</span>
+                        <span>${t('app_title')}:</span>
                         <span class="tg-link" onclick="notifyUser(${p.creator_tg_id})">
                             ${p.creator_name} <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                         </span>
@@ -820,7 +846,7 @@
 											p.cleaner_name ?
 												`
                     <div class="user-link">
-                        <span>Убрал:</span>
+                        <span>${t('status_cleaned')}:</span>
                         <span class="tg-link" onclick="notifyUser(${p.cleaner_tg_id})">
                             ${p.cleaner_name} <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                         </span>
@@ -829,23 +855,23 @@
 										}
 
                     <div class="card-meta">
-                        <div>Уровень ${p.level} • Reward: ${p.reward} UZS</div>
+                        <div>${t('add_level_label')} ${p.level} • ${t('reward')}: ${p.reward} UZS</div>
                         <div style="color:var(--primary); font-weight:700; margin-top:4px">${getLocalizedTypes(p.types)}</div>
                     </div>
-                    <div style="font-size:14px; margin-bottom:8px">${p.description || '<i>Описание отсутствует</i>'}</div>
+                    <div style="font-size:14px; margin-bottom:8px">${p.description || `<i>${t('admin_type_not_specified')}</i>`}</div>
                     <div class="gallery">
                         ${(p.photos || []).map(url => `<img src="${url}" class="photo-thumb" onclick="openPhotoViewer('${url}')">`).join('')}
                     </div>
                     <div class="btn-row">
-                        <button class="btn btn-outline" onclick="editReward(${p.id}, ${p.reward})">Награда</button>
+                        <button class="btn btn-outline" onclick="editReward(${p.id}, ${p.reward})">${t('reward')}</button>
                         <button class="btn btn-danger btn-min" onclick="deletePollution(${p.id})">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                         </button>
                     </div>
                 </div>
             `,
-						)
-						.join('') || '<div class="loading">Пусто</div>'
+					)
+					.join('')
 			}
 
 			async function loadSettings() {
@@ -872,27 +898,23 @@
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ settings }),
 				})
-				if (res) tg.showAlert('Настройки сохранены')
+				if (res) tg.showAlert(t('submit_success'))
 			}
 
 			async function notifyUser(userId) {
-				if (!userId) {
-					tg.showAlert('ID юзера не найден')
-					return
-				}
-				const msg = prompt('Текст сообщения:')
+				if (!userId) return
+				const msg = prompt(t('clean_comment_label'))
 				if (!msg) return
 				const res = await apiFetch('/admin/notify', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ target_tg_id: userId, message: msg }),
 				})
-				if (res && res.status === 'ok') tg.showAlert('Отправлено')
-				else if (res) tg.showAlert('Ошибка: ' + res.message)
+				if (res && res.status === 'ok') tg.showAlert(t('submit_success'))
 			}
 
 			async function editBalance(id, curr) {
-				const v = prompt('Новый баланс:', curr)
+				const v = prompt(t('admin_btn_balance'), curr)
 				if (v === null || isNaN(v)) return
 				const res = await apiFetch(`/admin/users/${id}/balance`, {
 					method: 'POST',
@@ -903,7 +925,7 @@
 			}
 
 			async function editReward(id, curr) {
-				const v = prompt('Новая награда:', curr)
+				const v = prompt(t('reward'), curr)
 				if (v === null || isNaN(v)) return
 				const res = await apiFetch(`/admin/pollutions/${id}/reward`, {
 					method: 'POST',
@@ -914,13 +936,14 @@
 			}
 
 			async function deletePollution(id) {
-				if (!confirm('Удалить метку навсегда?')) return
+				if (!confirm(t('admin_btn_delete'))) return
 				const res = await apiFetch(`/admin/pollutions/${id}`, {
 					method: 'DELETE',
 				})
 				if (res) loadPollutions()
 			}
 
+			translateAdminUI()
 			loadStats()
 		</script>
 	</body>
