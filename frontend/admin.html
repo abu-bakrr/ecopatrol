@@ -477,22 +477,22 @@
 		<div id="section-dashboard" class="section active">
 			<div id="stats-loader" class="loading" data-t="admin_stats_loading">Загрузка статистики...</div>
 			<div id="stats-content" class="stats-grid" style="display: none">
-				<div class="stat-card">
-					<span class="stat-label" data-t="admin_tab_users">Люди</span>
-					<span class="stat-value" id="st-users">0</span>
-				</div>
-				<div class="stat-card">
-					<span class="stat-label" data-t="status_active">На карте</span>
-					<span class="stat-value" id="st-active">0</span>
-				</div>
-				<div class="stat-card">
-					<span class="stat-label" data-t="status_cleaned">Очищено</span>
-					<span class="stat-value" id="st-cleaned">0</span>
-				</div>
-				<div class="stat-card">
-					<span class="stat-label" data-t="admin_stat_rewards">Выплаты</span>
-					<span class="stat-value" id="st-rewards">0 UZS</span>
-				</div>
+						<div class="stat-card">
+							<div class="stat-label" data-t="admin_tab_users">Пользователи</div>
+							<div class="stat-value" id="st-users">0</div>
+						</div>
+						<div class="stat-card">
+							<div class="stat-label" data-t="menu_pollutions">На карте</div>
+							<div class="stat-value" id="st-active">0</div>
+						</div>
+						<div class="stat-card">
+							<div class="stat-label" data-t="status_cleaned">Очищено</div>
+							<div class="stat-value" id="st-cleaned">0</div>
+						</div>
+						<div class="stat-card">
+							<div class="stat-label" data-t="admin_stat_rewards">Выплаты</div>
+							<div class="stat-value" id="st-rewards">0 UZS</div>
+						</div>
 			</div>
 		</div>
 
@@ -836,7 +836,7 @@
                     </div>
                     
                     <div class="user-link">
-                        <span>${t('app_title')}:</span>
+                        <span>${t('admin_label_author')}:</span>
                         <span class="tg-link" onclick="notifyUser(${p.creator_tg_id})">
                             ${p.creator_name} <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                         </span>
@@ -846,7 +846,7 @@
 											p.cleaner_name ?
 												`
                     <div class="user-link">
-                        <span>${t('status_cleaned')}:</span>
+                        <span>${t('admin_label_cleaner')}:</span>
                         <span class="tg-link" onclick="notifyUser(${p.cleaner_tg_id})">
                             ${p.cleaner_name} <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                         </span>

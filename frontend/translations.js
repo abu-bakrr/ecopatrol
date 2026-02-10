@@ -160,6 +160,8 @@ const translations = {
 		admin_settings_debug: 'Jurnal tugmachasini yoqish (Debug)',
 		admin_settings_save: 'Sozlamalarni saqlash',
 		admin_type_not_specified: 'Tur koʻrsatilmagan',
+		admin_label_author: 'Muallif',
+		admin_label_cleaner: 'Tozaladi',
 		admin_delete_confirm:
 			'Haqiqatan ham "{userName}" foydalanuvchisini oʻchirib tashlamoqchimisiz?\n\nBu quyidagilarni butunlay oʻchirib tashlaydi:\n- Foydalanuvchi hisobi\n- Ularning barcha hisobotlari\n- Barcha tegishli rasmlar\n\nUshbu amalni ortga qaytarib boʻlmaydi.',
 	},
@@ -323,6 +325,8 @@ const translations = {
 		admin_settings_debug: 'Включить кнопку логов (Debug)',
 		admin_settings_save: 'Сохранить настройки',
 		admin_type_not_specified: 'Тип не указан',
+		admin_label_author: 'Автор',
+		admin_label_cleaner: 'Убрал',
 		admin_delete_confirm:
 			'Вы уверены, что хотите удалить пользователя "{userName}"?\n\nЭто навсегда удалит:\n- Аккаунт пользователя\n- Все его отчеты о загрязнениях\n- Все связанные фотографии\n\nЭто действие нельзя отменить.',
 	},
@@ -475,6 +479,8 @@ const translations = {
 		admin_settings_debug: 'Enable logs button (Debug)',
 		admin_settings_save: 'Save Settings',
 		admin_type_not_specified: 'Type not specified',
+		admin_label_author: 'Author',
+		admin_label_cleaner: 'Cleaner',
 		admin_delete_confirm:
 			'Are you sure you want to delete user "{userName}"?\n\nThis will permanently delete:\n- User account\n- All their pollution reports\n- All related photos\n\nThis action cannot be undone.',
 	},
