@@ -1016,16 +1016,18 @@ window.showCityStatus = async function showCityStatus() {
         `
 
 		// 3. Render STATIC skeleton (Immediate)
-		renderSheetPage(getTemplate(0, 0, 0, '0', 0, 0, true), false)
+		renderSheetPage(getTemplate('--', '--', '--', '--', 0, 0, true), false)
 
 		// 4. Fetch actual data
 		await Promise.all([fetchAirQuality(), fetchAdminStats(), loadPollutions()])
 
 		const stats = window.cityStats || {}
+		console.log('🔍 cityStats after fetch:', stats)
 		const aqi = stats.aqi !== undefined ? stats.aqi : '--'
 		const temp = stats.temp !== undefined ? Math.round(stats.temp) : '--'
 		const wind = stats.wind !== undefined ? Math.round(stats.wind) : '--'
 		const radiation = stats.radiation || '0.11'
+		console.log('📊 Final values:', { aqi, temp, wind, radiation })
 
 		const totalReports = markers.length || 0
 		const cleanedReports = markers.filter(m =>
