@@ -2043,3 +2043,52 @@ button:active,
 .action-btn:active {
 	transform: scale(0.96);
 }
+
+/* --- SKELETON LOADING v2.2 --- */
+.skeleton {
+	background: linear-gradient(
+		90deg,
+		var(--bg-secondary) 25%,
+		var(--border) 50%,
+		var(--bg-secondary) 75%
+	);
+	background-size: 200% 100%;
+	animation: skeleton-loading 1.5s infinite;
+	border-radius: 8px;
+	width: 100%;
+}
+
+@keyframes skeleton-loading {
+	0% {
+		background-position: 200% 0;
+	}
+	100% {
+		background-position: -200% 0;
+	}
+}
+
+.skeleton-text {
+	height: 16px;
+	margin-bottom: 8px;
+}
+.skeleton-title {
+	height: 24px;
+	width: 60%;
+	margin-bottom: 12px;
+}
+.skeleton-card {
+	background: var(--bg-secondary);
+	border: 1px solid var(--border);
+	border-radius: 16px;
+	padding: 16px;
+	margin-bottom: 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+/* Fixed Height Containers to prevent jump */
+.sheet-min-height {
+	min-height: 50vh; /* Start with half screen */
+	display: flex;
+	flex-direction: column;
+}

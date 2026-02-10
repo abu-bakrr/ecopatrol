@@ -838,6 +838,101 @@ function closeBottomSheet() {
 	sheetHistory = [] // Clear history on close
 }
 
+async function showCityStatus() {
+	// 1. Render Skeleton FIRST to prevent jump
+	const skeletonHtml = `
+        <div class="sheet-min-height">
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h2 style="font-size: 20px; font-weight: 600;">${window.t('menu_pollutions')}</h2>
+                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Tashkent, Uzbekistan</div>
+            </div>
+
+            <!-- AQI Skeleton -->
+            <div class="aqi-circle" style="border-color: var(--border);">
+                 <div class="skeleton" style="width: 50px; height: 32px; margin-bottom: 4px;"></div>
+                 <div class="skeleton" style="width: 30px; height: 12px;"></div>
+            </div>
+
+            <!-- Stats Grid Skeleton -->
+            <div class="city-stats-grid">
+                <div class="stat-card">
+                    <div class="skeleton skeleton-text" style="width: 50%"></div>
+                    <div class="skeleton skeleton-title" style="width: 80%"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="skeleton skeleton-text" style="width: 50%"></div>
+                    <div class="skeleton skeleton-title" style="width: 80%"></div>
+                </div>
+                 <div class="stat-card">
+                    <div class="skeleton skeleton-text" style="width: 50%"></div>
+                    <div class="skeleton skeleton-title" style="width: 80%"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="skeleton skeleton-text" style="width: 50%"></div>
+                    <div class="skeleton skeleton-title" style="width: 80%"></div>
+                </div>
+            </div>
+            
+             <div class="info-card" style="margin-top: auto;">
+                 <div class="skeleton skeleton-text"></div>
+                 <div class="skeleton skeleton-text" style="width: 80%"></div>
+            </div>
+        </div>
+    `
+	renderSheetPage(skeletonHtml, false)
+
+	// 2. Fetch Data (Parallel if possible)
+	await fetchAirQuality()
+	await Promise.all([fetchAdminStats(), loadPollutions()]) // Refresh local pollution count too
+
+	// 3. Render Real Data
+	// Calculate stats
+	const totalReports = markers.length || 0
+	const cleanedReports = markers.filter(m => {
+		const el = m.getElement()
+		return el.classList.contains('cleaned')
+	}).length
+
+	const html = `
+        <div class="sheet-min-height">
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h2 style="font-size: 20px; font-weight: 600;">${window.t('menu_pollutions')}</h2>
+                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Tashkent, Uzbekistan</div>
+            </div>
+
+            <div class="aqi-circle" style="border-color: var(--aqi-color);">
+                <div class="aqi-value">${aqiData.aqi || 'N/A'}</div>
+                <div class="aqi-label">${aqiData.category || 'N/A'}</div>
+            </div>
+
+            <div class="city-stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">${totalReports}</div>
+                    <div class="stat-label">${window.t('total_reports')}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${cleanedReports}</div>
+                    <div class="stat-label">${window.t('cleaned_reports')}</div>
+                </div>
+                 <div class="stat-card">
+                    <div class="stat-value">${adminStats.total_users || 0}</div>
+                    <div class="stat-label">${window.t('total_users')}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${adminStats.active_users || 0}</div>
+                    <div class="stat-label">${window.t('active_users')}</div>
+                </div>
+            </div>
+            
+             <div class="info-card" style="margin-top: auto;">
+                <p>${window.t('city_status_info_1')}</p>
+                <p>${window.t('city_status_info_2')}</p>
+            </div>
+        </div>
+    `
+	renderSheetPage(html, false)
+}
+
 function togglePollutions() {
 	pollutionsVisible = !pollutionsVisible
 	const btn = document.getElementById('toggle-pollutions-btn')
@@ -879,14 +974,27 @@ async function showMyReports() {
 	closeSidebar()
 	if (!currentUser) return
 	const html = `
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-            <h2 style="font-size: 20px; font-weight: 600;">${window.t('menu_reports')}</h2>
-            <div id="reports-loader" class="loader-small" style="display: none;"></div>
+        <div class="sheet-min-height">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                <h2 style="font-size: 20px; font-weight: 600;">${window.t('menu_reports')}</h2>
+            </div>
+            <div id="reports-list" class="reports-list">
+                <!-- Skeleton Loader -->
+                <div class="skeleton-card">
+                    <div class="skeleton skeleton-title"></div>
+                    <div class="skeleton skeleton-text"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton skeleton-title"></div>
+                    <div class="skeleton skeleton-text"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton skeleton-title"></div>
+                    <div class="skeleton skeleton-text"></div>
+                </div>
+            </div>
+            <div style="height: 20px;"></div>
         </div>
-        <div id="reports-list" class="reports-list">
-            <div style="padding: 20px; text-align: center; opacity: 0.5;">${window.t('loading')}</div>
-        </div>
-        <div style="height: 20px;"></div>
     `
 	// Clear history so this becomes the new "root" of the sheet
 	sheetHistory = []
@@ -979,14 +1087,27 @@ async function showMyHistory() {
 	closeSidebar()
 	if (!currentUser) return
 	const html = `
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-            <h2 style="font-size: 20px; font-weight: 600;">История начислений</h2>
-            <div id="history-loader" class="loader-small" style="display: none;"></div>
+        <div class="sheet-min-height">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                <h2 style="font-size: 20px; font-weight: 600;">${window.t('menu_history')}</h2>
+            </div>
+            <div id="history-list" class="history-list">
+                <!-- Skeleton Loader -->
+                <div class="skeleton-card">
+                    <div class="skeleton skeleton-title" style="width: 40%"></div>
+                    <div class="skeleton skeleton-text" style="width: 80%"></div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton skeleton-title" style="width: 40%"></div>
+                    <div class="skeleton skeleton-text" style="width: 80%"></div>
+                </div>
+                 <div class="skeleton-card">
+                    <div class="skeleton skeleton-title" style="width: 40%"></div>
+                    <div class="skeleton skeleton-text" style="width: 80%"></div>
+                </div>
+            </div>
+            <div style="height: 20px;"></div>
         </div>
-        <div id="history-list" class="history-list">
-            <div style="padding: 20px; text-align: center; opacity: 0.5;">Загрузка...</div>
-        </div>
-        <div style="height: 20px;"></div>
     `
 	// Clear history so this becomes the new "root" of the sheet
 	sheetHistory = []
@@ -2048,12 +2169,134 @@ function showReportDetails(r) {
 
 // --- CITY PASSPORT & AIR QUALITY ---
 
+// --- CITY PASSPORT & AIR QUALITY ---
+
 let cityStats = {
 	aqi: '-',
 	pm10: '-',
 	temp: '-',
 	wind: '-',
-	radiation: '0.11 мкЗв/ч', // Simulation
+	radiation: '0.11 мкЗв/ч',
+}
+
+let aqiData = {}
+let adminStats = {}
+
+// Fetch Admin Stats for the passport
+async function fetchAdminStats() {
+	try {
+		const res = await fetch(`${API_URL}/admin/stats`)
+		if (res.ok) {
+			adminStats = await res.json()
+		}
+	} catch (e) {
+		console.error('Failed to fetch admin stats for passport', e)
+	}
+}
+
+async function showCityStatus() {
+	// 1. Render Skeleton FIRST
+	const skeletonHtml = `
+        <div class="sheet-min-height">
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h2 style="font-size: 20px; font-weight: 600;">${window.t('menu_pollutions')}</h2>
+                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Tashkent, Uzbekistan</div>
+            </div>
+
+            <!-- AQI Skeleton -->
+            <div class="aqi-circle" style="border-color: var(--border);">
+                 <div class="skeleton" style="width: 50px; height: 32px; margin-bottom: 4px;"></div>
+                 <div class="skeleton" style="width: 30px; height: 12px;"></div>
+            </div>
+
+            <!-- Stats Grid Skeleton -->
+            <div class="city-stats-grid">
+                <div class="stat-card">
+                    <div class="skeleton skeleton-text" style="width: 50%"></div>
+                    <div class="skeleton skeleton-title" style="width: 80%"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="skeleton skeleton-text" style="width: 50%"></div>
+                    <div class="skeleton skeleton-title" style="width: 80%"></div>
+                </div>
+                 <div class="stat-card">
+                    <div class="skeleton skeleton-text" style="width: 50%"></div>
+                    <div class="skeleton skeleton-title" style="width: 80%"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="skeleton skeleton-text" style="width: 50%"></div>
+                    <div class="skeleton skeleton-title" style="width: 80%"></div>
+                </div>
+            </div>
+        </div>
+    `
+	renderSheetPage(skeletonHtml, false)
+
+	// 2. Fetch Data
+	await fetchAirQuality()
+	await Promise.all([fetchAdminStats(), loadPollutions()])
+
+	// 3. Render Real Data
+	const totalReports = markers.length || 0
+	const cleanedReports = markers.filter(m =>
+		m.getElement().classList.contains('cleaned'),
+	).length
+
+	const html = `
+        <div class="sheet-min-height">
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h2 style="font-size: 20px; font-weight: 600;">${window.t('menu_pollutions')}</h2>
+                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Tashkent, Uzbekistan</div>
+            </div>
+
+            <div class="aqi-circle" style="border-color: ${getAqiColor(cityStats.aqi)};">
+                <div class="aqi-number" style="color: ${getAqiColor(cityStats.aqi)}">${cityStats.aqi || '-'}</div>
+                <div class="aqi-text">${getAqiLabel(cityStats.aqi)}</div>
+            </div>
+
+            <div class="city-stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-icon">📍</div>
+                    <div class="stat-card-label">${window.t('stat_on_map')}</div>
+                    <div class="stat-card-value">${totalReports}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon">✨</div>
+                    <div class="stat-card-label">${window.t('stat_cleaned')}</div>
+                    <div class="stat-card-value">${cleanedReports}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon">👥</div>
+                    <div class="stat-card-label">${window.t('stat_users')}</div>
+                    <div class="stat-card-value">${adminStats.total_users || '-'}</div>
+                </div>
+                 <div class="stat-card">
+                    <div class="stat-card-icon">🎁</div>
+                    <div class="stat-card-label">${window.t('stat_rewards')}</div>
+                    <div class="stat-card-value">${adminStats.total_rewards_paid || 0}</div>
+                </div>
+            </div>
+            
+             <div class="info-card" style="margin-top: 20px; text-align: center; opacity: 0.7;">
+                 <div style="font-size: 12px;">${window.t('city_passport_desc')}</div>
+            </div>
+        </div>
+    `
+	renderSheetPage(html, false)
+}
+
+function getAqiColor(aqi) {
+	if (!aqi || isNaN(aqi)) return 'var(--text-secondary)'
+	if (aqi <= 50) return '#10b981'
+	if (aqi <= 100) return '#f59e0b'
+	return '#ef4444'
+}
+
+function getAqiLabel(aqi) {
+	if (!aqi || isNaN(aqi)) return '---'
+	if (aqi <= 50) return window.t('aqi_good')
+	if (aqi <= 100) return window.t('aqi_moderate')
+	return window.t('aqi_bad')
 }
 
 async function fetchAirQuality() {
