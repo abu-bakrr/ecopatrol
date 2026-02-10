@@ -753,6 +753,10 @@ html {
 	perspective: 1000px;
 }
 
+.bottom-sheet.active {
+	transform: translateY(0);
+}
+
 .bottom-sheet.dragging {
 	transition: none !important;
 }
@@ -1978,20 +1982,6 @@ body.tour-active .tour-spotlight {
 	border-top-color: var(--primary);
 	border-radius: 50%;
 	animation: spin 0.8s linear infinite;
-}
-
-/* --- SMOOTH ANIMATIONS v2.2 --- */
-
-/* Bottom Sheet Animation */
-.bottom-sheet {
-	transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-	will-change: transform;
-}
-
-/* Sidebar Animation - ensure it matches */
-.sidebar {
-	transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-	will-change: transform;
 }
 
 /* Overlays (Global) */
