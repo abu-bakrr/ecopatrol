@@ -52,9 +52,15 @@ const translations = {
 		radiation: 'Radiatsiya',
 		weather: 'Ob-havo',
 		pressure: 'Bosim',
-		wind: 'Shamol',
-
-		// Existing keys...
+		stat_on_map: 'Xaritada',
+		stat_cleaned: 'Tozalangan',
+		stat_users: 'Foydalanuvchilar',
+		stat_rewards: 'Mukofotlar',
+		weather_temp: 'Harorat',
+		weather_wind: 'Shamol',
+		weather_radiation: 'Radiatsiya',
+		city_passport_desc:
+			'Ma’lumotlar ochiq manbalar va foydalanuvchilarning faolligi asosida real vaqt rejimida shakllantiriladi.',
 		types: {
 			plastic: 'Plastik',
 			glass: 'Shisha',
@@ -223,9 +229,15 @@ const translations = {
 		radiation: 'Радиация',
 		weather: 'Погода',
 		pressure: 'Давление',
-		wind: 'Ветер',
-
-		// Existing keys...
+		stat_on_map: 'На карте',
+		stat_cleaned: 'Очищено',
+		stat_users: 'Пользователи',
+		stat_rewards: 'Награды',
+		weather_temp: 'Температура',
+		weather_wind: 'Ветер',
+		weather_radiation: 'Радиация',
+		city_passport_desc:
+			'Данные формируются в реальном времени на основе открытых источников и активности пользователей.',
 		types: {
 			plastic: 'Пластик',
 			glass: 'Стекло',
@@ -385,6 +397,23 @@ const translations = {
 		clean_pollution_comment: 'What did you do? (optional)',
 		clean_pollution_photo: 'Result photo (required)',
 		clean_pollution_submit: 'Confirm and get reward',
+		quality_good: 'Good',
+		quality_moderate: 'Moderate',
+		quality_bad: 'Bad',
+		air_quality: 'Air Quality',
+		city_status_title: 'City Eco-Passport',
+		radiation: 'Radiation',
+		weather: 'Weather',
+		pressure: 'Pressure',
+		stat_on_map: 'On Map',
+		stat_cleaned: 'Cleaned',
+		stat_users: 'Users',
+		stat_rewards: 'Rewards',
+		weather_temp: 'Temp',
+		weather_wind: 'Wind',
+		weather_radiation: 'Radiation',
+		city_passport_desc:
+			'Data is formed in real-time based on open sources and user activity.',
 		types: {
 			plastic: 'Plastic',
 			glass: 'Glass',

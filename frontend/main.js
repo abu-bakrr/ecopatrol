@@ -250,12 +250,37 @@ function renderSheetPage(html, addToHistory = true) {
 		sheetHistory.push(content.innerHTML)
 	}
 
-	// Apply animation class
-	content.classList.remove('sheet-page-anim')
-	void content.offsetWidth // Force reflow
-	content.classList.add('sheet-page-anim')
+	// --- SMOOTH HEIGHT Logic ---
+	// 1. Measure current height
+	const beforeH = content.offsetHeight
 
+	// 2. Apply animation class
+	content.classList.remove('sheet-page-anim')
+
+	// 3. Swap content
 	content.innerHTML = html
+
+	// 4. Measure new height
+	content.style.minHeight = '0'
+	const afterH = content.scrollHeight || 300 // Fallback
+
+	// 5. Apply smooth expansion
+	if (beforeH > 0) {
+		content.style.minHeight = beforeH + 'px'
+		void content.offsetHeight // Force reflow
+		content.style.minHeight = afterH + 'px'
+	} else {
+		content.style.minHeight = '50vh'
+	}
+
+	// 6. Reset after transition
+	setTimeout(() => {
+		if (content.innerHTML === html) {
+			content.style.minHeight = '50vh'
+		}
+	}, 500)
+
+	content.classList.add('sheet-page-anim')
 	openBottomSheet()
 }
 
@@ -873,95 +898,140 @@ function getAqiLabel(aqi) {
 }
 
 window.showCityStatus = async function showCityStatus() {
-	// 1. Render Skeleton FIRST to prevent jump
-	const skeletonHtml = `
-        <div class="sheet-min-height">
+	try {
+		if (typeof closeSidebar === 'function') closeSidebar()
+
+		// 1. Render Skeleton FIRST
+		const skeletonHtml = `
+            <div class="sheet-min-height">
+                <div style="text-align: center; margin-bottom: 24px; opacity: 0.5;">
+                    <div class="skeleton" style="width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 16px;"></div>
+                    <div class="skeleton" style="width: 140px; height: 24px; margin: 0 auto;"></div>
+                </div>
+                <div class="aqi-circle" style="border-color: var(--border); opacity: 0.5;">
+                     <div class="skeleton" style="width: 50px; height: 32px; margin-bottom: 4px;"></div>
+                     <div class="skeleton" style="width: 30px; height: 12px;"></div>
+                </div>
+                <div class="city-stats-grid">
+                    <div class="stat-card"><div class="skeleton" style="height:60px;"></div></div>
+                    <div class="stat-card"><div class="skeleton" style="height:60px;"></div></div>
+                    <div class="stat-card"><div class="skeleton" style="height:60px;"></div></div>
+                    <div class="stat-card"><div class="skeleton" style="height:60px;"></div></div>
+                </div>
+            </div>
+        `
+		renderSheetPage(skeletonHtml, false)
+
+		// 2. Fetch Data
+		await Promise.all([fetchAirQuality(), fetchAdminStats(), loadPollutions()])
+
+		// Safety: Ensure cityStats exists
+		const stats = window.cityStats || {}
+		const aqi = stats.aqi !== undefined ? stats.aqi : '--'
+		const temp = stats.temp !== undefined ? Math.round(stats.temp) : '--'
+		const wind = stats.wind !== undefined ? Math.round(stats.wind) : '--'
+		const radiation = stats.radiation || '0.11 мкЗв/ч'
+
+		// Safety: Pollutions
+		const totalReports = markers.length || 0
+		const cleanedReports = markers.filter(m =>
+			m.getElement().classList.contains('cleaned'),
+		).length
+
+		// Safety: Translation
+		const t = window.t || (k => k)
+
+		// Icons (SVGs)
+		const iconThermometer =
+			'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>'
+		const iconWind =
+			'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>'
+
+		const html = `
+        <div class="info-sheet">
+            <!-- Modern Header -->
             <div style="text-align: center; margin-bottom: 24px;">
-                <h2 style="font-size: 20px; font-weight: 600;">${window.t('menu_pollutions')}</h2>
+                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(59, 130, 246, 0.15)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="buildingGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <rect x="3" y="10" width="4" height="11" fill="url(#buildingGradient2)" rx="0.5"/>
+                        <rect x="8" y="6" width="4" height="15" fill="url(#buildingGradient2)" rx="0.5"/>
+                        <rect x="13" y="8" width="4" height="13" fill="url(#buildingGradient2)" rx="0.5"/>
+                        <rect x="18" y="4" width="3" height="17" fill="url(#buildingGradient2)" rx="0.5"/>
+                        <rect x="9" y="8" width="1" height="1" fill="white" opacity="0.6"/>
+                        <rect x="11" y="8" width="1" height="1" fill="white" opacity="0.6"/>
+                        <rect x="14" y="10" width="1" height="1" fill="white" opacity="0.6"/>
+                        <rect x="16" y="10" width="1" height="1" fill="white" opacity="0.6"/>
+                        <line x1="2" y1="21" x2="22" y2="21" stroke="url(#buildingGradient2)" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin: 0;">${t('city_status_title')}</h2>
                 <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Tashkent, Uzbekistan</div>
             </div>
 
-            <!-- AQI Skeleton -->
-            <div class="aqi-circle" style="border-color: var(--border);">
-                 <div class="skeleton" style="width: 50px; height: 32px; margin-bottom: 4px;"></div>
-                 <div class="skeleton" style="width: 30px; height: 12px;"></div>
+            <!-- Central AQI Display -->
+            <div class="aqi-circle" style="border-color: ${getAqiColor(aqi)}; margin: 0 auto 24px;">
+                <div class="aqi-number" style="color: ${getAqiColor(aqi)}">${aqi || '-'}</div>
+                <div class="aqi-text">${getAqiLabel(aqi)}</div>
             </div>
 
-            <!-- Stats Grid Skeleton -->
+            <!-- Stats Grid -->
             <div class="city-stats-grid">
                 <div class="stat-card">
-                    <div class="skeleton skeleton-text" style="width: 50%"></div>
-                    <div class="skeleton skeleton-title" style="width: 80%"></div>
+                    <div class="stat-card-icon">📍</div>
+                    <div class="stat-card-label">${t('stat_on_map')}</div>
+                    <div class="stat-card-value">${totalReports}</div>
                 </div>
                 <div class="stat-card">
-                    <div class="skeleton skeleton-text" style="width: 50%"></div>
-                    <div class="skeleton skeleton-title" style="width: 80%"></div>
+                    <div class="stat-card-icon">✨</div>
+                    <div class="stat-card-label">${t('stat_cleaned')}</div>
+                    <div class="stat-card-value">${cleanedReports}</div>
                 </div>
                  <div class="stat-card">
-                    <div class="skeleton skeleton-text" style="width: 50%"></div>
-                    <div class="skeleton skeleton-title" style="width: 80%"></div>
+                    <div class="stat-card-icon">👥</div>
+                    <div class="stat-card-label">${t('stat_users')}</div>
+                    <div class="stat-card-value">${adminStats.total_users || '-'}</div>
                 </div>
                 <div class="stat-card">
-                    <div class="skeleton skeleton-text" style="width: 50%"></div>
-                    <div class="skeleton skeleton-title" style="width: 80%"></div>
+                    <div class="stat-card-icon">🎁</div>
+                    <div class="stat-card-label">${t('stat_rewards')}</div>
+                    <div class="stat-card-value">${adminStats.total_rewards_paid || 0}</div>
                 </div>
             </div>
             
-             <div class="info-card" style="margin-top: auto;">
-                 <div class="skeleton skeleton-text"></div>
-                 <div class="skeleton skeleton-text" style="width: 80%"></div>
+            <!-- Weather Details -->
+            <div style="background: var(--bg-secondary); border-radius: 20px; padding: 16px; border: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 24px;">
+                 <div style="text-align: center;">
+                    <div style="color: var(--primary); margin-bottom: 4px;">${iconThermometer}</div>
+                    <div style="font-size: 14px; font-weight: 700;">${temp}°</div>
+                    <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">${t('weather_temp')}</div>
+                 </div>
+                 <div style="text-align: center; border-left: 1px solid var(--border); border-right: 1px solid var(--border);">
+                    <div style="color: var(--primary); margin-bottom: 4px;">${iconWind}</div>
+                    <div style="font-size: 14px; font-weight: 700;">${wind} <small>км/ч</small></div>
+                    <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">${t('weather_wind')}</div>
+                 </div>
+                 <div style="text-align: center;">
+                    <div style="color: #f59e0b; margin-bottom: 4px;">☢️</div>
+                    <div style="font-size: 14px; font-weight: 700;">${radiation}</div>
+                    <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">${t('weather_radiation')}</div>
+                 </div>
+            </div>
+
+             <div class="info-card" style="text-align: center; opacity: 0.7;">
+                 <div style="font-size: 12px;">${t('city_passport_desc')}</div>
             </div>
         </div>
     `
-	renderSheetPage(skeletonHtml, false)
-
-	// 2. Fetch Data (Parallel)
-	await Promise.all([fetchAirQuality(), fetchAdminStats(), loadPollutions()])
-
-	// 3. Render Real Data
-	const totalReports = markers.length || 0
-	const cleanedReports = markers.filter(m =>
-		m.getElement().classList.contains('cleaned'),
-	).length
-
-	const html = `
-        <div class="sheet-min-height">
-            <div style="text-align: center; margin-bottom: 24px;">
-                <h2 style="font-size: 20px; font-weight: 600;">${window.t('menu_pollutions')}</h2>
-                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Tashkent, Uzbekistan</div>
-            </div>
-
-            <div class="aqi-circle" style="border-color: ${getAqiColor(cityStats.aqi)};">
-                <div class="aqi-value" style="color: ${getAqiColor(cityStats.aqi)}">${cityStats.aqi || '-'}</div>
-                <div class="aqi-label">${getAqiLabel(cityStats.aqi)}</div>
-            </div>
-
-            <div class="city-stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value">${totalReports}</div>
-                    <div class="stat-label">${window.t('total_reports')}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${cleanedReports}</div>
-                    <div class="stat-label">${window.t('cleaned_reports')}</div>
-                </div>
-                 <div class="stat-card">
-                    <div class="stat-value">${adminStats.total_users || 0}</div>
-                    <div class="stat-label">${window.t('total_users')}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${adminStats.active_users || 0}</div>
-                    <div class="stat-label">${window.t('active_users')}</div>
-                </div>
-            </div>
-            
-             <div class="info-card" style="margin-top: auto;">
-                <p>${window.t('city_status_info_1')}</p>
-                <p>${window.t('city_status_info_2')}</p>
-            </div>
-        </div>
-    `
-	renderSheetPage(html, false)
+		renderSheetPage(html, false)
+	} catch (e) {
+		console.error('showCityStatus failed', e)
+	}
 }
 
 function togglePollutions() {
@@ -1038,17 +1108,19 @@ async function showMyReports() {
 
 		const list = document.getElementById('reports-list')
 		if (reports.length === 0) {
-			list.innerHTML = `
-                <div style="padding: 40px 20px; text-align: center;">
-                    <div style="font-size: 48px; margin-bottom: 16px;">📄</div>
-                    <div style="font-size: 16px; font-weight: 500; color: var(--text-primary);">${window.t('reports_empty_title')}</div>
-                    <div style="font-size: 14px; color: var(--text-secondary); margin-top: 4px;">${window.t('reports_empty_text')}</div>
+			const emptyHtml = `
+                <div class="empty-state">
+                    <div class="empty-icon">📄</div>
+                    <div class="empty-title">${window.t('reports_empty_title')}</div>
+                    <div class="empty-text">${window.t('reports_empty_text')}</div>
                 </div>
             `
+			renderSheetPage(emptyHtml, false)
 			return
 		}
 
-		list.innerHTML = reports
+		let listHtml = '<div class="reports-list">'
+		listHtml += reports
 			.map((r, idx) => {
 				const date = new Date(r.created_at).toLocaleDateString(
 					currentLang === 'uz' ? 'uz-UZ' : 'ru-RU',
@@ -1149,19 +1221,20 @@ async function showMyHistory() {
 		if (!response.ok) throw new Error('Fetch failed')
 		const history = await response.json()
 
-		const list = document.getElementById('history-list')
 		if (history.length === 0) {
-			list.innerHTML = `
-                <div style="padding: 40px 20px; text-align: center;">
-                    <div style="font-size: 48px; margin-bottom: 16px;">💰</div>
-                    <div style="font-size: 16px; font-weight: 500; color: var(--text-primary);">${window.t('history_empty_title')}</div>
-                    <div style="font-size: 14px; color: var(--text-secondary); margin-top: 4px;">${window.t('history_empty_text')}</div>
+			const emptyHtml = `
+                <div class="empty-state">
+                    <div class="empty-icon">💰</div>
+                    <div class="empty-title">${window.t('history_empty_title')}</div>
+                    <div class="empty-text">${window.t('history_empty_text')}</div>
                 </div>
             `
+			renderSheetPage(emptyHtml, false)
 			return
 		}
 
-		list.innerHTML = history
+		let listHtml = '<div class="history-list">'
+		listHtml += history
 			.map(h => {
 				const date = new Date(h.date).toLocaleDateString('ru-RU', {
 					day: 'numeric',
@@ -1178,29 +1251,39 @@ async function showMyHistory() {
             `
 			})
 			.join('')
+		listHtml += '</div><div style="height: 20px;"></div>'
+
+		const finalHtml = `
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                <h2 style="font-size: 20px; font-weight: 600;">${window.t('menu_history')}</h2>
+            </div>
+            ${listHtml}
+        `
+		renderSheetPage(finalHtml, false)
 	} catch (e) {
 		console.error(e)
-		document.getElementById('history-list').innerHTML = `
+		const errorHtml = `
             <div style="padding: 20px; text-align: center; color: #ef4444;">
                 Ошибка при загрузке данных
             </div>
         `
+		renderSheetPage(errorHtml, false)
 	}
 }
 
 async function showExchange() {
-	closeSidebar()
-	const content = document.getElementById('sheet-content')
-	content.innerHTML = `
+	if (typeof closeSidebar === 'function') closeSidebar()
+
+	// 1. Initial Skeleton Render
+	const skeletonHtml = `
         <div class="sheet-loading">
             <div class="skeleton" style="height: 100px; border-radius: 20px; margin-bottom: 12px;"></div>
             <div class="skeleton" style="height: 100px; border-radius: 20px; margin-bottom: 12px;"></div>
             <div class="skeleton" style="height: 100px; border-radius: 20px;"></div>
         </div>
     `
-	// Clear history so this becomes the new "root" of the sheet
-	sheetHistory = []
-	openBottomSheet()
+	sheetHistory = [] // Reset history for this root page
+	renderSheetPage(skeletonHtml, false)
 
 	try {
 		const response = await fetch(`${API_URL}/pollutions`)
@@ -1213,13 +1296,14 @@ async function showExchange() {
 			.sort((a, b) => (b.level || 0) - (a.level || 0))
 
 		if (activePollutions.length === 0) {
-			content.innerHTML = `
+			const emptyHtml = `
                 <div class="empty-state">
                     <div class="empty-icon">🌟</div>
                     <div class="empty-title">${window.t('city_clean_title')}</div>
                     <div class="empty-text">${window.t('city_clean_text')}</div>
                 </div>
             `
+			renderSheetPage(emptyHtml, false)
 			return
 		}
 
@@ -1243,11 +1327,13 @@ async function showExchange() {
             `
 		})
 		html += '</div><div style="height: 20px;"></div>'
-		content.innerHTML = html
+		renderSheetPage(html, false)
 	} catch (e) {
 		console.error('Exchange error:', e)
-		content.innerHTML =
-			'<div class="error-msg">Не удалось загрузить биржу задач</div>'
+		renderSheetPage(
+			'<div class="error-msg">Не удалось загрузить биржу задач</div>',
+			false,
+		)
 	}
 }
 
@@ -1540,8 +1626,7 @@ function showAddForm() {
 	let selectedTags = []
 	uploadingCount = 0 // Reset global uploading count logic
 
-	const content = document.getElementById('sheet-content')
-	content.innerHTML = `
+	const html = `
         <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">${window.t('add_pollution_title')}</h2>
         
         <div class="form-group">
@@ -1597,7 +1682,7 @@ function showAddForm() {
         <div style="height: 20px;"></div>
     `
 
-	openBottomSheet()
+	renderSheetPage(html)
 
 	// --- Viewer Delegation ---
 	// Handle clicks on photo items (both uploaded and loading, though loading won't have url)
@@ -1611,10 +1696,10 @@ function showAddForm() {
 	})
 
 	// --- Logic for Levels ---
-	content.querySelectorAll('.level-btn').forEach(btn => {
+	document.querySelectorAll('#sheet-content .level-btn').forEach(btn => {
 		btn.addEventListener('click', () => {
-			content
-				.querySelectorAll('.level-btn')
+			document
+				.querySelectorAll('#sheet-content .level-btn')
 				.forEach(b => b.classList.remove('active'))
 			btn.classList.add('active')
 			selectedLevel = parseInt(btn.dataset.level)
@@ -1623,7 +1708,7 @@ function showAddForm() {
 	})
 
 	// --- Logic for Tags ---
-	content.querySelectorAll('.tag-btn').forEach(btn => {
+	document.querySelectorAll('#sheet-content .tag-btn').forEach(btn => {
 		btn.addEventListener('click', () => {
 			btn.classList.toggle('active')
 			const tag = btn.dataset.tag
@@ -1800,7 +1885,7 @@ function showPollutionDetails(pollution) {
 
 	const reward = pollution.level
 
-	content.innerHTML = `
+	const html = `
         <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 16px;">${window.t('detail_view_title')}</h2>
         
         <div style="background: ${levelColors[pollution.level]}20; padding: 10px 14px; border-radius: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
@@ -1854,8 +1939,7 @@ function showPollutionDetails(pollution) {
             ${window.t('clean_confirm_btn')}
         </button>
     `
-
-	openBottomSheet()
+	renderSheetPage(html)
 
 	document.getElementById('clean-btn').addEventListener('click', showCleanForm)
 }
@@ -1864,7 +1948,7 @@ function showCleanForm() {
 	uploadedPhotos = []
 	const content = document.getElementById('sheet-content')
 
-	content.innerHTML = `
+	const html = `
         <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">${window.t('clean_form_title')}</h2>
         
         <div class="form-group">
@@ -1890,6 +1974,8 @@ function showCleanForm() {
             ${window.t('clean_submit_btn')}
         </button>
     `
+
+	renderSheetPage(html)
 
 	document
 		.getElementById('upload-after-trigger')
@@ -2003,15 +2089,17 @@ async function showLeaderboard() {
 		const response = await fetch(`${API_URL}/leaderboard`)
 		const users = await response.json()
 
-		const list = document.getElementById('leaderboard-list')
-		list.classList.remove('loading')
-
 		if (users.length === 0) {
-			list.innerHTML = `<p style="text-align: center; opacity: 0.5;">${window.t('city_clean_text')}</p>`
+			const emptyHtml = `<p style="text-align: center; opacity: 0.5;">${window.t('city_clean_text')}</p>`
+			const finalHtml = `
+                <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">${window.t('menu_leaderboard')}</h2>
+                ${emptyHtml}
+            `
+			renderSheetPage(finalHtml, false)
 			return
 		}
 
-		list.innerHTML = users
+		let listHtml = users
 			.map(
 				(u, index) => `
             <div class="history-item" style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-secondary); border-radius: 12px; margin-bottom: 8px;">
@@ -2025,11 +2113,20 @@ async function showLeaderboard() {
         `,
 			)
 			.join('')
+
+		const finalHtml = `
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">${window.t('menu_leaderboard')}</h2>
+            <div id="leaderboard-list">${listHtml}</div>
+        `
+		renderSheetPage(finalHtml, false)
 	} catch (e) {
 		if (navigator.onLine) console.error('Leaderboard error:', e)
-		const list = document.getElementById('leaderboard-list')
-		if (list)
-			list.innerHTML = `<p style="color: #ef4444;">${window.t('submit_error')}</p>`
+		const errorHtml = `<p style="color: #ef4444;">${window.t('submit_error')}</p>`
+		const finalHtml = `
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">${window.t('menu_leaderboard')}</h2>
+            ${errorHtml}
+        `
+		renderSheetPage(finalHtml, false)
 	}
 }
 
