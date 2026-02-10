@@ -875,13 +875,8 @@ function closeBottomSheet() {
 }
 
 // --- CITY PASSPORT STATE ---
-let cityStats = {
-	aqi: '-',
-	pm10: '-',
-	temp: '-',
-	wind: '-',
-	radiation: '0.11 мкЗв/ч',
-}
+// NOTE: cityStats is already declared globally as window.cityStats at the top of the file
+// We use window.cityStats to avoid scope issues
 let aqiData = {}
 let adminStats = {}
 
@@ -2367,8 +2362,8 @@ async function fetchAirQuality() {
 			console.log(`✅ Parsed AQI: ${aqi}, PM10: ${pm10}`)
 
 			// Update global city stats
-			cityStats.aqi = aqi
-			cityStats.pm10 = pm10
+			window.cityStats.aqi = aqi
+			window.cityStats.pm10 = pm10
 
 			updateAirWidget(aqi)
 		} else {
@@ -2391,8 +2386,8 @@ async function fetchAirQuality() {
 		console.log('🌤️ Weather API Response:', JSON.stringify(weatherData))
 
 		if (weatherData.current) {
-			cityStats.temp = weatherData.current.temperature_2m
-			cityStats.wind = weatherData.current.wind_speed_10m
+			window.cityStats.temp = weatherData.current.temperature_2m
+			window.cityStats.wind = weatherData.current.wind_speed_10m
 			console.log(
 				`✅ Parsed Weather - Temp: ${weatherData.current.temperature_2m}°C, Wind: ${weatherData.current.wind_speed_10m} km/h`,
 			)
