@@ -945,9 +945,9 @@ window.showCityStatus = async function showCityStatus() {
 		) => `
             <div style="flex: 1; display: flex; flex-direction: column;">
                 <div class="info-sheet" style="flex: 1;">
-                <div style="text-align: center; margin-bottom: 24px;">
-                    <div style="width: 60px; height: 60px; background: var(--bg-secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border: 1px solid var(--border);">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <div style="text-align: center; margin-bottom: 24px; height: 110px;">
+                    <div style="width: 56px; height: 56px; background: var(--bg-secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; border: 1px solid var(--border);">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <defs>
                                 <linearGradient id="buildingGradFinal" x1="0%" y1="0%" x2="100%" y2="100%">
                                     <stop offset="0%" style="stop-color:var(--primary);stop-opacity:1" />
@@ -961,75 +961,75 @@ window.showCityStatus = async function showCityStatus() {
                             <line x1="2" y1="21" x2="22" y2="21" stroke="var(--border)" stroke-width="1.5" stroke-linecap="round"/>
                         </svg>
                     </div>
-                    <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin: 0;">${t('city_status_title')}</h2>
-                    <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Tashkent, Uzbekistan</div>
+                    <h2 style="font-size: 19px; font-weight: 700; color: var(--text-primary); margin: 0; line-height: 1.2; height: 23px; overflow: hidden;">${t('city_status_title')}</h2>
+                    <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px; height: 16px; line-height: 16px; overflow: hidden;">Tashkent, Uzbekistan</div>
                 </div>
 
-                <div style="background: linear-gradient(135deg, ${isLoading ? 'var(--bg-secondary)' : getAqiColor(aqi) + '10'}, var(--bg-secondary)); border-radius: 20px; padding: 24px; border: 1px solid ${isLoading ? 'var(--border)' : getAqiColor(aqi) + '30'}; margin-bottom: 20px; text-align: center;">
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${isLoading ? 'var(--text-secondary)' : getAqiColor(aqi)}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/></svg>
-                        <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary);">${t('air_quality')}</span>
+                <div style="background: linear-gradient(135deg, ${isLoading ? 'var(--bg-secondary)' : getAqiColor(aqi) + '10'}, var(--bg-secondary)); border-radius: 20px; padding: 20px; border: 1px solid ${isLoading ? 'var(--border)' : getAqiColor(aqi) + '30'}; margin-bottom: 20px; text-align: center; height: 170px; display: flex; flex-direction: column; justify-content: center;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px; height: 18px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${isLoading ? 'var(--text-secondary)' : getAqiColor(aqi)}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/></svg>
+                        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); line-height: 1;">${t('air_quality')}</span>
                     </div>
-                    <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 48px; font-weight: 900; height: 48px; border-radius: 8px; color: ${isLoading ? 'transparent' : getAqiColor(aqi)}; line-height: 48px; letter-spacing: -2px;">
+                    <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 48px; font-weight: 900; height: 52px; border-radius: 8px; color: ${isLoading ? 'transparent' : getAqiColor(aqi)}; line-height: 52px; letter-spacing: -2px; margin: 4px 0;">
                         ${isLoading ? '00' : aqi || '--'}
                     </div>
-                    <div style="margin-top: 10px;">
+                    <div style="margin-top: 6px; height: 26px;">
                         <span class="${isLoading ? 'skeleton' : ''}" style="display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 800; min-width: 100px; height: 22px; line-height: 14px; background: ${isLoading ? 'var(--bg-secondary)' : getAqiColor(aqi) + '18'}; color: ${isLoading ? 'transparent' : getAqiColor(aqi)}; border: 1px solid ${isLoading ? 'var(--border)' : getAqiColor(aqi) + '25'}; white-space: nowrap;">
                             ${isLoading ? 'Label Content' : getAqiLabel(aqi)}
                         </span>
                     </div>
-                    <div style="font-size: 10px; color: var(--text-secondary); margin-top: 8px; opacity: 0.6;">European AQI</div>
+                    <div style="font-size: 10px; color: var(--text-secondary); margin-top: 8px; opacity: 0.6; height: 12px; line-height: 12px;">European AQI</div>
                 </div>
 
-                <div class="city-stats-grid" style="grid-template-columns: 1fr 1fr;">
-                    <div class="stat-card">
-                        <div class="stat-card-icon" style="color: var(--primary);">${iconMap}</div>
-                        <div class="stat-card-label">${t('stat_on_map')}</div>
-                        <div class="stat-value ${isLoading ? 'skeleton' : ''}" style="min-width: 50px; height: 34px; line-height: 34px; border-radius: 4px; margin: 4px auto 0; color: ${isLoading ? 'transparent' : 'var(--primary)'};">
+                <div class="city-stats-grid" style="grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; height: 94px;">
+                    <div class="stat-card" style="margin: 0; height: 94px; display: flex; flex-direction: column; justify-content: center; padding: 12px;">
+                        <div class="stat-card-icon" style="color: var(--primary); height: 18px;">${iconMap}</div>
+                        <div class="stat-card-label" style="height: 16px; line-height: 16px; overflow: hidden; white-space: nowrap;">${t('stat_on_map')}</div>
+                        <div class="stat-value ${isLoading ? 'skeleton' : ''}" style="min-width: 50px; height: 32px; line-height: 32px; border-radius: 4px; margin: 2px auto 0; color: ${isLoading ? 'transparent' : 'var(--primary)'}; font-size: 24px;">
                             ${isLoading ? '000' : total}
                         </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-card-icon" style="color: var(--primary);">${iconClean}</div>
-                        <div class="stat-card-label">${t('stat_cleaned')}</div>
-                        <div class="stat-value ${isLoading ? 'skeleton' : ''}" style="min-width: 50px; height: 34px; line-height: 34px; border-radius: 4px; margin: 4px auto 0; color: ${isLoading ? 'transparent' : 'var(--primary)'};">
+                    <div class="stat-card" style="margin: 0; height: 94px; display: flex; flex-direction: column; justify-content: center; padding: 12px;">
+                        <div class="stat-card-icon" style="color: var(--primary); height: 18px;">${iconClean}</div>
+                        <div class="stat-card-label" style="height: 16px; line-height: 16px; overflow: hidden; white-space: nowrap;">${t('stat_cleaned')}</div>
+                        <div class="stat-value ${isLoading ? 'skeleton' : ''}" style="min-width: 50px; height: 32px; line-height: 32px; border-radius: 4px; margin: 2px auto 0; color: ${isLoading ? 'transparent' : 'var(--primary)'}; font-size: 24px;">
                             ${isLoading ? '000' : cleaned}
                         </div>
                     </div>
                 </div>
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 24px;">
-                     <div style="text-align: center; background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(59,130,246,0.02)); border-radius: 16px; padding: 16px 8px; border: 1px solid rgba(59,130,246,0.15);">
-                        <div style="width: 40px; height: 40px; background: rgba(59,130,246,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 24px; height: 106px;">
+                     <div style="text-align: center; background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(59,130,246,0.02)); border-radius: 16px; padding: 12px 6px; border: 1px solid rgba(59,130,246,0.15); height: 106px; display: flex; flex-direction: column; justify-content: center;">
+                        <div style="width: 36px; height: 36px; background: rgba(59,130,246,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
                         </div>
-                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 20px; font-weight: 800; height: 24px; line-height: 24px; border-radius: 6px; color: ${isLoading ? 'transparent' : 'var(--text-primary)'};">
+                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 18px; font-weight: 800; height: 22px; line-height: 22px; border-radius: 6px; color: ${isLoading ? 'transparent' : 'var(--text-primary)'};">
                             ${isLoading ? '00°C' : `${temp}°C`}
                         </div>
-                        <div style="font-size: 10px; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 6px; font-weight: 700;">${t('weather_temp')}</div>
+                        <div style="font-size: 9px; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; font-weight: 700; height: 11px; line-height: 11px;">${t('weather_temp')}</div>
                      </div>
-                     <div style="text-align: center; background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(6,182,212,0.02)); border-radius: 16px; padding: 16px 8px; border: 1px solid rgba(6,182,212,0.15);">
-                        <div style="width: 40px; height: 40px; background: rgba(6,182,212,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
+                     <div style="text-align: center; background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(6,182,212,0.02)); border-radius: 16px; padding: 12px 6px; border: 1px solid rgba(6,182,212,0.15); height: 106px; display: flex; flex-direction: column; justify-content: center;">
+                        <div style="width: 36px; height: 36px; background: rgba(6,182,212,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
                         </div>
-                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 20px; font-weight: 800; height: 24px; line-height: 24px; border-radius: 6px; color: ${isLoading ? 'transparent' : 'var(--text-primary)'};">
-                            ${isLoading ? '00 km/h' : `${wind} <small style="font-size: 11px; font-weight: 600; vertical-align: baseline;">km</small>`}
+                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 18px; font-weight: 800; height: 22px; line-height: 22px; border-radius: 6px; color: ${isLoading ? 'transparent' : 'var(--text-primary)'};">
+                            ${isLoading ? '00 km/h' : `${wind} <small style="font-size: 10px; font-weight: 600; vertical-align: baseline;">km</small>`}
                         </div>
-                        <div style="font-size: 10px; color: #06b6d4; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 6px; font-weight: 700;">${t('weather_wind')}</div>
+                        <div style="font-size: 9px; color: #06b6d4; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; font-weight: 700; height: 11px; line-height: 11px;">${t('weather_wind')}</div>
                      </div>
-                     <div style="text-align: center; background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.02)); border-radius: 16px; padding: 16px 8px; border: 1px solid rgba(245,158,11,0.15);">
-                        <div style="width: 40px; height: 40px; background: rgba(245,158,11,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 2v20"/><path d="M2 12h20"/><circle cx="12" cy="12" r="3" fill="#f59e0b"/></svg>
+                     <div style="text-align: center; background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.02)); border-radius: 16px; padding: 12px 6px; border: 1px solid rgba(245,158,11,0.15); height: 106px; display: flex; flex-direction: column; justify-content: center;">
+                        <div style="width: 36px; height: 36px; background: rgba(245,158,11,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 2v20"/><path d="M2 12h20"/><circle cx="12" cy="12" r="3" fill="#f59e0b"/></svg>
                         </div>
-                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 20px; font-weight: 800; height: 24px; line-height: 24px; border-radius: 6px; color: ${isLoading ? 'transparent' : 'var(--text-primary)'};">
-                            ${isLoading ? '0.00 μSv' : `${rad} <small style="font-size: 11px; font-weight: 600; vertical-align: baseline;">μS</small>`}
+                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 18px; font-weight: 800; height: 22px; line-height: 22px; border-radius: 6px; color: ${isLoading ? 'transparent' : 'var(--text-primary)'};">
+                            ${isLoading ? '0.00 μSv' : `${rad} <small style="font-size: 10px; font-weight: 600; vertical-align: baseline;">μS</small>`}
                         </div>
-                        <div style="font-size: 10px; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 6px; font-weight: 700;">${t('weather_radiation')}</div>
+                        <div style="font-size: 9px; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; font-weight: 700; height: 11px; line-height: 11px;">${t('weather_radiation')}</div>
                      </div>
                 </div>
 
-                 <div style="text-align: center; opacity: 0.4; padding: 0 16px;">
-                     <div style="font-size: 11px; line-height: 1.5;">${t('city_passport_desc')}</div>
+                 <div style="text-align: center; opacity: 0.4; padding: 0 16px; height: 34px;">
+                     <div style="font-size: 11px; line-height: 1.5; height: 34px; overflow: hidden;">${t('city_passport_desc')}</div>
                 </div>
             </div>
         </div>
