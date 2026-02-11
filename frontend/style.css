@@ -752,6 +752,10 @@ html {
 	backface-visibility: hidden;
 }
 
+.detail-sheet {
+	z-index: 600; /* Over main bottom-sheet (500) */
+}
+
 .fade-in {
 	animation: fadeInOpacity 0.3s ease-in;
 }
