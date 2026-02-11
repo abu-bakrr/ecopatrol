@@ -249,13 +249,22 @@ function initBottomSheetDrag() {
 // Navigation History for Bottom Sheet
 let sheetHistory = []
 
-function renderSheetPage(html, addToHistory = true) {
+function renderSheetPage(html, addToHistory = true, context = null) {
 	const content = document.getElementById('sheet-content')
 	const sheet = document.getElementById('bottom-sheet')
 	if (!content || !sheet) return
 
+	if (context) {
+		content.dataset.context = context
+	} else {
+		delete content.dataset.context
+	}
+
 	if (addToHistory && content.innerHTML.trim() !== '') {
-		sheetHistory.push(content.innerHTML)
+		sheetHistory.push({
+			html: content.innerHTML,
+			context: content.dataset.context,
+		})
 	}
 
 	// 1. Check if sheet is currently OPEN
@@ -301,7 +310,7 @@ function renderSheetPage(html, addToHistory = true) {
 function goBackInSheet() {
 	if (sheetHistory.length > 0) {
 		const prev = sheetHistory.pop()
-		renderSheetPage(prev, false)
+		renderSheetPage(prev.html, false, prev.context)
 	}
 }
 
@@ -862,9 +871,11 @@ function openBottomSheet() {
 }
 
 function closeBottomSheet() {
-	// SMART NAVIGATION: If there is history (e.g. we are in details and came from list),
-	// go back to previous page instead of closing the entire sheet.
-	if (sheetHistory.length > 0) {
+	const content = document.getElementById('sheet-content')
+	const context = content ? content.dataset.context : null
+
+	// ONLY special case: if we are in my-report-details, go back to my-reports-list
+	if (context === 'my-report-details' && sheetHistory.length > 0) {
 		goBackInSheet()
 		return
 	}
@@ -2330,7 +2341,7 @@ function showReportDetails(r) {
             </button>
         </div>
     `
-	renderSheetPage(html)
+	renderSheetPage(html, true, 'my-report-details')
 }
 
 async function fetchAirQuality() {
