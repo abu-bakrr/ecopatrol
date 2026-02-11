@@ -744,11 +744,26 @@ html {
 	z-index: 500;
 	transform: translateY(100%);
 	transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
-	height: 85vh; /* Fixed height to prevent jitter */
-	display: flex;
-	flex-direction: column;
-	will-change: transform;
+	max-height: 92vh;
+	overflow-y: auto;
+	display: block; /* Back to block for auto-height */
+	will-change: transform, height;
 	backface-visibility: hidden;
+}
+
+.fade-in {
+	animation: fadeInOpacity 0.3s ease-in;
+}
+
+@keyframes fadeInOpacity {
+	0% {
+		opacity: 0;
+		transform: translateY(5px);
+	}
+	100% {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 .bottom-sheet.active {

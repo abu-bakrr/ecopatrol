@@ -284,6 +284,11 @@ function renderSheetPage(html, addToHistory = true, context = null) {
 	// 3. Swap content
 	content.innerHTML = html
 
+	// 4. Trigger Fade-in
+	content.classList.remove('fade-in')
+	void content.offsetWidth // Force reflow
+	content.classList.add('fade-in')
+
 	// 4. Measure new height
 	content.style.height = 'auto'
 	const afterH = content.scrollHeight || 300
@@ -938,7 +943,7 @@ window.showCityStatus = async function showCityStatus() {
 			cleaned,
 			isLoading = false,
 		) => `
-            <div class="sheet-min-height">
+            <div style="flex: 1;">
                 <div class="info-sheet" style="flex: 1;">
                 <div style="text-align: center; margin-bottom: 24px;">
                     <div style="width: 60px; height: 60px; background: var(--bg-secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border: 1px solid var(--border);">
@@ -1120,27 +1125,25 @@ async function showMyReports() {
 	closeSidebar()
 	if (!currentUser) return
 	const html = `
-        <div class="sheet-min-height">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                <h2 style="font-size: 20px; font-weight: 600;">${window.t('menu_reports')}</h2>
-            </div>
-            <div id="reports-list" class="reports-list">
-                <!-- Skeleton Loader -->
-                <div class="skeleton-card">
-                    <div class="skeleton skeleton-title"></div>
-                    <div class="skeleton skeleton-text"></div>
-                </div>
-                <div class="skeleton-card">
-                    <div class="skeleton skeleton-title"></div>
-                    <div class="skeleton skeleton-text"></div>
-                </div>
-                <div class="skeleton-card">
-                    <div class="skeleton skeleton-title"></div>
-                    <div class="skeleton skeleton-text"></div>
-                </div>
-            </div>
-            <div style="height: 20px;"></div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+            <h2 style="font-size: 20px; font-weight: 600;">${window.t('menu_reports')}</h2>
         </div>
+        <div id="reports-list" class="reports-list">
+            <!-- Skeleton Loader -->
+            <div class="skeleton-card">
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-text"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-text"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-text"></div>
+            </div>
+        </div>
+        <div style="height: 20px;"></div>
     `
 	// Clear history so this becomes the new "root" of the sheet
 	sheetHistory = []
@@ -1241,27 +1244,25 @@ async function showMyHistory() {
 	closeSidebar()
 	if (!currentUser) return
 	const html = `
-        <div class="sheet-min-height">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                <h2 style="font-size: 20px; font-weight: 600;">${window.t('menu_history')}</h2>
-            </div>
-            <div id="history-list" class="history-list">
-                <!-- Skeleton Loader -->
-                <div class="skeleton-card">
-                    <div class="skeleton skeleton-title" style="width: 40%"></div>
-                    <div class="skeleton skeleton-text" style="width: 80%"></div>
-                </div>
-                <div class="skeleton-card">
-                    <div class="skeleton skeleton-title" style="width: 40%"></div>
-                    <div class="skeleton skeleton-text" style="width: 80%"></div>
-                </div>
-                 <div class="skeleton-card">
-                    <div class="skeleton skeleton-title" style="width: 40%"></div>
-                    <div class="skeleton skeleton-text" style="width: 80%"></div>
-                </div>
-            </div>
-            <div style="height: 20px;"></div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+            <h2 style="font-size: 20px; font-weight: 600;">${window.t('menu_history')}</h2>
         </div>
+        <div id="history-list" class="history-list">
+            <!-- Skeleton Loader -->
+            <div class="skeleton-card">
+                <div class="skeleton skeleton-title" style="width: 40%"></div>
+                <div class="skeleton skeleton-text" style="width: 80%"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton skeleton-title" style="width: 40%"></div>
+                <div class="skeleton skeleton-text" style="width: 80%"></div>
+            </div>
+                <div class="skeleton-card">
+                <div class="skeleton skeleton-title" style="width: 40%"></div>
+                <div class="skeleton skeleton-text" style="width: 80%"></div>
+            </div>
+        </div>
+        <div style="height: 20px;"></div>
     `
 	// Clear history so this becomes the new "root" of the sheet
 	sheetHistory = []
@@ -1307,12 +1308,10 @@ async function showMyHistory() {
 		listHtml += '</div><div style="height: 20px;"></div>'
 
 		const finalHtml = `
-            <div class="sheet-min-height">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                    <h2 style="font-size: 20px; font-weight: 600;">${window.t('menu_history')}</h2>
-                </div>
-                ${listHtml}
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                <h2 style="font-size: 20px; font-weight: 600;">${window.t('menu_history')}</h2>
             </div>
+            ${listHtml}
         `
 		renderSheetPage(finalHtml, false)
 	} catch (e) {
@@ -1331,13 +1330,11 @@ async function showExchange() {
 
 	// 1. Initial Skeleton Render
 	const skeletonHtml = `
-        <div class="sheet-min-height">
-            <div class="sheet-loading" style="flex: 1;">
+            <div class="sheet-loading">
                 <div class="skeleton" style="height: 100px; border-radius: 20px; margin-bottom: 12px;"></div>
                 <div class="skeleton" style="height: 100px; border-radius: 20px; margin-bottom: 12px;"></div>
                 <div class="skeleton" style="height: 100px; border-radius: 20px;"></div>
             </div>
-        </div>
     `
 	sheetHistory = [] // Reset history for this root page
 	renderSheetPage(skeletonHtml, false, 'exchange-root')
@@ -1385,7 +1382,7 @@ async function showExchange() {
                 </div>
             `
 		})
-		const finalHtml = `<div class="sheet-min-height">${html}</div><div style="height: 20px;"></div>`
+		const finalHtml = `${html}<div style="height: 20px;"></div>`
 		renderSheetPage(finalHtml, false, 'exchange-root')
 	} catch (e) {
 		console.error('Exchange error:', e)
@@ -1686,62 +1683,60 @@ function showAddForm() {
 	let uploadingCount = 0 // Reset global uploading count logic
 
 	const html = `
-        <div class="sheet-min-height">
-            <div style="flex: 1;">
-                <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">${window.t('add_pollution_title')}</h2>
-                
-                <div class="form-group">
-                    <label class="form-label">${window.t('add_level_label')}</label>
-                    <div class="level-selector">
-                        <button class="level-btn active level-1" data-level="1">${window.t('level_low')}</button>
-                        <button class="level-btn level-2" data-level="2">${window.t('level_medium')}</button>
-                        <button class="level-btn level-3" data-level="3">${window.t('level_high')}</button>
-                    </div>
+        <div style="flex: 1;">
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">${window.t('add_pollution_title')}</h2>
+            
+            <div class="form-group">
+                <label class="form-label">${window.t('add_level_label')}</label>
+                <div class="level-selector">
+                    <button class="level-btn active level-1" data-level="1">${window.t('level_low')}</button>
+                    <button class="level-btn level-2" data-level="2">${window.t('level_medium')}</button>
+                    <button class="level-btn level-3" data-level="3">${window.t('level_high')}</button>
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label class="form-label">${window.t('add_tags_label')}</label>
-                    <div class="tag-selector">
-                        <button class="tag-btn" data-tag="plastic">${window.t('types.plastic')}</button>
-                        <button class="tag-btn" data-tag="glass">${window.t('types.glass')}</button>
-                        <button class="tag-btn" data-tag="paper">${window.t('types.paper')}</button>
-                        <button class="tag-btn" data-tag="metal">${window.t('types.metal')}</button>
-                        <button class="tag-btn" data-tag="organic">${window.t('types.organic')}</button>
-                        <button class="tag-btn" data-tag="construction">${window.t('types.construction')}</button>
-                        <button class="tag-btn" data-tag="electronic">${window.t('types.electronic')}</button>
-                        <button class="tag-btn" data-tag="tires">${window.t('types.tires')}</button>
-                        <button class="tag-btn" data-tag="hazardous">${window.t('types.hazardous')}</button>
-                        <button class="tag-btn" data-tag="bulky">${window.t('types.bulky')}</button>
-                        <button class="tag-btn" data-tag="chemical">${window.t('types.chemical')}</button>
-                        <button class="tag-btn" data-tag="other">${window.t('types.other')}</button>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" data-t="add_pollution_desc">${window.t('add_pollution_desc')}</label>
-                    <textarea class="form-textarea" id="pollution-desc" rows="3" placeholder="${window.t('add_pollution_desc')}"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">${window.t('add_pollution_photo')}</label>
-                    <div class="file-upload" id="upload-trigger">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 8px; opacity: 0.5;">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <polyline points="21 15 16 10 5 21"/>
-                        </svg>
-                        <p style="color: var(--text-secondary); font-size: 14px;">${window.t('add_photo_click')}</p>
-                        <input type="file" id="photo-input" accept="image/*" multiple>
-                    </div>
-                    <div id="photo-preview" class="photo-grid"></div>
+            <div class="form-group">
+                <label class="form-label">${window.t('add_tags_label')}</label>
+                <div class="tag-selector">
+                    <button class="tag-btn" data-tag="plastic">${window.t('types.plastic')}</button>
+                    <button class="tag-btn" data-tag="glass">${window.t('types.glass')}</button>
+                    <button class="tag-btn" data-tag="paper">${window.t('types.paper')}</button>
+                    <button class="tag-btn" data-tag="metal">${window.t('types.metal')}</button>
+                    <button class="tag-btn" data-tag="organic">${window.t('types.organic')}</button>
+                    <button class="tag-btn" data-tag="construction">${window.t('types.construction')}</button>
+                    <button class="tag-btn" data-tag="electronic">${window.t('types.electronic')}</button>
+                    <button class="tag-btn" data-tag="tires">${window.t('types.tires')}</button>
+                    <button class="tag-btn" data-tag="hazardous">${window.t('types.hazardous')}</button>
+                    <button class="tag-btn" data-tag="bulky">${window.t('types.bulky')}</button>
+                    <button class="tag-btn" data-tag="chemical">${window.t('types.chemical')}</button>
+                    <button class="tag-btn" data-tag="other">${window.t('types.other')}</button>
                 </div>
             </div>
             
-            <div style="padding-bottom: 24px;">
-                <button class="btn btn-primary" style="width: 100%; height: 60px; font-size: 17px; font-weight: 700; border-radius: 18px;" id="submit-pollution">
-                    ${window.t('add_pollution_submit')}
-                </button>
+            <div class="form-group">
+                <label class="form-label" data-t="add_pollution_desc">${window.t('add_pollution_desc')}</label>
+                <textarea class="form-textarea" id="pollution-desc" rows="3" placeholder="${window.t('add_pollution_desc')}"></textarea>
             </div>
+            
+            <div class="form-group">
+                <label class="form-label">${window.t('add_pollution_photo')}</label>
+                <div class="file-upload" id="upload-trigger">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 8px; opacity: 0.5;">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                    <p style="color: var(--text-secondary); font-size: 14px;">${window.t('add_photo_click')}</p>
+                    <input type="file" id="photo-input" accept="image/*" multiple>
+                </div>
+                <div id="photo-preview" class="photo-grid"></div>
+            </div>
+        </div>
+        
+        <div style="padding-bottom: 24px;">
+            <button class="btn btn-primary" style="width: 100%; height: 60px; font-size: 17px; font-weight: 700; border-radius: 18px;" id="submit-pollution">
+                ${window.t('add_pollution_submit')}
+            </button>
         </div>
     `
 
@@ -1959,9 +1954,7 @@ function showPollutionDetails(pollution) {
 	const reward = pollution.level
 
 	const html = `
-        <div class="sheet-min-height">
-            <div style="flex: 1;">
-                <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 16px;">${window.t('detail_view_title')}</h2>
+        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 16px;">${window.t('detail_view_title')}</h2>
         
         <div style="background: ${levelColors[pollution.level]}20; padding: 10px 14px; border-radius: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
             <span style="color: ${levelColors[pollution.level]}; font-weight: 600; font-size: 14px;">
@@ -2014,7 +2007,6 @@ function showPollutionDetails(pollution) {
                 <button class="btn btn-primary" style="width: 100%; height: 60px; font-size: 17px; font-weight: 700; border-radius: 18px;" id="clean-btn">
                     ${window.t('clean_confirm_btn')}
                 </button>
-            </div>
         </div>
     `
 	renderSheetPage(html)
@@ -2027,35 +2019,31 @@ function showCleanForm() {
 	const content = document.getElementById('sheet-content')
 
 	const html = `
-        <div class="sheet-min-height">
-            <div style="flex: 1;">
-                <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">${window.t('clean_form_title')}</h2>
-                
-                <div class="form-group">
-                    <label class="form-label">${window.t('clean_photo_label')}</label>
-                    <div class="file-upload" id="upload-after-trigger">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 8px; opacity: 0.5;">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <polyline points="21 15 16 10 5 21"/>
-                        </svg>
-                        <p style="color: var(--text-secondary); font-size: 14px;">${window.t('clean_photo_desc')}</p>
-                        <input type="file" id="photo-input-after" accept="image/*" multiple>
-                    </div>
-                    <div id="photo-preview-after" class="photo-grid"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">${window.t('clean_comment_label')}</label>
-                    <textarea class="form-textarea" id="clean-comment" rows="2" placeholder="${window.t('clean_comment_placeholder')}"></textarea>
-                </div>
+        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">${window.t('clean_form_title')}</h2>
+        
+        <div class="form-group">
+            <label class="form-label">${window.t('clean_photo_label')}</label>
+            <div class="file-upload" id="upload-after-trigger">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 8px; opacity: 0.5;">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                <p style="color: var(--text-secondary); font-size: 14px;">${window.t('clean_photo_desc')}</p>
+                <input type="file" id="photo-input-after" accept="image/*" multiple>
             </div>
-            
-            <div style="padding-bottom: 24px;">
-                <button class="btn btn-primary" style="width: 100%; height: 60px; font-size: 17px; font-weight: 700; border-radius: 18px;" id="submit-clean">
-                    ${window.t('clean_submit_btn')}
-                </button>
-            </div>
+            <div id="photo-preview-after" class="photo-grid"></div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">${window.t('clean_comment_label')}</label>
+            <textarea class="form-textarea" id="clean-comment" rows="2" placeholder="${window.t('clean_comment_placeholder')}"></textarea>
+        </div>
+        
+        <div style="padding-bottom: 24px;">
+            <button class="btn btn-primary" style="width: 100%; height: 60px; font-size: 17px; font-weight: 700; border-radius: 18px;" id="submit-clean">
+                ${window.t('clean_submit_btn')}
+            </button>
         </div>
     `
 
@@ -2162,10 +2150,8 @@ async function showLeaderboard() {
 
 	tg.HapticFeedback.impactOccurred('light')
 	const html = `
-        <div class="sheet-min-height">
-            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">${window.t('menu_leaderboard')}</h2>
-            <div id="leaderboard-list" class="loading" style="flex: 1;">${window.t('loading')}</div>
-        </div>
+        <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">${window.t('menu_leaderboard')}</h2>
+        <div id="leaderboard-list" class="loading">${window.t('loading')}</div>
     `
 	// Clear history so this becomes the new "root" of the sheet
 	sheetHistory = []
@@ -2284,8 +2270,7 @@ function showReportDetails(r) {
 		:	'---'
 
 	const html = `
-        <div class="sheet-min-height">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
             <h2 style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin: 0;">${window.t('report_title')}</h2>
             <span class="status-badge ${r.status}" style="padding: 6px 14px; font-weight: 700; border-radius: 12px;">${statusText}</span>
         </div>
