@@ -943,7 +943,7 @@ window.showCityStatus = async function showCityStatus() {
 			cleaned,
 			isLoading = false,
 		) => `
-            <div style="flex: 1;">
+            <div style="flex: 1; display: flex; flex-direction: column;">
                 <div class="info-sheet" style="flex: 1;">
                 <div style="text-align: center; margin-bottom: 24px;">
                     <div style="width: 60px; height: 60px; background: var(--bg-secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border: 1px solid var(--border);">
@@ -970,12 +970,12 @@ window.showCityStatus = async function showCityStatus() {
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${isLoading ? 'var(--text-secondary)' : getAqiColor(aqi)}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/></svg>
                         <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary);">${t('air_quality')}</span>
                     </div>
-                    <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 48px; font-weight: 900; min-height: 56px; border-radius: 8px; color: ${isLoading ? 'var(--text-secondary)' : getAqiColor(aqi)}; line-height: 1; letter-spacing: -2px;">
-                        ${isLoading ? '' : aqi || '--'}
+                    <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 48px; font-weight: 900; min-height: 48px; border-radius: 8px; color: ${isLoading ? 'transparent' : getAqiColor(aqi)}; line-height: 1; letter-spacing: -2px;">
+                        ${isLoading ? '00' : aqi || '--'}
                     </div>
                     <div style="margin-top: 10px;">
-                        <span class="${isLoading ? 'skeleton' : ''}" style="display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; min-width: 60px; min-height: 22px; background: ${isLoading ? 'var(--bg-secondary)' : getAqiColor(aqi) + '18'}; color: ${isLoading ? 'var(--text-secondary)' : getAqiColor(aqi)}; border: 1px solid ${isLoading ? 'var(--border)' : getAqiColor(aqi) + '25'};">
-                            ${isLoading ? '' : getAqiLabel(aqi)}
+                        <span class="${isLoading ? 'skeleton' : ''}" style="display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; min-width: 80px; min-height: 22px; background: ${isLoading ? 'var(--bg-secondary)' : getAqiColor(aqi) + '18'}; color: ${isLoading ? 'transparent' : getAqiColor(aqi)}; border: 1px solid ${isLoading ? 'var(--border)' : getAqiColor(aqi) + '25'};">
+                            ${isLoading ? 'Label' : getAqiLabel(aqi)}
                         </span>
                     </div>
                     <div style="font-size: 10px; color: var(--text-secondary); margin-top: 8px; opacity: 0.6;">European AQI</div>
@@ -985,15 +985,15 @@ window.showCityStatus = async function showCityStatus() {
                     <div class="stat-card">
                         <div class="stat-card-icon" style="color: var(--primary);">${iconMap}</div>
                         <div class="stat-card-label">${t('stat_on_map')}</div>
-                        <div class="stat-card-value ${isLoading ? 'skeleton' : ''}" style="min-width: 30px; min-height: 20px; border-radius: 4px; margin-top: 4px;">
-                            ${isLoading ? '' : total}
+                        <div class="stat-card-value ${isLoading ? 'skeleton' : ''}" style="min-width: 40px; min-height: 34px; border-radius: 4px; margin: 4px auto 0; color: ${isLoading ? 'transparent' : 'var(--primary)'};">
+                            ${isLoading ? '00' : total}
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-card-icon" style="color: var(--primary);">${iconClean}</div>
                         <div class="stat-card-label">${t('stat_cleaned')}</div>
-                        <div class="stat-card-value ${isLoading ? 'skeleton' : ''}" style="min-width: 30px; min-height: 20px; border-radius: 4px; margin-top: 4px;">
-                            ${isLoading ? '' : cleaned}
+                        <div class="stat-card-value ${isLoading ? 'skeleton' : ''}" style="min-width: 40px; min-height: 34px; border-radius: 4px; margin: 4px auto 0; color: ${isLoading ? 'transparent' : 'var(--primary)'};">
+                            ${isLoading ? '00' : cleaned}
                         </div>
                     </div>
                 </div>
@@ -1003,8 +1003,8 @@ window.showCityStatus = async function showCityStatus() {
                         <div style="width: 40px; height: 40px; background: rgba(59,130,246,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
                         </div>
-                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 20px; font-weight: 800; min-height: 26px; border-radius: 6px; color: var(--text-primary); line-height: 1.2;">
-                            ${isLoading ? '' : `${temp}°C`}
+                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 20px; font-weight: 800; min-height: 24px; border-radius: 6px; color: ${isLoading ? 'transparent' : 'var(--text-primary)'}; line-height: 1.2;">
+                            ${isLoading ? '00°C' : `${temp}°C`}
                         </div>
                         <div style="font-size: 10px; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 6px; font-weight: 700;">${t('weather_temp')}</div>
                      </div>
@@ -1012,8 +1012,8 @@ window.showCityStatus = async function showCityStatus() {
                         <div style="width: 40px; height: 40px; background: rgba(6,182,212,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
                         </div>
-                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 20px; font-weight: 800; min-height: 26px; border-radius: 6px; color: var(--text-primary); line-height: 1.2;">
-                            ${isLoading ? '' : `${wind} <small style="font-size: 11px; font-weight: 600; opacity: 0.6;">km/h</small>`}
+                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 20px; font-weight: 800; min-height: 24px; border-radius: 6px; color: ${isLoading ? 'transparent' : 'var(--text-primary)'}; line-height: 1.2;">
+                            ${isLoading ? '00 km/h' : `${wind} <small style="font-size: 11px; font-weight: 600; opacity: 0.6;">km/h</small>`}
                         </div>
                         <div style="font-size: 10px; color: #06b6d4; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 6px; font-weight: 700;">${t('weather_wind')}</div>
                      </div>
@@ -1021,8 +1021,8 @@ window.showCityStatus = async function showCityStatus() {
                         <div style="width: 40px; height: 40px; background: rgba(245,158,11,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 2v20"/><path d="M2 12h20"/><circle cx="12" cy="12" r="3" fill="#f59e0b"/></svg>
                         </div>
-                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 20px; font-weight: 800; min-height: 26px; border-radius: 6px; color: var(--text-primary); line-height: 1.2;">
-                            ${isLoading ? '' : `${rad} <small style="font-size: 11px; font-weight: 600; opacity: 0.6;">μSv</small>`}
+                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 20px; font-weight: 800; min-height: 24px; border-radius: 6px; color: ${isLoading ? 'transparent' : 'var(--text-primary)'}; line-height: 1.2;">
+                            ${isLoading ? '0.00 μSv' : `${rad} <small style="font-size: 11px; font-weight: 600; opacity: 0.6;">μSv</small>`}
                         </div>
                         <div style="font-size: 10px; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 6px; font-weight: 700;">${t('weather_radiation')}</div>
                      </div>
