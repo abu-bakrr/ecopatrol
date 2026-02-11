@@ -244,6 +244,15 @@ function initBottomSheetDrag() {
 		}
 		sheet.style.transform = ''
 	})
+
+	// Header border on scroll
+	sheet.addEventListener('scroll', () => {
+		if (sheet.scrollTop > 10) {
+			sheet.classList.add('scrolled')
+		} else {
+			sheet.classList.remove('scrolled')
+		}
+	})
 }
 
 // Navigation History for Bottom Sheet
@@ -295,6 +304,20 @@ function renderSheetPage(html, addToHistory = true) {
 	}
 
 	content.classList.add('sheet-page-anim')
+
+	// Show/Hide back button
+	const backBtn = document.getElementById('sheet-back-btn')
+	if (backBtn) {
+		if (sheetHistory.length > 0) {
+			backBtn.style.display = 'flex'
+			// Update text manually to ensure it's translated
+			const btnText = backBtn.querySelector('span')
+			if (btnText) btnText.textContent = window.t('back_btn')
+		} else {
+			backBtn.style.display = 'none'
+		}
+	}
+
 	openBottomSheet()
 }
 
@@ -862,16 +885,9 @@ function openBottomSheet() {
 }
 
 function closeBottomSheet() {
-	// SMART NAVIGATION: If there is history (e.g. we are in details and came from list),
-	// go back to previous page instead of closing the entire sheet.
-	if (sheetHistory.length > 0) {
-		goBackInSheet()
-		return
-	}
-
 	document.getElementById('bottom-sheet').classList.remove('active')
 	document.getElementById('overlay').classList.remove('active')
-	sheetHistory = [] // Clear history on close
+	sheetHistory = [] // Clear history on close ALWAYS
 }
 
 // --- CITY PASSPORT STATE ---
@@ -1282,7 +1298,7 @@ async function showMyHistory() {
                         <div class="history-title">${h.description || 'Уборка территории'}</div>
                         <div class="history-date">${date}</div>
                     </div>
-                    <div class="history-amount">+${window.t('currency')}${h.reward}</div>
+                    <div class="history-amount">+$${h.reward}</div>
                 </div>
             `
 			})
@@ -1360,7 +1376,7 @@ async function showExchange() {
                             <span>📍 ${window.t('reward')} ${p.level || 1}</span>
                         </div>
                     </div>
-                    <div class="exchange-reward-badge">+${window.t('currency')}${p.level || 1}</div>
+                    <div class="exchange-reward-badge">+$${p.level || 1}</div>
                 </div>
             `
 		})
@@ -1970,7 +1986,7 @@ function showPollutionDetails(pollution) {
         
         <div style="background: var(--bg-secondary); padding: 14px; border-radius: 12px; margin-bottom: 16px;">
             <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">${window.t('reward_label')}</p>
-            <p style="font-size: 24px; font-weight: 700; color: var(--primary);">${window.t('currency')}${reward}</p>
+            <p style="font-size: 24px; font-weight: 700; color: var(--primary);">$${reward}</p>
         </div>
         
         <button class="btn btn-primary" style="width: 100%;" id="clean-btn">

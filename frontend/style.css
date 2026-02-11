@@ -746,7 +746,7 @@ html {
 	z-index: 500; /* Higher than sidebar (300) */
 	transform: translateY(100%);
 	transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-	max-height: 80vh;
+	max-height: 90vh; /* Increased slightly */
 	overflow-y: auto;
 	will-change: transform;
 	backface-visibility: hidden;
@@ -761,18 +761,53 @@ html {
 	transition: none !important;
 }
 
-.sheet-handle {
+.sheet-header {
 	width: 100%;
-	height: 32px; /* Increased hit area */
+	height: 56px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 16px;
+	position: sticky;
+	top: 0;
+	background: var(--bg-primary);
+	z-index: 10;
+	border-bottom: 1px solid transparent;
+	transition: border-color 0.3s;
+}
+
+.bottom-sheet.scrolled .sheet-header {
+	border-color: var(--border);
+}
+
+.sheet-back-btn {
+	background: none;
+	border: none;
+	color: var(--primary);
+	display: none; /* Hidden by default */
+	align-items: center;
+	gap: 4px;
+	font-size: 15px;
+	font-weight: 700;
+	padding: 8px 12px;
+	margin-left: -12px;
+	border-radius: 12px;
+	cursor: pointer;
+	-webkit-tap-highlight-color: transparent;
+}
+
+.sheet-back-btn:active {
+	background: var(--bg-secondary);
+}
+
+.sheet-handle {
+	flex: 1;
+	height: 100%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	touch-action: none;
 	cursor: grab;
-	position: sticky;
-	top: 0;
-	background: var(--bg-primary);
-	z-index: 10;
 }
 
 .sheet-handle::after {

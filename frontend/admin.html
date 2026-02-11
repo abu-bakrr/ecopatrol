@@ -752,7 +752,7 @@
 				document.getElementById('st-cleaned').innerText =
 					data.cleaned_pollutions
 				document.getElementById('st-rewards').innerText =
-					t('currency') + data.total_rewards.toFixed(0)
+					'$' + data.total_rewards.toFixed(0)
 			}
 
 			let allUsers = []
@@ -778,7 +778,7 @@
                             <div class="card-title">${u.first_name || 'Hero'}</div>
                             <div class="card-meta">@${u.username || '—'} • ${u.phone || '—'}</div>
                         </div>
-                        <div style="font-weight:800; color:var(--primary); font-size:17px">${t('currency')}${u.balance.toFixed(0)}</div>
+                        <div style="font-weight:800; color:var(--primary); font-size:17px">$${u.balance.toFixed(0)}</div>
                     </div>
                     <div class="btn-row">
                         <button class="btn btn-solid" onclick="notifyUser(${u.telegram_id})">
