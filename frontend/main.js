@@ -1282,7 +1282,7 @@ async function showMyHistory() {
                         <div class="history-title">${h.description || 'Уборка территории'}</div>
                         <div class="history-date">${date}</div>
                     </div>
-                    <div class="history-amount">+$${h.reward}</div>
+                    <div class="history-amount">+${window.t('currency')}${h.reward}</div>
                 </div>
             `
 			})
@@ -1360,7 +1360,7 @@ async function showExchange() {
                             <span>📍 ${window.t('reward')} ${p.level || 1}</span>
                         </div>
                     </div>
-                    <div class="exchange-reward-badge">+$${p.level || 1}</div>
+                    <div class="exchange-reward-badge">+${window.t('currency')}${p.level || 1}</div>
                 </div>
             `
 		})
@@ -1970,7 +1970,7 @@ function showPollutionDetails(pollution) {
         
         <div style="background: var(--bg-secondary); padding: 14px; border-radius: 12px; margin-bottom: 16px;">
             <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">${window.t('reward_label')}</p>
-            <p style="font-size: 24px; font-weight: 700; color: var(--primary);">$${reward}</p>
+            <p style="font-size: 24px; font-weight: 700; color: var(--primary);">${window.t('currency')}${reward}</p>
         </div>
         
         <button class="btn btn-primary" style="width: 100%;" id="clean-btn">
