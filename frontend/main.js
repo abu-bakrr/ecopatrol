@@ -981,50 +981,50 @@ window.showCityStatus = async function showCityStatus() {
                     <div style="font-size: 10px; color: var(--text-secondary); margin-top: 8px; opacity: 0.6; height: 12px; line-height: 12px;">European AQI</div>
                 </div>
 
-                <div class="city-stats-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; height: 94px;">
-                    <div class="stat-card" style="margin: 0; height: 94px; display: flex; flex-direction: column; justify-content: center; padding: 12px;">
-                        <div class="stat-card-icon" style="color: var(--primary); height: 18px;">${iconMap}</div>
-                        <div class="stat-card-label" style="height: 16px; line-height: 16px; overflow: hidden; white-space: nowrap;">${t('stat_on_map')}</div>
-                        <div class="stat-value ${isLoading ? 'skeleton' : ''}" style="min-width: 50px; height: 32px; line-height: 32px; border-radius: 4px; margin: 2px auto 0; color: ${isLoading ? 'transparent' : 'var(--primary)'}; font-size: 24px;">
+                <div class="city-stats-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; height: 110px;">
+                    <div class="stat-card" style="margin: 0; height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; overflow: hidden;">
+                        <div class="stat-card-icon" style="color: var(--primary); height: 18px; margin-bottom: 4px;">${iconMap}</div>
+                        <div class="stat-card-label" style="height: 14px; line-height: 14px; font-size: 11px; color: var(--text-secondary); overflow: hidden; white-space: nowrap; text-align: center; width: 100%;">${t('stat_on_map')}</div>
+                        <div class="stat-value ${isLoading ? 'skeleton' : ''}" style="min-width: 60px; height: 32px; line-height: 32px; border-radius: 4px; color: ${isLoading ? 'transparent' : 'var(--primary)'}; font-size: 26px; font-weight: 800; text-align: center;">
                             ${isLoading ? '000' : total}
                         </div>
                     </div>
-                    <div class="stat-card" style="margin: 0; height: 94px; display: flex; flex-direction: column; justify-content: center; padding: 12px;">
-                        <div class="stat-card-icon" style="color: var(--primary); height: 18px;">${iconClean}</div>
-                        <div class="stat-card-label" style="height: 16px; line-height: 16px; overflow: hidden; white-space: nowrap;">${t('stat_cleaned')}</div>
-                        <div class="stat-value ${isLoading ? 'skeleton' : ''}" style="min-width: 50px; height: 32px; line-height: 32px; border-radius: 4px; margin: 2px auto 0; color: ${isLoading ? 'transparent' : 'var(--primary)'}; font-size: 24px;">
+                    <div class="stat-card" style="margin: 0; height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; overflow: hidden;">
+                        <div class="stat-card-icon" style="color: var(--primary); height: 18px; margin-bottom: 4px;">${iconClean}</div>
+                        <div class="stat-card-label" style="height: 14px; line-height: 14px; font-size: 11px; color: var(--text-secondary); overflow: hidden; white-space: nowrap; text-align: center; width: 100%;">${t('stat_cleaned')}</div>
+                        <div class="stat-value ${isLoading ? 'skeleton' : ''}" style="min-width: 60px; height: 32px; line-height: 32px; border-radius: 4px; color: ${isLoading ? 'transparent' : 'var(--primary)'}; font-size: 26px; font-weight: 800; text-align: center;">
                             ${isLoading ? '000' : cleaned}
                         </div>
                     </div>
                 </div>
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 24px; height: 106px;">
-                     <div style="text-align: center; background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(59,130,246,0.02)); border-radius: 16px; padding: 12px 6px; border: 1px solid rgba(59,130,246,0.15); height: 106px; display: flex; flex-direction: column; justify-content: center;">
-                        <div style="width: 36px; height: 36px; background: rgba(59,130,246,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 24px; height: 110px;">
+                     <div style="text-align: center; background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(59,130,246,0.02)); border-radius: 16px; padding: 8px 4px; border: 1px solid rgba(59,130,246,0.15); height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden;">
+                        <div style="width: 32px; height: 32px; background: rgba(59,130,246,0.12); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
                         </div>
-                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 18px; font-weight: 800; height: 22px; line-height: 22px; border-radius: 6px; color: ${isLoading ? 'transparent' : 'var(--text-primary)'};">
+                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 16px; font-weight: 800; height: 20px; line-height: 20px; border-radius: 6px; color: ${isLoading ? 'transparent' : 'var(--text-primary)'}; width: 90%; white-space: nowrap;">
                             ${isLoading ? '00°C' : `${temp}°C`}
                         </div>
-                        <div style="font-size: 9px; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; font-weight: 700; height: 11px; line-height: 11px;">${t('weather_temp')}</div>
+                        <div style="font-size: 8.5px; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 4px; font-weight: 700; height: 10px; line-height: 10px; width: 100%; overflow: hidden; white-space: nowrap;">${t('weather_temp')}</div>
                      </div>
-                     <div style="text-align: center; background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(6,182,212,0.02)); border-radius: 16px; padding: 12px 6px; border: 1px solid rgba(6,182,212,0.15); height: 106px; display: flex; flex-direction: column; justify-content: center;">
-                        <div style="width: 36px; height: 36px; background: rgba(6,182,212,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;">
+                     <div style="text-align: center; background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(6,182,212,0.02)); border-radius: 16px; padding: 8px 4px; border: 1px solid rgba(6,182,212,0.15); height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden;">
+                        <div style="width: 32px; height: 32px; background: rgba(6,182,212,0.12); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
                         </div>
-                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 18px; font-weight: 800; height: 22px; line-height: 22px; border-radius: 6px; color: ${isLoading ? 'transparent' : 'var(--text-primary)'};">
+                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 16px; font-weight: 800; height: 20px; line-height: 20px; border-radius: 6px; color: ${isLoading ? 'transparent' : 'var(--text-primary)'}; width: 90%; white-space: nowrap;">
                             ${isLoading ? '00 km/h' : `${wind} <small style="font-size: 10px; font-weight: 600; vertical-align: baseline;">km</small>`}
                         </div>
-                        <div style="font-size: 9px; color: #06b6d4; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; font-weight: 700; height: 11px; line-height: 11px;">${t('weather_wind')}</div>
+                        <div style="font-size: 8.5px; color: #06b6d4; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 4px; font-weight: 700; height: 10px; line-height: 10px; width: 100%; overflow: hidden; white-space: nowrap;">${t('weather_wind')}</div>
                      </div>
-                     <div style="text-align: center; background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.02)); border-radius: 16px; padding: 12px 6px; border: 1px solid rgba(245,158,11,0.15); height: 106px; display: flex; flex-direction: column; justify-content: center;">
-                        <div style="width: 36px; height: 36px; background: rgba(245,158,11,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;">
+                     <div style="text-align: center; background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.02)); border-radius: 16px; padding: 8px 4px; border: 1px solid rgba(245,158,11,0.15); height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden;">
+                        <div style="width: 32px; height: 32px; background: rgba(245,158,11,0.12); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 2v20"/><path d="M2 12h20"/><circle cx="12" cy="12" r="3" fill="#f59e0b"/></svg>
                         </div>
-                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 18px; font-weight: 800; height: 22px; line-height: 22px; border-radius: 6px; color: ${isLoading ? 'transparent' : 'var(--text-primary)'};">
-                            ${isLoading ? '0.00 μSv' : `${rad} <small style="font-size: 10px; font-weight: 600; vertical-align: baseline;">μS</small>`}
+                        <div class="${isLoading ? 'skeleton' : ''}" style="font-size: 16px; font-weight: 800; height: 20px; line-height: 20px; border-radius: 6px; color: ${isLoading ? 'transparent' : 'var(--text-primary)'}; width: 90%; white-space: nowrap;">
+                            ${isLoading ? '0.00 μSv' : `${rad}<small style="font-size: 9px; vertical-align: baseline;">μS</small>`}
                         </div>
-                        <div style="font-size: 9px; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; font-weight: 700; height: 11px; line-height: 11px;">${t('weather_radiation')}</div>
+                        <div style="font-size: 8.5px; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 4px; font-weight: 700; height: 10px; line-height: 10px; width: 100%; overflow: hidden; white-space: nowrap;">${t('weather_radiation')}</div>
                      </div>
                 </div>
 
