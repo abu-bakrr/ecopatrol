@@ -981,7 +981,7 @@ window.showCityStatus = async function showCityStatus() {
                     <div style="font-size: 10px; color: var(--text-secondary); margin-top: 8px; opacity: 0.6; height: 12px; line-height: 12px;">European AQI</div>
                 </div>
 
-                <div class="city-stats-grid" style="grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; height: 94px;">
+                <div class="city-stats-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; height: 94px;">
                     <div class="stat-card" style="margin: 0; height: 94px; display: flex; flex-direction: column; justify-content: center; padding: 12px;">
                         <div class="stat-card-icon" style="color: var(--primary); height: 18px;">${iconMap}</div>
                         <div class="stat-card-label" style="height: 16px; line-height: 16px; overflow: hidden; white-space: nowrap;">${t('stat_on_map')}</div>
