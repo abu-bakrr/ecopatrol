@@ -1142,7 +1142,7 @@ async function showMyReports() {
     `
 	// Clear history so this becomes the new "root" of the sheet
 	sheetHistory = []
-	renderSheetPage(html, false)
+	renderSheetPage(html, false, 'my-reports-list')
 
 	try {
 		const response = await fetch(`${API_URL}/pollutions/user/${currentUser.id}`)
@@ -1150,6 +1150,8 @@ async function showMyReports() {
 		const reports = await response.json()
 
 		const list = document.getElementById('reports-list')
+		if (!list) return
+
 		if (reports.length === 0) {
 			const emptyHtml = `
                 <div class="empty-state">
@@ -1160,11 +1162,11 @@ async function showMyReports() {
                     <div class="empty-text">${window.t('reports_empty_text')}</div>
                 </div>
             `
-			renderSheetPage(emptyHtml, false)
+			renderSheetPage(emptyHtml, false, 'my-reports-list')
 			return
 		}
 
-		let listHtml = '<div class="reports-list">'
+		let listHtml = ''
 		listHtml += reports
 			.map((r, idx) => {
 				const date = new Date(r.created_at).toLocaleDateString(
@@ -1196,6 +1198,8 @@ async function showMyReports() {
             `
 			})
 			.join('')
+
+		list.innerHTML = listHtml
 
 		// Add global click handler for clarity
 		window.handleReportCardClick = (lng, lat, level, status, id) => {
@@ -1314,7 +1318,7 @@ async function showMyHistory() {
                 Ошибка при загрузке данных
             </div>
         `
-		renderSheetPage(errorHtml, false)
+		renderSheetPage(errorHtml, false, 'my-history')
 	}
 }
 
@@ -1330,7 +1334,7 @@ async function showExchange() {
         </div>
     `
 	sheetHistory = [] // Reset history for this root page
-	renderSheetPage(skeletonHtml, false)
+	renderSheetPage(skeletonHtml, false, 'exchange-root')
 
 	try {
 		const response = await fetch(`${API_URL}/pollutions`)
@@ -1376,7 +1380,7 @@ async function showExchange() {
             `
 		})
 		html += '</div><div style="height: 20px;"></div>'
-		renderSheetPage(html, false)
+		renderSheetPage(html, false, 'exchange-root')
 	} catch (e) {
 		console.error('Exchange error:', e)
 		renderSheetPage(
