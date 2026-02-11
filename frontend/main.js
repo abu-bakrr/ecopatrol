@@ -1291,19 +1291,10 @@ async function showMyHistory() {
             <h2 style="font-size: 20px; font-weight: 600;">${window.t('menu_history')}</h2>
         </div>
         <div id="history-list" class="history-list">
-            <!-- Skeleton Loader -->
-            <div class="skeleton-card">
-                <div class="skeleton skeleton-title" style="width: 40%"></div>
-                <div class="skeleton skeleton-text" style="width: 80%"></div>
-            </div>
-            <div class="skeleton-card">
-                <div class="skeleton skeleton-title" style="width: 40%"></div>
-                <div class="skeleton skeleton-text" style="width: 80%"></div>
-            </div>
-                <div class="skeleton-card">
-                <div class="skeleton skeleton-title" style="width: 40%"></div>
-                <div class="skeleton skeleton-text" style="width: 80%"></div>
-            </div>
+            <div class="skeleton-history-item skeleton"></div>
+            <div class="skeleton-history-item skeleton"></div>
+            <div class="skeleton-history-item skeleton" style="opacity: 0.6"></div>
+            <div class="skeleton-history-item skeleton" style="opacity: 0.3"></div>
         </div>
         <div style="height: 20px;"></div>
     `
@@ -2194,7 +2185,12 @@ async function showLeaderboard() {
 	tg.HapticFeedback.impactOccurred('light')
 	const html = `
         <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">${window.t('menu_leaderboard')}</h2>
-        <div id="leaderboard-list" class="loading">${window.t('loading')}</div>
+        <div class="leaderboard-list">
+             <div class="skeleton-list-item skeleton" style="height: 60px; margin-bottom: 8px; border-radius: 12px;"></div>
+             <div class="skeleton-list-item skeleton" style="height: 60px; margin-bottom: 8px; border-radius: 12px;"></div>
+             <div class="skeleton-list-item skeleton" style="height: 60px; margin-bottom: 8px; border-radius: 12px; opacity: 0.6;"></div>
+             <div class="skeleton-list-item skeleton" style="height: 60px; margin-bottom: 8px; border-radius: 12px; opacity: 0.3;"></div>
+        </div>
     `
 	// Clear history so this becomes the new "root" of the sheet
 	sheetHistory = []

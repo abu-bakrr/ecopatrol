@@ -790,7 +790,8 @@ html {
 	position: sticky;
 	top: 0;
 	background: var(--bg-primary);
-	z-index: 10;
+	z-index: 100; /* Ensure it stays above content */
+	border-bottom: 1px solid transparent; /* Placeholder to prevent shift */
 }
 
 .sheet-handle::after {
@@ -801,14 +802,41 @@ html {
 	border-radius: 2px;
 }
 
+/* Skeleton List Items */
+.skeleton-list-item,
+.skeleton-history-item {
+	height: 60px;
+	background: var(--bg-secondary);
+	border-radius: 12px;
+	margin-bottom: 8px;
+	position: relative;
+	overflow: hidden;
+}
+
+.skeleton-history-item {
+	height: 64px;
+}
+
 .sheet-content {
-	padding: 0 20px 32px;
+	padding: 8px 20px 32px;
 	flex: 1;
 	overflow-y: auto;
 	display: flex;
 	flex-direction: column;
 	min-height: 0; /* Important for flex-scroll */
 	-webkit-overflow-scrolling: touch;
+}
+
+/* Skeleton List Items */
+.skeleton-list-item {
+	height: 64px;
+	background: var(--bg-secondary);
+	border-radius: 12px;
+	margin-bottom: 8px;
+	display: flex;
+	align-items: center;
+	padding: 12px;
+	gap: 12px;
 }
 
 .sheet-page-anim {
