@@ -720,7 +720,7 @@ function updateProfileUI() {
 	document.getElementById('sidebar-userid').textContent =
 		`ID: ${currentUser.telegram_id}`
 	document.getElementById('sidebar-balance').textContent =
-		`${currentUser.balance.toFixed(0)} ${window.t('currency')}`
+		`${window.t('currency')}${currentUser.balance.toFixed(0)}`
 	setProfileAvatar(fullName)
 }
 
@@ -2146,7 +2146,7 @@ async function showLeaderboard() {
                     <div style="font-weight: 600; color: var(--text-primary);">${u.first_name}</div>
                     <div style="font-size: 11px; color: var(--text-secondary);">${u.cleaned_count} ${window.t('cleaned')}</div>
                 </div>
-                <div style="font-weight: 700; color: var(--primary);">${u.balance} ${window.t('currency')}</div>
+                <div style="font-weight: 700; color: var(--primary);">${window.t('currency')}${u.balance}</div>
             </div>
         `,
 			)
@@ -2249,7 +2249,7 @@ function showReportDetails(r) {
             </div>
             <div style="background: var(--bg-secondary); padding: 16px; border-radius: 20px; border: 1px solid var(--border); text-align: right;">
                 <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">${window.t('reward_label')}</div>
-                <div style="font-size: 20px; font-weight: 800; color: var(--primary);">${r.level || 0} ${window.t('currency')}</div>
+                <div style="font-size: 20px; font-weight: 800; color: var(--primary);">${window.t('currency')}${r.level || 0}</div>
             </div>
             <div style="background: var(--bg-secondary); padding: 16px; border-radius: 20px; border: 1px solid var(--border);">
                 <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">${window.t('detail_level_label')}</div>

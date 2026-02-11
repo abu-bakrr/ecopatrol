@@ -517,7 +517,7 @@
 						</div>
 						<div class="stat-card">
 							<div class="stat-label" data-t="admin_stat_rewards">Выплаты</div>
-							<div class="stat-value" id="st-rewards">0 UZS</div>
+							<div class="stat-value" id="st-rewards">$0</div>
 						</div>
 			</div>
 		</div>
@@ -752,7 +752,7 @@
 				document.getElementById('st-cleaned').innerText =
 					data.cleaned_pollutions
 				document.getElementById('st-rewards').innerText =
-					data.total_rewards.toFixed(0) + ' UZS'
+					'$' + data.total_rewards.toFixed(0)
 			}
 
 			let allUsers = []
@@ -778,7 +778,7 @@
                             <div class="card-title">${u.first_name || 'Hero'}</div>
                             <div class="card-meta">@${u.username || '—'} • ${u.phone || '—'}</div>
                         </div>
-                        <div style="font-weight:800; color:var(--primary); font-size:17px">${u.balance.toFixed(0)} UZS</div>
+                        <div style="font-weight:800; color:var(--primary); font-size:17px">$${u.balance.toFixed(0)}</div>
                     </div>
                     <div class="btn-row">
                         <button class="btn btn-solid" onclick="notifyUser(${u.telegram_id})">
@@ -881,7 +881,7 @@
 										}
 
                     <div class="card-meta">
-                        <div>${t('add_level_label')} ${p.level} • ${t('reward')}: ${p.reward} UZS</div>
+                        <div>${t('add_level_label')} ${p.level} • ${t('reward')}: $${p.reward}</div>
                         <div style="color:var(--primary); font-weight:700; margin-top:4px">${getLocalizedTypes(p.types)}</div>
                     </div>
                     <div style="font-size:14px; margin-bottom:8px">${p.description || `<i>${t('admin_type_not_specified')}</i>`}</div>
