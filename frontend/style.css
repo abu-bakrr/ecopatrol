@@ -804,6 +804,7 @@ html {
 	display: flex;
 	flex-direction: column;
 	min-height: 0; /* Important for flex-scroll */
+	transition: min-height 0.4s cubic-bezier(0.32, 0.72, 0, 1);
 	-webkit-overflow-scrolling: touch;
 }
 
