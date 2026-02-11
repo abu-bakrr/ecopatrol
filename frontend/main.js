@@ -189,7 +189,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 		console.log('Fullscreen not supported')
 	}
 
-	initBottomSheetDrag()
+	initBottomSheetDrag('bottom-sheet')
+	initBottomSheetDrag('detail-sheet')
 
 	// 0.5. Load Language
 	const savedLang = localStorage.getItem('language') || 'ru'
@@ -200,10 +201,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 	checkRegistration()
 })
 
-function initBottomSheetDrag() {
-	const sheet = document.getElementById('bottom-sheet')
+function renderDetailSheet(html) {
+	const content = document.getElementById('detail-content')
+	const sheet = document.getElementById('detail-sheet')
+	if (!content || !sheet) return
+
+	content.innerHTML = html
+	content.classList.remove('fade-in')
+	void content.offsetWidth
+	content.classList.add('fade-in')
+
+	openDetailSheet()
+}
+
+function initBottomSheetDrag(sheetId) {
+	const sheet = document.getElementById(sheetId)
+	if (!sheet) return
 	const handle = sheet.querySelector('.sheet-handle')
-	if (!sheet || !handle) return
+	if (!handle) return
 
 	let startY = 0
 	let currentY = 0
@@ -213,7 +228,7 @@ function initBottomSheetDrag() {
 		'touchstart',
 		e => {
 			startY = e.touches[0].clientY
-			currentY = startY // Initialize to avoid jumps
+			currentY = startY
 			dragging = true
 			sheet.classList.add('dragging')
 		},
@@ -240,7 +255,11 @@ function initBottomSheetDrag() {
 
 		const delta = currentY - startY
 		if (delta > 100) {
-			closeBottomSheet()
+			if (sheetId === 'detail-sheet') {
+				closeDetailSheet()
+			} else {
+				closeBottomSheet()
+			}
 		}
 		sheet.style.transform = ''
 	})
@@ -875,19 +894,43 @@ function openBottomSheet() {
 	tg.HapticFeedback.impactOccurred('light')
 }
 
-function closeBottomSheet() {
+function closeBottomSheet(forceClose = false) {
+	const detailSheet = document.getElementById('detail-sheet')
+	const mainSheet = document.getElementById('bottom-sheet')
+
+	// 1. If detail-sheet is open, close IT first
+	if (detailSheet.classList.contains('active')) {
+		closeDetailSheet()
+		return
+	}
+
+	// 2. If main sheet is in a sub-page (like report-details inside IT), go back
 	const content = document.getElementById('sheet-content')
 	const context = content ? content.dataset.context : null
 
-	// ONLY special case: if we are in my-report-details, go back to my-reports-list
-	if (context === 'my-report-details' && sheetHistory.length > 0) {
+	if (
+		!forceClose &&
+		context === 'my-report-details' &&
+		sheetHistory.length > 0
+	) {
 		goBackInSheet()
 		return
 	}
 
-	document.getElementById('bottom-sheet').classList.remove('active')
+	// 3. Otherwise, close entire system
+	mainSheet.classList.remove('active')
 	document.getElementById('overlay').classList.remove('active')
-	sheetHistory = [] // Clear history on close
+	sheetHistory = []
+}
+
+function openDetailSheet() {
+	document.getElementById('detail-sheet').classList.add('active')
+	tg.HapticFeedback.impactOccurred('light')
+}
+
+function closeDetailSheet() {
+	document.getElementById('detail-sheet').classList.remove('active')
+	// We DON'T remove overlay here because bottom-sheet might still be active under it
 }
 
 // --- CITY PASSPORT STATE ---
@@ -2364,7 +2407,7 @@ function showReportDetails(r) {
             </button>
         </div>
     `
-	renderSheetPage(html, true, 'my-report-details')
+	renderDetailSheet(html)
 }
 
 async function fetchAirQuality() {
