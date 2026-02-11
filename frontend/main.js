@@ -2270,9 +2270,9 @@ function showReportDetails(r) {
                 <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">${window.t('detail_level_label')}</div>
                 <div style="font-size: 15px; font-weight: 700; color: var(--primary);">${levelText}</div>
             </div>
-            <div style="background: var(--bg-secondary); padding: 16px; border-radius: 20px; border: 1px solid var(--border); text-align: right;">
+            <div style="background: var(--bg-secondary); padding: 16px; border-radius: 20px; border: 1px solid var(--border); text-align: right; min-width: 0;">
                 <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">${window.t('detail_types_label')}</div>
-                <div style="font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${translatedTypes}</div>
+                <div style="font-size: 13px; font-weight: 600; word-break: break-word; white-space: normal;">${translatedTypes}</div>
             </div>
         </div>
 
