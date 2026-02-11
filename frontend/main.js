@@ -1,7 +1,6 @@
 // EcoPatrol - Onboarding Edition
 const tg = window.Telegram.WebApp
-console.log('🚀 EcoPatrol frontend v2.2.1 | Bottom sheet optimized')
-const API_URL = window.CONFIG ? window.CONFIG.API_URL : 'https://ecopatrol.shop'
+const API_URL = window.location.origin + '/api'
 
 // Viewer Functions (Global)
 window.openPhotoViewer = function (url) {
