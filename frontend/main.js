@@ -1,23 +1,16 @@
 // EcoPatrol - Onboarding Edition
 const tg = window.Telegram.WebApp
 const API_URL = window.location.origin + '/api'
-console.log('--- ECOPATROL DEBUG: VERSION 1.2.2 LOADED (ZOOM-UNLOCKED) ---')
+console.log('--- ECOPATROL DEBUG: VERSION 1.3.0 LOADED (EXTERNAL-BORDER) ---')
 
-// Uzbekistan Border Points (High Accuracy)
-const UZBEKISTAN_COORDS = [
-	[55.912, 41.185],
-	[55.939, 41.527],
-	[58.0, 42.0],
-	[58.749, 45.54],
-	[61.272, 45.597],
-	[64.0, 44.5],
-	[66.52, 43.186],
-	[67.5, 42.5],
-	[68.324, 42.146],
-	[69.317, 41.956],
-	[70.0, 42.2],
-	[71.054, 42.348],
-	[71.611, 42.146],
+// UZBEKISTAN_COORDS is loaded from uzbekistan_border.js
+if (!window.UZBEKISTAN_COORDS) {
+	console.error('CRITICAL: uzbekistan_border.js not loaded!')
+	window.UZBEKISTAN_COORDS = [
+		[55.9, 37.0], [73.1, 37.0], [73.1, 45.6], [55.9, 45.6], [55.9, 37.0]
+	]
+}
+
 	[72.58, 40.542],
 	[72.84, 40.19],
 	[72.3, 40.11],
