@@ -1,7 +1,9 @@
 // EcoPatrol - Onboarding Edition
 const tg = window.Telegram.WebApp
 const API_URL = window.location.origin + '/api'
-console.log('--- ECOPATROL DEBUG: VERSION 1.1.7 LOADED (SYNTAX-FIX) ---')
+console.log(
+	'--- ECOPATROL DEBUG: VERSION 1.2.0 LOADED (HARD-WALL/ACCURATE) ---',
+)
 
 // Viewer Functions (Global)
 window.openPhotoViewer = function (url) {
@@ -668,6 +670,19 @@ function initMap(initialCenter = null) {
 		document.getElementById('center-marker').classList.add('dragging')
 	})
 
+	map.on('move', () => {
+		const center = map.getCenter()
+		const point = [center.lng, center.lat]
+
+		if (!isPointInPolygon(point, UZBEKISTAN_COORDS)) {
+			// Hit the wall!
+			map.setCenter(lastValidCenter)
+			tg.HapticFeedback.impactOccurred('heavy')
+		} else {
+			lastValidCenter = point
+		}
+	})
+
 	map.on('moveend', () => {
 		isDragging = false
 		document.getElementById('center-marker').classList.remove('dragging')
@@ -686,30 +701,7 @@ function initMap(initialCenter = null) {
 }
 
 function addUzbekistanBorder(map) {
-	const uzBounds = [
-		[55.912, 41.185],
-		[55.939, 41.527],
-		[58.749, 45.54],
-		[61.272, 45.597],
-		[66.52, 43.186],
-		[68.324, 42.146],
-		[69.317, 41.956],
-		[71.054, 42.348],
-		[71.611, 42.146],
-		[72.58, 40.542],
-		[72.84, 40.19],
-		[72.3, 40.11],
-		[71.74, 39.46],
-		[70.93, 39.8],
-		[69.87, 39.2],
-		[69.1, 40.1],
-		[67.4, 38.9],
-		[67.2, 37.2],
-		[64.5, 37.3],
-		[61.5, 39.3],
-		[60.3, 41.2],
-		[55.912, 41.185],
-	]
+	const uzBounds = UZBEKISTAN_COORDS
 
 	if (!map.getSource('uzbekistan-border')) {
 		map.addSource('uzbekistan-border', {
