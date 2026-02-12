@@ -1,7 +1,7 @@
 // EcoPatrol - Onboarding Edition
 const tg = window.Telegram.WebApp
 const API_URL = window.location.origin + '/api'
-console.log('--- ECOPATROL DEBUG: VERSION 1.1.1 LOADED (LANG-FIX) ---')
+console.log('--- ECOPATROL DEBUG: VERSION 1.1.2 LOADED (UZB-MAP) ---')
 
 // Viewer Functions (Global)
 window.openPhotoViewer = function (url) {
@@ -607,7 +607,7 @@ function initMap(initialCenter = null) {
 	map = new maplibregl.Map({
 		container: 'map',
 		style: style,
-		center: initialCenter || [37.6173, 55.7558],
+		center: initialCenter || [69.2401, 41.2995], // Tashkent, Uzbekistan
 		zoom: 15,
 		minZoom: 10, // Prevent zooming out to world view
 		maxZoom: 18, // Prevent getting too close
@@ -617,8 +617,8 @@ function initMap(initialCenter = null) {
 		dragRotate: false, // Disable rotation by mouse drag
 		touchPitch: false, // Disable pitch by touch
 		maxBounds: [
-			[55.0, 36.0], // Southwest coordinates (approx)
-			[74.0, 46.0], // Northeast coordinates (approx)
+			[55.0, 36.0], // Southwest (Karakalpakstan/Turkmenistan border)
+			[75.0, 47.0], // Northeast (Uzbekistan/Kazakhstan border)
 		],
 	})
 
