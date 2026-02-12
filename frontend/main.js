@@ -1,7 +1,7 @@
 // EcoPatrol - Onboarding Edition
 const tg = window.Telegram.WebApp
 const API_URL = window.location.origin + '/api'
-console.log('--- ECOPATROL DEBUG: VERSION 1.3.2 LOADED (ZOOM-LOCKED) ---')
+console.log('--- ECOPATROL DEBUG: VERSION 1.3.3 LOADED (FIXED-PREFIX) ---')
 
 // UZBEKISTAN_COORDS is loaded from uzbekistan_border.js
 if (!window.UZBEKISTAN_COORDS) {
@@ -499,7 +499,10 @@ async function handleRegistration() {
 	const firstName = document.getElementById('first-name').value.trim()
 	const lastName = document.getElementById('last-name').value.trim()
 	const age = parseInt(document.getElementById('age').value)
-	const phone = document.getElementById('phone').value.trim()
+	const age = parseInt(document.getElementById('age').value)
+	const rawPhone = document.getElementById('phone').value.trim()
+	// Combine prefix with input
+	const phone = rawPhone.startsWith('+998') ? rawPhone : '+998' + rawPhone
 
 	console.log('Registration attempt:', { firstName, lastName, age, phone })
 
@@ -514,11 +517,9 @@ async function handleRegistration() {
 		return
 	}
 
-	// Validate phone starts with +998
-	if (!phone.startsWith('+998')) {
-		// Auto-fix if they forgot but typed valid length?
-		// For now, strict check but we auto-fill it in UI
-		tg.showAlert('Номер телефона должен начинаться с +998')
+	// Validate phone starts with +998 (Already enforced by logic, but good double check)
+	if (!phone.startsWith('+998') || phone.length < 13) {
+		tg.showAlert('Пожалуйста, введите корректный номер телефона')
 		return
 	}
 
@@ -624,22 +625,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	// Phone Input Logic (+998 mask)
-	const phoneInput = document.getElementById('phone')
-	if (phoneInput) {
-		phoneInput.addEventListener('focus', () => {
-			if (!phoneInput.value) {
-				phoneInput.value = '+998 '
-			}
-		})
-
-		phoneInput.addEventListener('input', e => {
-			let val = phoneInput.value
-			if (!val.startsWith('+998')) {
-				// If user deletes +998, restore it
-				phoneInput.value = '+998 ' + val.replace(/^\+998\s?/, '')
-			}
-		})
-	}
+	// No longer needed: Visual prefix is handled key HTML/CSS
+	// We just handle submission logic
 })
 
 function initMap(initialCenter = null) {
