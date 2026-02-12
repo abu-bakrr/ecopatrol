@@ -987,7 +987,7 @@ window.showCityStatus = async function showCityStatus() {
 			isLoading = false,
 		) => `
             <div style="flex: 1; display: flex; flex-direction: column;">
-                <div class="info-sheet" style="flex: 1;">
+                <div class="info-sheet" style="flex: 1; padding-top: 12px;">
                 <div style="text-align: center; margin-bottom: 24px; height: 110px;">
                     <div style="width: 56px; height: 56px; background: var(--bg-secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; border: 1px solid var(--border);">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1433,7 +1433,7 @@ async function showSafetyGuide() {
 	const data = window.safetyContent[lang]
 
 	const html = `
-        <div class="info-sheet">
+        <div class="info-sheet" style="padding-top: 12px;">
             <div class="info-header-img" style="background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);">🛡️</div>
             
             <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 24px; text-align: center;">${data.title}</h2>
@@ -1551,7 +1551,7 @@ async function showSafetyGuide() {
 async function showAboutInfo() {
 	closeSidebar()
 	const html = `
-        <div class="info-sheet">
+        <div class="info-sheet" style="padding-top: 12px;">
             <div class="info-header-img">🏛️</div>
             
             <div class="info-card">
