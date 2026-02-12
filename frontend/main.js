@@ -622,31 +622,24 @@ function initMap(initialCenter = null) {
 		],
 	})
 
-	// Force resize to fix gray blocks if map was initialized before full expansion
 	map.on('load', () => {
 		map.resize()
-		console.log('Map resized and loaded')
+		console.log('Map load triggered')
 
-		// ADD UZBEKISTAN BORDER
+		// 1. Add Uzbekistan Border
 		addUzbekistanBorder(map)
 
-		setTimeout(() => {
-			const mapEl = document.getElementById('map')
-			const bgColor = window.getComputedStyle(mapEl).backgroundColor
-			console.log('--- THEME DIAGNOSTIC ---')
-			console.log('Theme:', theme)
-			console.log('Map Computed BG:', bgColor)
-			console.log(
-				'Body Computed BG:',
-				window.getComputedStyle(document.body).backgroundColor,
-			)
-			console.log(
-				'Vignette var(--map-bg):',
-				window
-					.getComputedStyle(document.documentElement)
-					.getPropertyValue('--map-bg'),
-			)
-		}, 1000)
+		// 2. Load markers
+		loadPollutions()
+
+		// 3. Trigger geolocation
+		geolocate.trigger()
+
+		// 4. Hide loader
+		const loader = document.getElementById('map-loading-overlay')
+		if (loader) loader.classList.add('hidden')
+
+		console.log('Map initialization complete')
 	})
 
 	// Global helper for manual tuning
@@ -669,20 +662,6 @@ function initMap(initialCenter = null) {
 	})
 	map.addControl(geolocate)
 
-	map.on('load', () => {
-		// 1. Hide the loading overlay
-		const loader = document.getElementById('map-loading-overlay')
-		if (loader) loader.classList.add('hidden')
-
-		// 2. Load markers only after map is ready
-		loadPollutions()
-
-		// 3. Trigger geolocation
-		geolocate.trigger()
-
-		console.log('Map fully ready: overlay hidden, markers loaded')
-	})
-
 	// Handle map movement
 	map.on('movestart', () => {
 		isDragging = true
@@ -704,10 +683,73 @@ function initMap(initialCenter = null) {
 			container.classList.remove('map-zoom-out')
 		}
 	})
+}
 
-	map.on('load', () => {
-		console.log('Map loaded')
-	})
+function addUzbekistanBorder(map) {
+	const uzBounds = [
+		[55.912, 41.185],
+		[55.939, 41.527],
+		[58.749, 45.54],
+		[61.272, 45.597],
+		[66.52, 43.186],
+		[68.324, 42.146],
+		[69.317, 41.956],
+		[71.054, 42.348],
+		[71.611, 42.146],
+		[72.58, 40.542],
+		[72.84, 40.19],
+		[72.3, 40.11],
+		[71.74, 39.46],
+		[70.93, 39.8],
+		[69.87, 39.2],
+		[69.1, 40.1],
+		[67.4, 38.9],
+		[67.2, 37.2],
+		[64.5, 37.3],
+		[61.5, 39.3],
+		[60.3, 41.2],
+		[55.912, 41.185],
+	]
+
+	if (!map.getSource('uzbekistan-border')) {
+		map.addSource('uzbekistan-border', {
+			type: 'geojson',
+			data: {
+				type: 'Feature',
+				geometry: {
+					type: 'LineString',
+					coordinates: uzBounds,
+				},
+			},
+		})
+	}
+
+	if (!map.getLayer('uzbekistan-border-glow')) {
+		map.addLayer({
+			id: 'uzbekistan-border-glow',
+			type: 'line',
+			source: 'uzbekistan-border',
+			paint: {
+				'line-color': '#10b981',
+				'line-width': 10,
+				'line-blur': 8,
+				'line-opacity': 0.6,
+			},
+		})
+	}
+
+	if (!map.getLayer('uzbekistan-border-line')) {
+		map.addLayer({
+			id: 'uzbekistan-border-line',
+			type: 'line',
+			source: 'uzbekistan-border',
+			paint: {
+				'line-color': '#10b981',
+				'line-width': 2,
+				'line-opacity': 1,
+			},
+		})
+	}
 }
 
 async function authUser() {
