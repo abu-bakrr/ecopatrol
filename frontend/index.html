@@ -663,12 +663,16 @@
 			function logToScreen(msg, type = 'log') {
 				const msgStr = String(msg).toLowerCase()
 				// SILENCE ANNOYING LOAD ERRORS GLOBALLY
-				if (msgStr.includes('load failed') || msgStr.includes('networkerror')) {
-					return
+				if (
+					msgStr.includes('load failed') ||
+					msgStr.includes('networkerror') ||
+					msgStr.includes('tile')
+				) {
+					return false
 				}
 				// SILENCE FETCH ERRORS ONLY WHEN OFFLINE
 				if (!navigator.onLine && msgStr.includes('fetch')) {
-					return
+					return false
 				}
 
 				const line = document.createElement('div')
@@ -682,14 +686,18 @@
 				line.textContent = `[${new Date().toLocaleTimeString()}] ${String(msg)}`
 				debugConsole.appendChild(line)
 				debugConsole.scrollTop = debugConsole.scrollHeight
+				return true
 			}
 
 			// Capture Global Errors
 			window.onerror = function (msg, url, line) {
-				logToScreen(`Global Error: ${msg} \nLine: ${line}`, 'error')
+				const logged = logToScreen(
+					`Global Error: ${msg} \nLine: ${line}`,
+					'error',
+				)
 
-				// ONLY AUTO-OPEN IF ONLINE AND ADMIN ENABLED LOGS
-				if (navigator.onLine && debugBtn.style.display !== 'none') {
+				// ONLY AUTO-OPEN IF LOGGED AND ONLINE AND ADMIN ENABLED LOGS
+				if (logged && navigator.onLine && debugBtn.style.display !== 'none') {
 					debugConsole.classList.add('active')
 				}
 				return false
@@ -716,10 +724,10 @@
 
 			console.error = function (...args) {
 				originalError.apply(console, args)
-				logToScreen(args.join(' '), 'error')
+				const logged = logToScreen(args.join(' '), 'error')
 
-				// ONLY AUTO-OPEN IF ONLINE AND ADMIN ENABLED LOGS
-				if (navigator.onLine && debugBtn.style.display !== 'none') {
+				// ONLY AUTO-OPEN IF LOGGED AND ONLINE AND ADMIN ENABLED LOGS
+				if (logged && navigator.onLine && debugBtn.style.display !== 'none') {
 					debugConsole.classList.add('active')
 				}
 			}
