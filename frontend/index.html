@@ -143,15 +143,18 @@
 
 					<div class="form-group">
 						<label class="form-label" data-t="form_phone">Телефон</label>
-						<input
-							type="tel"
-							class="form-input"
-							id="phone"
-							placeholder="+998 (__) ___-__-__"
-							autocomplete="tel"
-							inputmode="tel"
-							required
-						/>
+						<div class="phone-input-group">
+							<span class="phone-prefix">+998</span>
+							<input
+								type="tel"
+								class="form-input phone-field"
+								id="phone"
+								placeholder="(__) ___-__-__"
+								autocomplete="tel"
+								inputmode="numeric"
+								required
+							/>
+						</div>
 					</div>
 				</form>
 
