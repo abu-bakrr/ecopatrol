@@ -435,17 +435,13 @@ html {
 	background: var(--bg-primary);
 	box-shadow: 4px 0 24px var(--shadow);
 	z-index: 600;
-	transform: translateX(-100%);
+	transform: translateX(-110%);
 	opacity: 0;
 	pointer-events: auto !important;
-	transition:
-		transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-		opacity 0.4s ease;
+	transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 	overflow-y: auto;
 	backdrop-filter: blur(12px);
-	will-change: transform;
-	backface-visibility: hidden;
-	perspective: 1000px;
+	will-change: transform, opacity;
 }
 
 /* Air Widget Spinner Animation */
@@ -625,26 +621,43 @@ html {
 }
 
 .language-switcher {
-	display: flex;
-	justify-content: space-around;
-	background: var(--bg-secondary);
-	padding: 6px;
-	border-radius: 12px;
-	margin-bottom: 12px;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 8px;
+	margin-bottom: 20px;
 }
 
 .lang-option {
-	padding: 6px 10px;
-	border-radius: 8px;
+	background: var(--bg-secondary);
+	padding: 12px 8px;
+	border-radius: 14px;
 	cursor: pointer;
-	font-size: 13px;
-	font-weight: 650;
-	transition: all 0.2s;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+	border: 1px solid var(--border);
+}
+
+.lang-flag {
+	font-size: 20px;
+}
+
+.lang-name {
+	font-size: 11px;
+	font-weight: 700;
 	color: var(--text-secondary);
 }
 
 .lang-option.active {
 	background: var(--primary);
+	border-color: var(--primary);
+	transform: scale(1.05);
+	box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.lang-option.active .lang-name {
 	color: white;
 }
 
