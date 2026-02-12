@@ -1,7 +1,7 @@
 // EcoPatrol - Onboarding Edition
 const tg = window.Telegram.WebApp
 const API_URL = window.location.origin + '/api'
-console.log('--- ECOPATROL DEBUG: VERSION 1.1.2 LOADED (UZB-MAP) ---')
+console.log('--- ECOPATROL DEBUG: VERSION 1.1.3 LOADED (ERR-SUP) ---')
 
 // Viewer Functions (Global)
 window.openPhotoViewer = function (url) {

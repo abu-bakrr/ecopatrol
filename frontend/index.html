@@ -35,7 +35,7 @@
 			})()
 		</script>
 
-		<link rel="stylesheet" href="style.css?v=2112" />
+		<link rel="stylesheet" href="style.css?v=2113" />
 		<style>
 			/* Critical styles for startup stability */
 			#debug-console {
@@ -661,14 +661,13 @@
 			})
 
 			function logToScreen(msg, type = 'log') {
-				// SILENCE NETWORK ERRORS WHEN OFFLINE
 				const msgStr = String(msg).toLowerCase()
-				if (
-					!navigator.onLine &&
-					(msgStr.includes('fetch') ||
-						msgStr.includes('load failed') ||
-						msgStr.includes('networkerror'))
-				) {
+				// SILENCE ANNOYING LOAD ERRORS GLOBALLY
+				if (msgStr.includes('load failed') || msgStr.includes('networkerror')) {
+					return
+				}
+				// SILENCE FETCH ERRORS ONLY WHEN OFFLINE
+				if (!navigator.onLine && msgStr.includes('fetch')) {
 					return
 				}
 
