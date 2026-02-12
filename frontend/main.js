@@ -1,7 +1,10 @@
 // EcoPatrol - Onboarding Edition
 const tg = window.Telegram.WebApp
 const API_URL = window.location.origin + '/api'
-console.log('--- ECOPATROL DEBUG: VERSION 1.3.0 LOADED (EXTERNAL-BORDER) ---')
+console.log('--- ECOPATROL DEBUG: VERSION 1.3.1 LOADED (AUTOPILOT-FIX) ---')
+
+// Flag to bypass border checks during programmatic moves (e.g. "Show on Map")
+window.isProgrammaticMove = false
 
 // UZBEKISTAN_COORDS is loaded from uzbekistan_border.js
 if (!window.UZBEKISTAN_COORDS) {
@@ -696,6 +699,9 @@ function initMap(initialCenter = null) {
 	})
 
 	map.on('move', () => {
+		// BYPASS: If moving programmatically, don't enforce wall
+		if (window.isProgrammaticMove) return
+
 		const center = map.getCenter()
 		const point = [center.lng, center.lat]
 
@@ -1362,8 +1368,15 @@ window.flyToReport = (lng, lat, level = 1, status = 'active') => {
 		showGhostMarker(lng, lat, level)
 	}
 
+	// Enable programmatic flag
+	window.isProgrammaticMove = true
 	map.flyTo({ center: [lng, lat], zoom: 17, duration: 1500 })
 	tg.HapticFeedback.impactOccurred('medium')
+
+	// Disable flag after move ends
+	map.once('moveend', () => {
+		window.isProgrammaticMove = false
+	})
 }
 
 async function showMyHistory() {
