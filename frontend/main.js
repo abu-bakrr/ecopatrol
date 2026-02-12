@@ -1,7 +1,7 @@
 // EcoPatrol - Onboarding Edition
 const tg = window.Telegram.WebApp
 const API_URL = window.location.origin + '/api'
-console.log('--- ECOPATROL DEBUG: VERSION 1.3.1 LOADED (AUTOPILOT-FIX-V2) ---')
+console.log('--- ECOPATROL DEBUG: VERSION 1.3.2 LOADED (ZOOM-LOCKED) ---')
 
 // UZBEKISTAN_COORDS is loaded from uzbekistan_border.js
 if (!window.UZBEKISTAN_COORDS) {
@@ -639,7 +639,7 @@ function initMap(initialCenter = null) {
 		style: style,
 		center: initialCenter || [69.2401, 41.2995], // Tashkent, Uzbekistan
 		zoom: 15,
-		minZoom: 2, // Temporarily unlocked (was 10)
+		minZoom: 10, // Restrict zooming out
 		maxZoom: 18,
 		pitch: 0,
 		antialias: true,
