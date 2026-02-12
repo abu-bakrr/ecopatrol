@@ -499,7 +499,6 @@ async function handleRegistration() {
 	const firstName = document.getElementById('first-name').value.trim()
 	const lastName = document.getElementById('last-name').value.trim()
 	const age = parseInt(document.getElementById('age').value)
-	const age = parseInt(document.getElementById('age').value)
 	const rawPhone = document.getElementById('phone').value.trim()
 	// Combine prefix with input
 	const phone = rawPhone.startsWith('+998') ? rawPhone : '+998' + rawPhone
