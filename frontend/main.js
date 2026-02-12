@@ -627,65 +627,70 @@ function initMap(initialCenter = null) {
 		map.resize()
 		console.log('Map resized and loaded')
 
-		// ADD UZBEKISTAN GLOWING BORDER
+		// ADD UZBEKISTAN BORDER
 		addUzbekistanBorder(map)
+	})
 
-		function addUzbekistanMask(map) {
-			// Uzbekistan boundary (simplified)
-			const uzBounds = [
-				[55.912, 41.185],
-				[55.939, 41.527],
-				[58.749, 45.54],
-				[61.272, 45.597],
-				[66.52, 43.186],
-				[68.324, 42.146],
-				[69.317, 41.956],
-				[71.054, 42.348],
-				[71.611, 42.146],
-				[72.58, 40.542],
-				[72.84, 40.19],
-				[72.3, 40.11],
-				[71.74, 39.46],
-				[70.93, 39.8],
-				[69.87, 39.2],
-				[69.1, 40.1],
-				[67.4, 38.9],
-				[67.2, 37.2],
-				[64.5, 37.3],
-				[61.5, 39.3],
-				[60.3, 41.2],
-				[55.912, 41.185], // Close the ring
-			]
+	function addUzbekistanBorder(map) {
+		const uzBounds = [
+			[55.912, 41.185],
+			[55.939, 41.527],
+			[58.749, 45.54],
+			[61.272, 45.597],
+			[66.52, 43.186],
+			[68.324, 42.146],
+			[69.317, 41.956],
+			[71.054, 42.348],
+			[71.611, 42.146],
+			[72.58, 40.542],
+			[72.84, 40.19],
+			[72.3, 40.11],
+			[71.74, 39.46],
+			[70.93, 39.8],
+			[69.87, 39.2],
+			[69.1, 40.1],
+			[67.4, 38.9],
+			[67.2, 37.2],
+			[64.5, 37.3],
+			[61.5, 39.3],
+			[60.3, 41.2],
+			[55.912, 41.185],
+		]
 
-			const worldOuter = [
-				[-180, 90],
-				[180, 90],
-				[180, -90],
-				[-180, -90],
-				[-180, 90],
-			]
-
-			map.addSource('uzbekistan-mask', {
-				type: 'geojson',
-				data: {
-					type: 'Feature',
-					geometry: {
-						type: 'Polygon',
-						coordinates: [worldOuter, uzBounds],
-					},
+		map.addSource('uzbekistan-border', {
+			type: 'geojson',
+			data: {
+				type: 'Feature',
+				geometry: {
+					type: 'LineString',
+					coordinates: uzBounds,
 				},
-			})
+			},
+		})
 
-			map.addLayer({
-				id: 'uzbekistan-mask-layer',
-				type: 'fill',
-				source: 'uzbekistan-mask',
-				paint: {
-					'fill-color': '#000',
-					'fill-opacity': 0.4,
-				},
-			})
-		}
+		map.addLayer({
+			id: 'uzbekistan-border-glow',
+			type: 'line',
+			source: 'uzbekistan-border',
+			paint: {
+				'line-color': '#10b981',
+				'line-width': 10,
+				'line-blur': 8,
+				'line-opacity': 0.6,
+			},
+		})
+
+		map.addLayer({
+			id: 'uzbekistan-border-line',
+			type: 'line',
+			source: 'uzbekistan-border',
+			paint: {
+				'line-color': '#10b981',
+				'line-width': 2,
+				'line-opacity': 1,
+			},
+		})
+	}
 		setTimeout(() => {
 			const mapEl = document.getElementById('map')
 			const bgColor = window.getComputedStyle(mapEl).backgroundColor
