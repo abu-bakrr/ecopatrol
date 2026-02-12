@@ -100,6 +100,20 @@ window.toggleLangPicker = function () {
 	}
 }
 
+function translatePage() {
+	document.querySelectorAll('[data-t]').forEach(el => {
+		const key = el.getAttribute('data-t')
+		const text = window.t(key)
+		if (text) el.textContent = text
+	})
+	document.querySelectorAll('[data-t-placeholder]').forEach(el => {
+		const key = el.getAttribute('data-t-placeholder')
+		const text = window.t(key)
+		if (text) el.placeholder = text
+	})
+}
+window.translatePage = translatePage
+
 window.setLanguage = async function (lang) {
 	currentLang = lang
 	localStorage.setItem('lang', lang)
