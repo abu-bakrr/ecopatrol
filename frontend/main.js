@@ -1,7 +1,7 @@
 // EcoPatrol - Onboarding Edition
 const tg = window.Telegram.WebApp
 const API_URL = window.location.origin + '/api'
-console.log('--- ECOPATROL DEBUG: VERSION 1.0.9 LOADED (LANG-REB) ---')
+console.log('--- ECOPATROL DEBUG: VERSION 1.1.1 LOADED (LANG-FIX) ---')
 
 // Viewer Functions (Global)
 window.openPhotoViewer = function (url) {
@@ -62,31 +62,46 @@ window.t = function (key) {
 	return result
 }
 
+// Language Helper
+window.toggleLangPicker = function () {
+	const picker = document.getElementById('language-picker')
+	if (picker) {
+		picker.classList.toggle('active')
+	}
+}
+
 window.setLanguage = async function (lang) {
-	if (!['uz', 'ru', 'en'].includes(lang)) return
-	console.log('--- SETTING LANGUAGE ---', lang)
 	currentLang = lang
-	window.currentLang = lang
-	localStorage.setItem('language', lang)
+	localStorage.setItem('lang', lang)
 
-	// Mark active in UI
-	document.querySelectorAll('.lang-option').forEach(opt => {
+	// Close picker
+	const picker = document.getElementById('language-picker')
+	if (picker) picker.classList.remove('active')
+
+	// Update UI
+	document.querySelectorAll('.lang-picker-item').forEach(opt => {
 		opt.classList.remove('active')
-		if (opt.textContent.toLowerCase().includes(lang)) {
-			opt.classList.add('active')
+		if (opt.id === `lang-${lang}`) opt.classList.add('active')
+	})
+
+	// Update Current Label on Picker
+	const flag = document.getElementById('current-lang-flag')
+	const name = document.getElementById('current-lang-name')
+	if (flag && name) {
+		if (lang === 'uz') {
+			flag.textContent = '🇺🇿'
+			name.textContent = "O'zbek"
+		} else if (lang === 'ru') {
+			flag.textContent = '🇷🇺'
+			name.textContent = 'Русский'
+		} else {
+			flag.textContent = '🇬🇧'
+			name.textContent = 'English'
 		}
-	})
+	}
 
-	// Translate static elements
-	document.querySelectorAll('[data-t]').forEach(el => {
-		const key = el.getAttribute('data-t')
-		el.innerHTML = window.t(key)
-	})
-
-	document.querySelectorAll('[data-t-placeholder]').forEach(el => {
-		const key = el.getAttribute('data-t-placeholder')
-		el.placeholder = window.t(key)
-	})
+	translatePage()
+	if (typeof updateStatus === 'function') updateStatus()
 
 	// Update Backend if logged in
 	if (currentUser && currentUser.id) {
@@ -102,7 +117,7 @@ window.setLanguage = async function (lang) {
 		}
 	}
 
-	tg.HapticFeedback.impactOccurred('light')
+	tg.HapticFeedback.selectionChanged()
 }
 
 const locationPromise = new Promise(resolve => {
@@ -150,7 +165,7 @@ function setupConnectivityListeners() {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
-	console.log('--- ECOPATROL DEBUG: DOMContentLoaded (VERSION 1.0.9) ---')
+	console.log('--- ECOPATROL DEBUG: DOMContentLoaded (VERSION 1.1.0) ---')
 	// 0. IMMEDIATE FIX: Force height to prevent gray blocks
 	function fixHeight() {
 		const vh = window.innerHeight
