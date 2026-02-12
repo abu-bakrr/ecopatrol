@@ -993,7 +993,7 @@ window.showCityStatus = async function showCityStatus() {
 			isLoading = false,
 		) => `
             <div style="flex: 1; display: flex; flex-direction: column;">
-                <div class="info-sheet" style="flex: 1;">
+                <div class="info-sheet">
                 <div style="text-align: center; margin-bottom: 24px; height: 110px;">
                     <div style="width: 56px; height: 56px; background: var(--bg-secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; border: 1px solid var(--border);">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
