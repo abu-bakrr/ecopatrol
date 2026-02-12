@@ -1,7 +1,7 @@
 // EcoPatrol - Onboarding Edition
 const tg = window.Telegram.WebApp
 const API_URL = window.location.origin + '/api'
-console.log('--- ECOPATROL DEBUG: VERSION 1.1.5 LOADED (GLOW) ---')
+console.log('--- ECOPATROL DEBUG: VERSION 1.1.7 LOADED (SYNTAX-FIX) ---')
 
 // Viewer Functions (Global)
 window.openPhotoViewer = function (url) {
@@ -629,68 +629,7 @@ function initMap(initialCenter = null) {
 
 		// ADD UZBEKISTAN BORDER
 		addUzbekistanBorder(map)
-	})
 
-	function addUzbekistanBorder(map) {
-		const uzBounds = [
-			[55.912, 41.185],
-			[55.939, 41.527],
-			[58.749, 45.54],
-			[61.272, 45.597],
-			[66.52, 43.186],
-			[68.324, 42.146],
-			[69.317, 41.956],
-			[71.054, 42.348],
-			[71.611, 42.146],
-			[72.58, 40.542],
-			[72.84, 40.19],
-			[72.3, 40.11],
-			[71.74, 39.46],
-			[70.93, 39.8],
-			[69.87, 39.2],
-			[69.1, 40.1],
-			[67.4, 38.9],
-			[67.2, 37.2],
-			[64.5, 37.3],
-			[61.5, 39.3],
-			[60.3, 41.2],
-			[55.912, 41.185],
-		]
-
-		map.addSource('uzbekistan-border', {
-			type: 'geojson',
-			data: {
-				type: 'Feature',
-				geometry: {
-					type: 'LineString',
-					coordinates: uzBounds,
-				},
-			},
-		})
-
-		map.addLayer({
-			id: 'uzbekistan-border-glow',
-			type: 'line',
-			source: 'uzbekistan-border',
-			paint: {
-				'line-color': '#10b981',
-				'line-width': 10,
-				'line-blur': 8,
-				'line-opacity': 0.6,
-			},
-		})
-
-		map.addLayer({
-			id: 'uzbekistan-border-line',
-			type: 'line',
-			source: 'uzbekistan-border',
-			paint: {
-				'line-color': '#10b981',
-				'line-width': 2,
-				'line-opacity': 1,
-			},
-		})
-	}
 		setTimeout(() => {
 			const mapEl = document.getElementById('map')
 			const bgColor = window.getComputedStyle(mapEl).backgroundColor
