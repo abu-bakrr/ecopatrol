@@ -1,7 +1,7 @@
 // EcoPatrol - Onboarding Edition
 const tg = window.Telegram.WebApp
 const API_URL = window.location.origin + '/api'
-console.log('--- ECOPATROL DEBUG: VERSION 1.2.1 LOADED (REPAIR-WALL) ---')
+console.log('--- ECOPATROL DEBUG: VERSION 1.2.2 LOADED (ZOOM-UNLOCKED) ---')
 
 // Uzbekistan Border Points (High Accuracy)
 const UZBEKISTAN_COORDS = [
@@ -219,7 +219,7 @@ function setupConnectivityListeners() {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
-	console.log('--- ECOPATROL DEBUG: DOMContentLoaded (VERSION 1.1.0) ---')
+	console.log('--- ECOPATROL DEBUG: DOMContentLoaded (VERSION 1.2.2) ---')
 	// 0. IMMEDIATE FIX: Force height to prevent gray blocks
 	function fixHeight() {
 		const vh = window.innerHeight
@@ -663,17 +663,14 @@ function initMap(initialCenter = null) {
 		style: style,
 		center: initialCenter || [69.2401, 41.2995], // Tashkent, Uzbekistan
 		zoom: 15,
-		minZoom: 10, // Prevent zooming out to world view
-		maxZoom: 18, // Prevent getting too close
+		minZoom: 2, // Temporarily unlocked (was 10)
+		maxZoom: 18,
 		pitch: 0,
 		antialias: true,
-		attributionControl: false, // Cleaner look
-		dragRotate: false, // Disable rotation by mouse drag
-		touchPitch: false, // Disable pitch by touch
-		maxBounds: [
-			[55.9, 37.1], // Southwest
-			[73.2, 45.6], // Northeast
-		],
+		attributionControl: false,
+		dragRotate: false,
+		touchPitch: false,
+		// maxBounds: [[55.9, 37.1], [73.2, 45.6]] // Temporarily disabled
 	})
 
 	map.on('load', () => {
