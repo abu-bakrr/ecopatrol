@@ -268,7 +268,12 @@ function initBottomSheetDrag(sheetId) {
 // Navigation History for Bottom Sheet
 let sheetHistory = []
 
-function renderSheetPage(html, addToHistory = true, context = null) {
+function renderSheetPage(
+	html,
+	addToHistory = true,
+	context = null,
+	skipLock = false,
+) {
 	const content = document.getElementById('sheet-content')
 	const sheet = document.getElementById('bottom-sheet')
 	if (!content || !sheet) return
@@ -293,8 +298,8 @@ function renderSheetPage(html, addToHistory = true, context = null) {
 	// 2. Prep for new content
 	content.classList.remove('sheet-page-anim')
 
-	// Only lock height if we are ALREADY open (switching pages)
-	if (isCurrentlyOpen && beforeH > 0) {
+	// Only lock height if we are ALREADY open (switching pages) AND not skipping
+	if (!skipLock && isCurrentlyOpen && beforeH > 0) {
 		content.style.minHeight = beforeH + 'px'
 	} else {
 		content.style.minHeight = '0'
@@ -313,7 +318,7 @@ function renderSheetPage(html, addToHistory = true, context = null) {
 	const afterH = content.scrollHeight || 300
 
 	// 5. Apply smooth transition if internal switch
-	if (isCurrentlyOpen && beforeH > 0) {
+	if (!skipLock && isCurrentlyOpen && beforeH > 0) {
 		void content.offsetHeight // force reflow
 		content.style.minHeight = afterH + 'px'
 
@@ -323,7 +328,7 @@ function renderSheetPage(html, addToHistory = true, context = null) {
 			}
 		}, 400)
 	} else {
-		// Fresh open: No min-height lock, let the natural height drive the animation
+		// Fresh open or skipped: No min-height lock
 		content.style.minHeight = '0'
 	}
 
@@ -987,7 +992,7 @@ window.showCityStatus = async function showCityStatus() {
 			isLoading = false,
 		) => `
             <div style="flex: 1; display: flex; flex-direction: column;">
-                <div class="info-sheet" style="flex: 1; padding-top: 12px;">
+                <div class="info-sheet" style="flex: 1;">
                 <div style="text-align: center; margin-bottom: 24px; height: 110px;">
                     <div style="width: 56px; height: 56px; background: var(--bg-secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; border: 1px solid var(--border);">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
