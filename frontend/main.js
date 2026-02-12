@@ -516,6 +516,8 @@ async function handleRegistration() {
 
 	// Validate phone starts with +998
 	if (!phone.startsWith('+998')) {
+		// Auto-fix if they forgot but typed valid length?
+		// For now, strict check but we auto-fill it in UI
 		tg.showAlert('Номер телефона должен начинаться с +998')
 		return
 	}
@@ -618,6 +620,24 @@ document.addEventListener('DOMContentLoaded', () => {
 		retryBtnGlobal.addEventListener('click', () => {
 			tg.HapticFeedback.impactOccurred('light')
 			checkLocationStatus()
+		})
+	}
+
+	// Phone Input Logic (+998 mask)
+	const phoneInput = document.getElementById('phone')
+	if (phoneInput) {
+		phoneInput.addEventListener('focus', () => {
+			if (!phoneInput.value) {
+				phoneInput.value = '+998 '
+			}
+		})
+
+		phoneInput.addEventListener('input', e => {
+			let val = phoneInput.value
+			if (!val.startsWith('+998')) {
+				// If user deletes +998, restore it
+				phoneInput.value = '+998 ' + val.replace(/^\+998\s?/, '')
+			}
 		})
 	}
 })

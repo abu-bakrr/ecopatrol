@@ -346,7 +346,7 @@ html {
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background: var(--bg-primary);
+	background: var(--bg-primary); /* Default opaque */
 	z-index: 200;
 	display: flex;
 	flex-direction: column;
@@ -357,16 +357,14 @@ html {
 	opacity: 1;
 	visibility: visible;
 	transition: all 0.4s;
-	backdrop-filter: blur(20px);
-	-webkit-backdrop-filter: blur(20px);
 }
 
 [data-theme='dark'] .onboarding {
-	background: rgba(17, 24, 39, 0.85);
+	background: #111827; /* Opaque dark */
 }
 
 [data-theme='light'] .onboarding {
-	background: rgba(255, 255, 255, 0.85);
+	background: #ffffff; /* Opaque light */
 }
 
 .onboarding.hidden {
