@@ -1,7 +1,7 @@
 // EcoPatrol - Onboarding Edition
 const tg = window.Telegram.WebApp
 const API_URL = window.location.origin + '/api'
-console.log('--- ECOPATROL DEBUG: VERSION 1.0.7 LOADED (TOP) ---')
+console.log('--- ECOPATROL DEBUG: VERSION 1.0.8 LOADED (SIEB) ---')
 
 // Viewer Functions (Global)
 window.openPhotoViewer = function (url) {
@@ -150,7 +150,7 @@ function setupConnectivityListeners() {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
-	console.log('--- ECOPATROL DEBUG: DOMContentLoaded (VERSION 1.0.7) ---')
+	console.log('--- ECOPATROL DEBUG: DOMContentLoaded (VERSION 1.0.8) ---')
 	// 0. IMMEDIATE FIX: Force height to prevent gray blocks
 	function fixHeight() {
 		const vh = window.innerHeight
@@ -891,6 +891,7 @@ function openSidebar() {
 function closeSidebar() {
 	document.getElementById('sidebar').classList.remove('active')
 	document.getElementById('overlay').classList.remove('active')
+	tg.HapticFeedback.impactOccurred('light')
 }
 window.closeSidebar = closeSidebar
 

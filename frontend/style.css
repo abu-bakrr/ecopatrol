@@ -436,8 +436,11 @@ html {
 	box-shadow: 4px 0 24px var(--shadow);
 	z-index: 600;
 	transform: translateX(-100%);
+	opacity: 0;
 	pointer-events: auto !important;
-	transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+	transition:
+		transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+		opacity 0.4s ease;
 	overflow-y: auto;
 	backdrop-filter: blur(12px);
 	will-change: transform;
@@ -461,6 +464,7 @@ html {
 
 .sidebar.active {
 	transform: translateX(0);
+	opacity: 1;
 }
 
 .sidebar-header {
@@ -580,11 +584,11 @@ html {
 
 .stat-item {
 	background: var(--bg-secondary);
-	padding: 16px;
+	padding: 12px;
 	border-radius: 16px;
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
+	gap: 8px;
 	transition: transform 0.2s;
 }
 
@@ -596,8 +600,8 @@ html {
 }
 
 .stat-icon {
-	width: 36px;
-	height: 36px;
+	width: 32px;
+	height: 32px;
 	border-radius: 10px;
 	display: flex;
 	align-items: center;
@@ -617,24 +621,24 @@ html {
 .stat-info {
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
+	gap: 8px;
 }
 
 .language-switcher {
 	display: flex;
 	justify-content: space-around;
 	background: var(--bg-secondary);
-	padding: 10px;
+	padding: 6px;
 	border-radius: 12px;
-	margin-bottom: 20px;
+	margin-bottom: 12px;
 }
 
 .lang-option {
-	padding: 8px 12px;
+	padding: 6px 10px;
 	border-radius: 8px;
 	cursor: pointer;
-	font-size: 14px;
-	font-weight: 600;
+	font-size: 13px;
+	font-weight: 650;
 	transition: all 0.2s;
 	color: var(--text-secondary);
 }
@@ -645,8 +649,8 @@ html {
 }
 
 .stat-value {
-	font-size: 18px;
-	font-weight: 700;
+	font-size: 16px;
+	font-weight: 750;
 	color: var(--text-primary);
 }
 
