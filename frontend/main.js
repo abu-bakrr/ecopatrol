@@ -1,9 +1,61 @@
 // EcoPatrol - Onboarding Edition
 const tg = window.Telegram.WebApp
 const API_URL = window.location.origin + '/api'
-console.log(
-	'--- ECOPATROL DEBUG: VERSION 1.2.0 LOADED (HARD-WALL/ACCURATE) ---',
-)
+console.log('--- ECOPATROL DEBUG: VERSION 1.2.1 LOADED (REPAIR-WALL) ---')
+
+// Uzbekistan Border Points (High Accuracy)
+const UZBEKISTAN_COORDS = [
+	[55.912, 41.185],
+	[55.939, 41.527],
+	[58.0, 42.0],
+	[58.749, 45.54],
+	[61.272, 45.597],
+	[64.0, 44.5],
+	[66.52, 43.186],
+	[67.5, 42.5],
+	[68.324, 42.146],
+	[69.317, 41.956],
+	[70.0, 42.2],
+	[71.054, 42.348],
+	[71.611, 42.146],
+	[72.58, 40.542],
+	[72.84, 40.19],
+	[72.3, 40.11],
+	[71.74, 39.46],
+	[70.93, 39.8],
+	[70.5, 39.3],
+	[69.87, 39.2],
+	[69.1, 40.1],
+	[68.5, 39.8],
+	[67.4, 38.9],
+	[67.2, 37.2],
+	[66.0, 37.0],
+	[64.5, 37.3],
+	[63.0, 38.0],
+	[61.5, 39.3],
+	[60.3, 41.2],
+	[58.5, 41.0],
+	[56.5, 40.5],
+	[55.912, 41.185],
+]
+
+function isPointInPolygon(point, polygon) {
+	const x = point[0],
+		y = point[1]
+	let inside = false
+	for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+		const xi = polygon[i][0],
+			yi = polygon[i][1]
+		const xj = polygon[j][0],
+			yj = polygon[j][1]
+		const intersect =
+			yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi
+		if (intersect) inside = !inside
+	}
+	return inside
+}
+
+let lastValidCenter = [69.2401, 41.2995]
 
 // Viewer Functions (Global)
 window.openPhotoViewer = function (url) {
