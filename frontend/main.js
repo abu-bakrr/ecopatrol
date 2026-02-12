@@ -1,7 +1,7 @@
 // EcoPatrol - Onboarding Edition
 const tg = window.Telegram.WebApp
 const API_URL = window.location.origin + '/api'
-console.log('--- ECOPATROL DEBUG: VERSION 1.1.3 LOADED (ERR-SUP) ---')
+console.log('--- ECOPATROL DEBUG: VERSION 1.1.4 LOADED (MASK) ---')
 
 // Viewer Functions (Global)
 window.openPhotoViewer = function (url) {
@@ -617,8 +617,8 @@ function initMap(initialCenter = null) {
 		dragRotate: false, // Disable rotation by mouse drag
 		touchPitch: false, // Disable pitch by touch
 		maxBounds: [
-			[55.0, 36.0], // Southwest (Karakalpakstan/Turkmenistan border)
-			[75.0, 47.0], // Northeast (Uzbekistan/Kazakhstan border)
+			[55.9, 37.1], // Southwest
+			[73.2, 45.6], // Northeast
 		],
 	})
 
@@ -627,7 +627,65 @@ function initMap(initialCenter = null) {
 		map.resize()
 		console.log('Map resized and loaded')
 
-		// DIAGNOSTIC LOGS FOR THEME MATCHING
+		// ADD UZBEKISTAN MASK
+		addUzbekistanMask(map)
+
+		function addUzbekistanMask(map) {
+			// Uzbekistan boundary (simplified)
+			const uzBounds = [
+				[55.912, 41.185],
+				[55.939, 41.527],
+				[58.749, 45.54],
+				[61.272, 45.597],
+				[66.52, 43.186],
+				[68.324, 42.146],
+				[69.317, 41.956],
+				[71.054, 42.348],
+				[71.611, 42.146],
+				[72.58, 40.542],
+				[72.84, 40.19],
+				[72.3, 40.11],
+				[71.74, 39.46],
+				[70.93, 39.8],
+				[69.87, 39.2],
+				[69.1, 40.1],
+				[67.4, 38.9],
+				[67.2, 37.2],
+				[64.5, 37.3],
+				[61.5, 39.3],
+				[60.3, 41.2],
+				[55.912, 41.185], // Close the ring
+			]
+
+			const worldOuter = [
+				[-180, 90],
+				[180, 90],
+				[180, -90],
+				[-180, -90],
+				[-180, 90],
+			]
+
+			map.addSource('uzbekistan-mask', {
+				type: 'geojson',
+				data: {
+					type: 'Feature',
+					geometry: {
+						type: 'Polygon',
+						coordinates: [worldOuter, uzBounds],
+					},
+				},
+			})
+
+			map.addLayer({
+				id: 'uzbekistan-mask-layer',
+				type: 'fill',
+				source: 'uzbekistan-mask',
+				paint: {
+					'fill-color': '#000',
+					'fill-opacity': 0.4,
+				},
+			})
+		}
 		setTimeout(() => {
 			const mapEl = document.getElementById('map')
 			const bgColor = window.getComputedStyle(mapEl).backgroundColor
