@@ -818,7 +818,7 @@ html {
 }
 
 .sheet-content {
-	padding: 8px 20px 32px;
+	padding: 12px 20px 32px;
 	flex: 1;
 	overflow-y: auto;
 	display: flex;
@@ -1310,7 +1310,7 @@ html {
 
 /* Info Section Styles */
 .info-sheet {
-	padding: 12px 4px 24px 4px; /* Standardized top padding */
+	padding: 0 4px 24px 4px;
 	color: var(--text-primary);
 }
 

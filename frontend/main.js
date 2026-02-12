@@ -907,7 +907,7 @@ function closeBottomSheet(forceClose = false) {
 	// 1. If detail-sheet is open, close IT first
 	if (detailSheet.classList.contains('active')) {
 		closeDetailSheet()
-		return
+		if (!forceClose) return
 	}
 
 	// 2. If main sheet is in a sub-page (like report-details inside IT), go back
@@ -1167,7 +1167,7 @@ function togglePollutions() {
 
 function closeAll() {
 	closeSidebar()
-	closeBottomSheet()
+	closeBottomSheet(true)
 }
 
 async function showMyReports() {
