@@ -149,6 +149,7 @@ function setupConnectivityListeners() {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
+	console.log('--- ECOPATROL DEBUG: VERSION 1.0.5 APPLIED ---')
 	console.log('--- DOMContentLoaded ---')
 	// 0. IMMEDIATE FIX: Force height to prevent gray blocks
 	function fixHeight() {
@@ -1438,7 +1439,7 @@ async function showSafetyGuide() {
 	const data = window.safetyContent[lang]
 
 	const html = `
-        <div class="info-sheet" style="padding-top: 12px;">
+        <div class="info-sheet">
             <div class="info-header-img" style="background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);">🛡️</div>
             
             <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 24px; text-align: center;">${data.title}</h2>
@@ -1556,7 +1557,7 @@ async function showSafetyGuide() {
 async function showAboutInfo() {
 	closeSidebar()
 	const html = `
-        <div class="info-sheet" style="padding-top: 12px;">
+        <div class="info-sheet">
             <div class="info-header-img">🏛️</div>
             
             <div class="info-card">
