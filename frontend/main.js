@@ -1,7 +1,7 @@
 // EcoPatrol - Onboarding Edition
 const tg = window.Telegram.WebApp
 const API_URL = window.location.origin + '/api'
-console.log('--- ECOPATROL DEBUG: VERSION 1.1.4 LOADED (MASK) ---')
+console.log('--- ECOPATROL DEBUG: VERSION 1.1.5 LOADED (GLOW) ---')
 
 // Viewer Functions (Global)
 window.openPhotoViewer = function (url) {
@@ -627,8 +627,8 @@ function initMap(initialCenter = null) {
 		map.resize()
 		console.log('Map resized and loaded')
 
-		// ADD UZBEKISTAN MASK
-		addUzbekistanMask(map)
+		// ADD UZBEKISTAN GLOWING BORDER
+		addUzbekistanBorder(map)
 
 		function addUzbekistanMask(map) {
 			// Uzbekistan boundary (simplified)
