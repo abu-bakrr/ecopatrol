@@ -227,7 +227,7 @@ html {
 
 /* Top Buttons - Icons always green with extra top spacing */
 .profile-btn,
-.balance-btn {
+.rating-btn {
 	position: absolute;
 	/* Add 44px for Telegram header + safe area */
 	top: calc(44px + env(safe-area-inset-top) + 12px);
@@ -250,12 +250,12 @@ html {
 .profile-btn {
 	left: 12px;
 }
-.balance-btn {
+.rating-btn {
 	right: 12px;
 }
 
 .profile-btn:active,
-.balance-btn:active {
+.rating-btn:active {
 	transform: scale(0.95);
 }
 

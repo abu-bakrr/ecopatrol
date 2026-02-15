@@ -10,7 +10,7 @@ const translations = {
 		menu_language: 'Tilni oʻzgartirish',
 		menu_help: 'Qanday foydalanish kerak',
 		menu_safety: 'Xavfsizlik qoidalari',
-		balance: 'Balans',
+		balance: 'Reyting',
 		cleaned: 'Tozalangan',
 		loading: 'Yuklanmoqda...',
 		back_btn: 'Orqaga',

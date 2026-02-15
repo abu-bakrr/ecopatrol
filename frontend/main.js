@@ -858,8 +858,10 @@ function updateProfileUI() {
 	document.getElementById('sidebar-username').textContent = fullName
 	document.getElementById('sidebar-userid').textContent =
 		`ID: ${currentUser.telegram_id}`
-	document.getElementById('sidebar-balance').textContent =
-		`${window.t('currency')}${currentUser.balance.toFixed(0)}`
+	// Update Sidebar Rating
+	const ratingValue = currentUser.rating || 0
+	document.getElementById('sidebar-rating').textContent =
+		`${ratingValue.toFixed(1)}`
 	setProfileAvatar(fullName)
 }
 
@@ -948,7 +950,7 @@ function setProfileAvatar(name) {
 
 function setupEventListeners() {
 	document.getElementById('profile-btn').addEventListener('click', openSidebar)
-	document.getElementById('balance-btn').addEventListener('click', () => {
+	document.getElementById('rating-btn').addEventListener('click', () => {
 		showExchange()
 	})
 	document.getElementById('theme-toggle').addEventListener('click', toggleTheme)
@@ -2270,7 +2272,7 @@ async function submitClean() {
 		const data = await response.json()
 
 		if (response.ok) {
-			currentUser.balance = data.new_balance
+			currentUser.rating = data.new_rating
 			updateProfileUI()
 			closeBottomSheet()
 			loadPollutions()
@@ -2325,7 +2327,7 @@ async function showLeaderboard() {
                     <div style="font-weight: 600; color: var(--text-primary);">${u.first_name}</div>
                     <div style="font-size: 11px; color: var(--text-secondary);">${u.cleaned_count} ${window.t('cleaned')}</div>
                 </div>
-                <div style="font-weight: 700; color: var(--primary);">${window.t('currency')}${u.balance}</div>
+                <div style="font-weight: 700; color: var(--primary);">${u.rating.toFixed(1)}</div>
             </div>
         `,
 			)
