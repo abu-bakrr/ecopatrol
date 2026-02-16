@@ -603,8 +603,11 @@ html {
 }
 
 .stat-icon.rating {
-	background: rgba(245, 158, 11, 0.15); /* Light amber tint */
-	color: #f59e0b; /* Amber/Gold color */
+	background: rgba(245, 158, 11, 0.25) !important; /* Brighter amber tint */
+	color: #f59e0b !important; /* Pure Amber/Gold color */
+}
+.stat-icon.rating svg {
+	color: #f59e0b !important;
 }
 
 .stat-icon.cleaned {
