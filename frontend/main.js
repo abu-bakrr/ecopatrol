@@ -1520,7 +1520,7 @@ async function showExchange() {
                             <span>📍 ${window.t('reward')} ${p.level || 1}</span>
                         </div>
                     </div>
-                    <div class="exchange-reward-badge">+$${p.level || 1}</div>
+                    <div class="exchange-reward-badge">+${p.level || 1}</div>
                 </div>
             `
 		})

@@ -602,7 +602,7 @@ html {
 	justify-content: center;
 }
 
-.stat-icon.balance {
+.stat-icon.rating {
 	background: rgba(5, 150, 105, 0.1);
 	color: var(--primary);
 }
