@@ -116,7 +116,7 @@ window.translatePage = translatePage
 
 window.setLanguage = async function (lang) {
 	currentLang = lang
-	localStorage.setItem('lang', lang)
+	localStorage.setItem('language', lang)
 
 	// Close picker
 	const picker = document.getElementById('language-picker')
