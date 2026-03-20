@@ -14,12 +14,15 @@ echo "🔹 Настройка конфигурации..."
 if [ -f .env ]; then
     echo "✅ Найден файл .env, загружаю данные..."
     source .env
+    API_PORT=${PORT:-5000}
 else
     # Если .env нет, спрашиваем
     read -p "🔹 Введите токен Telegram бота: " BOT_TOKEN
     read -p "🔹 Введите CLOUDINARY_URL: " CLOUDINARY_URL
     read -p "🔹 Введите ваш домен (например, eco.mysite.com): " DOMAIN_NAME
     read -p "🔹 Введите email для SSL-сертификата: " SSL_EMAIL
+    read -p "🔹 Введите порт для API (по умолчанию 5000): " INPUT_PORT
+    API_PORT=${INPUT_PORT:-5000}
 fi
 
 # 2. Подготовка директорий
@@ -81,6 +84,7 @@ BOT_TOKEN=$BOT_TOKEN
 DATABASE_URL=$DATABASE_URL
 MINI_APP_URL=https://$DOMAIN_NAME
 CLOUDINARY_URL=$CLOUDINARY_URL
+PORT=$API_PORT
 EOF
 
 echo "🔹 Инициализация таблиц БД..."
@@ -97,7 +101,7 @@ server {
     server_name $DOMAIN_NAME;
 
     location /api {
-        proxy_pass http://127.0.0.1:5000;
+        proxy_pass http://127.0.0.1:$API_PORT;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
@@ -131,7 +135,7 @@ After=network.target
 [Service]
 User=$USER
 WorkingDirectory=$PROJECT_ROOT/backend
-ExecStart=$PROJECT_ROOT/backend/venv/bin/gunicorn -w 4 -b 127.0.0.1:5000 app:app
+ExecStart=$PROJECT_ROOT/backend/venv/bin/gunicorn -w 4 -b 127.0.0.1:$API_PORT app:app
 Restart=always
 
 [Install]
