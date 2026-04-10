@@ -97,39 +97,50 @@
 			}
 
 			.tabs {
+				position: fixed;
+				bottom: 0;
+				left: 0;
+				width: 100%;
 				display: flex;
 				background: var(--bg-card);
-				padding: 4px;
-				border-radius: 14px;
-				margin-bottom: 24px;
-				border: 1px solid var(--border);
+				padding: 8px 16px calc(env(safe-area-inset-bottom) + 8px);
+				border-top: 1px solid var(--border);
+				z-index: 900;
+				justify-content: space-around;
 			}
 
 			.tab-btn {
-				flex: 1;
-				padding: 10px;
+				flex: none;
+				width: 25%;
+				padding: 8px;
 				border: none;
-				border-radius: 10px;
+				border-radius: 12px;
 				background: transparent;
 				color: var(--text-muted);
 				font-weight: 700;
-				font-size: 13px;
+				font-size: 10px;
 				cursor: pointer;
 				display: flex;
 				flex-direction: column;
 				align-items: center;
-				gap: 4px;
+				gap: 6px;
+				transition: all 0.2s;
 			}
 
 			.tab-btn.active {
-				background: var(--primary);
-				color: white;
+				color: var(--primary);
 			}
 
 			.tab-btn svg {
-				width: 20px;
-				height: 20px;
+				width: 24px;
+				height: 24px;
+				transition: transform 0.2s;
 			}
+
+			.tab-btn.active svg {
+				transform: translateY(-2px);
+			}
+
 
 			.section {
 				display: none;
@@ -142,27 +153,30 @@
 			.stats-grid {
 				display: grid;
 				grid-template-columns: 1fr 1fr;
-				gap: 12px;
+				gap: 16px;
 				margin-bottom: 24px;
 			}
 			.stat-card {
 				background: var(--bg-card);
-				padding: 20px;
-				border-radius: 16px;
+				padding: 24px 16px;
+				border-radius: 20px;
 				border: 1px solid var(--border);
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+				text-align: center;
 			}
 			.stat-label {
 				font-size: 11px;
-				font-weight: 700;
+				font-weight: 800;
 				color: var(--text-muted);
 				text-transform: uppercase;
-				letter-spacing: 0.05em;
-				margin-bottom: 4px;
+				letter-spacing: 0.1em;
+				margin-bottom: 8px;
 				display: block;
 			}
 			.stat-value {
-				font-size: 24px;
-				font-weight: 800;
+				font-size: 26px;
+				font-weight: 900;
+				color: var(--primary);
 			}
 
 			/* Card list */
@@ -752,7 +766,7 @@
 				document.getElementById('st-cleaned').innerText =
 					data.cleaned_pollutions
 				document.getElementById('st-rewards').innerText =
-					data.total_balance.toFixed(0)
+					data.total_rewards.toFixed(0) + ' ' + t('currency')
 			}
 
 			let allUsers = []
