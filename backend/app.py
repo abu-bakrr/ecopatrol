@@ -115,7 +115,7 @@ def init_user():
             'last_name': user.last_name,
             'age': user.age,
             'phone': user.phone,
-            'rating': user.rating,
+            'balance': user.balance,
             'language': user_lang
         }
     })
@@ -175,10 +175,10 @@ def create_pollution():
         new_photo = Photo(pollution_id=new_p.id, url=photo_url, type='before')
         db.session.add(new_photo)
     
-    # +0.2 Rating for reporting
+    # +0.2 Balance for reporting
     user = User.query.get(new_p.user_id)
     if user:
-        user.rating += 0.2
+        user.balance += 500.0 # Standard reward for reporting in currency
     
     db.session.commit()
     return jsonify({'status': 'ok', 'id': new_p.id})
@@ -199,7 +199,7 @@ def clean_pollution(p_id):
         p.cleaner_id = cleaner_id # Save who cleaned it
         cleaner = User.query.get(cleaner_id)
         if cleaner:
-            cleaner.rating += p.reward
+            cleaner.balance += p.reward
     
     for photo_url in data.get('photos', []):
         new_photo = Photo(pollution_id=p.id, url=photo_url, type='after')
@@ -208,7 +208,7 @@ def clean_pollution(p_id):
     db.session.commit()
     return jsonify({
         'status': 'ok', 
-        'new_rating': cleaner.rating if cleaner_id and cleaner else 0
+        'new_balance': cleaner.balance if cleaner_id and cleaner else 0
     })
 
 @app.route('/api/history/user/<int:user_id>', methods=['GET'])
@@ -253,7 +253,7 @@ def get_profile(user_id):
     cleaned_count = Pollution.query.filter_by(user_id=user_id, status='cleaned').count()
     return jsonify({
         'username': user.username,
-        'rating': user.rating,
+        'balance': user.balance,
         'cleaned_count': cleaned_count,
         'language': user.language
     })
@@ -292,10 +292,10 @@ def health_check():
 
 @app.route('/api/leaderboard', methods=['GET'])
 def get_leaderboard():
-    # Fetch top 10 users by rating (as a proxy for activity/impact)
+    # Fetch top 10 users by balance (as a proxy for activity/impact)
     # In the future, we could add a dedicated 'impact_score' or use cleaned_count
-    # Since we don't have a direct 'cleaned_count' column, we use rating
-    users = User.query.order_by(User.rating.desc()).limit(10).all()
+    # Since we don't have a direct 'cleaned_count' column, we use balance
+    users = User.query.order_by(User.balance.desc()).limit(10).all()
     result = []
     for u in users:
         # Calculate cleaned count for each top user
@@ -303,7 +303,7 @@ def get_leaderboard():
         result.append({
             'username': u.username or f"User {u.id}",
             'first_name': u.first_name,
-            'rating': u.rating,
+            'balance': u.balance,
             'cleaned_count': cleaned_count
         })
     return jsonify(result)
@@ -333,8 +333,8 @@ def admin_get_users():
         })
     return jsonify(result)
 
-@app.route('/api/admin/users/<int:user_id>/rating', methods=['POST'])
-def admin_update_rating(user_id):
+@app.route('/api/admin/users/<int:user_id>/balance', methods=['POST'])
+def admin_update_balance(user_id):
     data = request.json or {}
     tg_id = data.get('admin_tg_id') or request.args.get('admin_tg_id', type=int)
     
@@ -343,9 +343,9 @@ def admin_update_rating(user_id):
     
     user = User.query.get_or_404(user_id)
     try:
-        user.rating = float(data.get('rating', user.rating))
+        user.balance = float(data.get('balance', user.balance))
         db.session.commit()
-        return jsonify({'status': 'ok', 'new_rating': user.rating})
+        return jsonify({'status': 'ok', 'new_balance': user.balance})
     except Exception as e:
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
@@ -531,14 +531,16 @@ def admin_get_stats():
     total_users = User.query.count()
     active_pollutions = Pollution.query.filter_by(status='active').count()
     cleaned_pollutions = Pollution.query.filter_by(status='cleaned').count()
-    total_rating = db.session.query(db.func.sum(User.rating)).scalar() or 0
+    total_balance = db.session.query(db.func.sum(User.balance)).scalar() or 0
+    # Also get total paid (sum of rewards for cleaned pollutions)
+    total_rewards = db.session.query(db.func.sum(Pollution.reward)).filter_by(status='cleaned').scalar() or 0
     
     return jsonify({
         'total_users': total_users,
         'active_pollutions': active_pollutions,
         'cleaned_pollutions': cleaned_pollutions,
         'total_rewards': float(total_rewards),
-        'total_rating': float(total_rating)
+        'total_balance': float(total_balance)
     })
 
 @app.route('/api/admin/notify', methods=['POST'])

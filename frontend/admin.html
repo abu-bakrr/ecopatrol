@@ -752,7 +752,7 @@
 				document.getElementById('st-cleaned').innerText =
 					data.cleaned_pollutions
 				document.getElementById('st-rewards').innerText =
-					data.total_rewards.toFixed(0)
+					data.total_balance.toFixed(0)
 			}
 
 			let allUsers = []
@@ -778,14 +778,14 @@
                             <div class="card-title">${u.first_name || 'Hero'}</div>
                             <div class="card-meta">@${u.username || '—'} • ${u.phone || '—'}</div>
                         </div>
-                        <div style="font-weight:800; color:var(--primary); font-size:17px">${u.rating.toFixed(1)}</div>
+                        <div style="font-weight:800; color:var(--primary); font-size:17px">${u.balance.toFixed(0)}</div>
                     </div>
                     <div class="btn-row">
                         <button class="btn btn-solid" onclick="notifyUser(${u.telegram_id})">
                              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                              ${t('admin_btn_message')}
                         </button>
-                        <button class="btn btn-outline" onclick="editRating(${u.id}, ${u.rating})">${t('admin_btn_balance')}</button>
+                        <button class="btn btn-outline" onclick="editBalance(${u.id}, ${u.balance})">${t('admin_btn_balance')}</button>
                         <button class="btn btn-danger" onclick="deleteUser(${u.id}, '${u.first_name || 'User'}')">
                              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                              ${t('admin_btn_delete')}
@@ -939,13 +939,13 @@
 				if (res && res.status === 'ok') tg.showAlert(t('submit_success'))
 			}
 
-			async function editRating(id, curr) {
+			async function editBalance(id, curr) {
 				const v = prompt(t('admin_btn_balance'), curr)
 				if (v === null || isNaN(v)) return
-				const res = await apiFetch(`/admin/users/${id}/rating`, {
+				const res = await apiFetch(`/admin/users/${id}/balance`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ rating: parseFloat(v) }),
+					body: JSON.stringify({ balance: parseFloat(v) }),
 				})
 				if (res) loadUsers()
 			}

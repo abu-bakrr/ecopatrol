@@ -13,7 +13,7 @@ class User(db.Model):
     age = db.Column(db.Integer)
     phone = db.Column(db.String(20))
     language = db.Column(db.String(10), default='ru')
-    rating = db.Column(db.Float, default=0.0)
+    balance = db.Column(db.Float, default=0.0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships

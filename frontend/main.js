@@ -858,10 +858,10 @@ function updateProfileUI() {
 	document.getElementById('sidebar-username').textContent = fullName
 	document.getElementById('sidebar-userid').textContent =
 		`ID: ${currentUser.telegram_id}`
-	// Update Sidebar Rating
-	const ratingValue = currentUser.rating || 0
+	// Update Sidebar Balance
+	const balanceValue = currentUser.balance || 0
 	document.getElementById('sidebar-rating').textContent =
-		`${ratingValue.toFixed(1)}`
+		`${Math.round(balanceValue)}${window.t('currency') || ''}`
 	setProfileAvatar(fullName)
 }
 
@@ -1442,7 +1442,7 @@ async function showMyHistory() {
                         <div class="history-title">${h.description || 'Уборка территории'}</div>
                         <div class="history-date">${date}</div>
                     </div>
-                    <div class="history-amount">+$${h.reward}</div>
+                    <div class="history-amount">+${Math.round(h.reward)}${window.t('currency') || ''}</div>
                 </div>
             `
 			})
@@ -1517,10 +1517,10 @@ async function showExchange() {
                         <div class="exchange-types">${typesStr}</div>
                         <div class="exchange-desc">${p.description || ''}</div>
                         <div class="exchange-meta">
-                            <span>📍 ${window.t('reward')} ${p.level || 1}</span>
+                            <span>📍 ${window.t('reward_label')}: ${Math.round(p.reward)}${window.t('currency') || ''}</span>
                         </div>
                     </div>
-                    <div class="exchange-reward-badge">+${p.level || 1}</div>
+                    <div class="exchange-reward-badge">+${Math.round(p.reward)}</div>
                 </div>
             `
 		})
