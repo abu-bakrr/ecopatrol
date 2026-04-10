@@ -2093,7 +2093,7 @@ function showPollutionDetails(pollution) {
 		3: window.t('level_high'),
 	}
 
-	const reward = pollution.level
+	const reward = pollution.reward || (pollution.level * 500) // Fallback for old data
 
 	const html = `
         <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 16px;">${window.t('detail_view_title')}</h2>
@@ -2142,7 +2142,7 @@ function showPollutionDetails(pollution) {
         
         <div style="background: var(--bg-secondary); padding: 14px; border-radius: 12px; margin-bottom: 16px;">
             <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">${window.t('reward_label')}</p>
-            <p style="font-size: 24px; font-weight: 700; color: var(--primary);">$${reward}</p>
+            <p style="font-size: 24px; font-weight: 700; color: var(--primary);">${Math.round(reward)}${window.t('currency') || ''}</p>
         </div>
         
             <div style="padding-bottom: 24px;">
@@ -2278,7 +2278,7 @@ async function submitClean() {
 			loadPollutions()
 
 			tg.HapticFeedback.notificationOccurred('success')
-			tg.showAlert(`Поздравляем! Вам начислено $${currentPollution.level}`)
+			tg.showAlert(`Поздравляем! Вам начислено ${Math.round(currentPollution.reward)}${window.t('currency') || ''}`)
 		}
 	} catch (e) {
 		tg.showAlert('Ошибка при подтверждении')
@@ -2430,7 +2430,7 @@ function showReportDetails(r) {
             </div>
             <div style="background: var(--bg-secondary); padding: 16px; border-radius: 20px; border: 1px solid var(--border); text-align: right;">
                 <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">${window.t('reward_label')}</div>
-                <div style="font-size: 20px; font-weight: 800; color: var(--primary);">${window.t('currency')}${r.level || 0}</div>
+                <div style="font-size: 20px; font-weight: 800; color: var(--primary);">${Math.round(r.reward || 0)}${window.t('currency')}</div>
             </div>
             <div style="background: var(--bg-secondary); padding: 16px; border-radius: 20px; border: 1px solid var(--border);">
                 <div style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">${window.t('detail_level_label')}</div>
