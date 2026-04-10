@@ -1,14 +1,26 @@
-import sqlite_utils # A handy tool if available, but let's use standard sqlite3 for compatibility
 import sqlite3
 import os
 
-db_path = 'ecopatrol.db' # Local path, will be different on VPS
+# Possible database paths (Check current and instance folder)
+DB_PATHS = [
+    'ecopatrol.db',
+    'instance/ecopatrol.db',
+    '/root/eco-app/backend/instance/ecopatrol.db',
+    '/root/eco-app/backend/ecopatrol.db'
+]
 
 def migrate():
-    if not os.path.exists(db_path):
-        print(f"Database not found at {db_path}")
+    db_path = None
+    for p in DB_PATHS:
+        if os.path.exists(p):
+            db_path = p
+            break
+    
+    if not db_path:
+        print(f"Database not found in checked paths: {DB_PATHS}")
         return
 
+    print(f"Using database: {db_path}")
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
