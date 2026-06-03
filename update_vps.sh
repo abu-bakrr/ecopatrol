@@ -17,7 +17,9 @@ git pull
 
 # 2. Синхронизация с рабочей папкой (/var/www/ecopatrol)
 echo "🔹 Синхронизация файлов с $PROJECT_ROOT..."
-sudo cp -r . $PROJECT_ROOT/
+if [ "$REPO_DIR" != "$PROJECT_ROOT" ]; then
+    sudo cp -r . $PROJECT_ROOT/
+fi
 sudo chown -R $USER:$USER $PROJECT_ROOT
 
 # 3. Обновление Python зависимостей и БД в рабочей папке
