@@ -472,7 +472,7 @@ async function checkLocationStatus() {
 			}
 		},
 		error => {
-			console.warn('Location check failed/denied:', error)
+			// Location denied or unavailable, show overlay silently without logging to debug console
 			overlay.classList.remove('hidden')
 			// Even if it failed, we might show map with default if we want,
 			// but here we block everything with overlay.
