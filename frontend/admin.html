@@ -785,14 +785,34 @@
 				const list = document.getElementById('users-list')
 				list.innerHTML = users
 					.map(
-						u => `
+						u => {
+							const mapLink = (u.lat && u.lng)
+								? `<a href="https://yandex.ru/maps/?pt=${u.lng},${u.lat}&z=16&l=map" target="_blank" style="color:var(--primary);text-decoration:none;font-weight:600;">📍 Открыть на карте</a>`
+								: `<span style="color:var(--text-muted)">📍 Локация не известна</span>`
+
+							const lastSeen = u.last_seen_at
+								? new Date(u.last_seen_at).toLocaleString('ru-RU')
+								: '—'
+
+							const regDate = u.created_at
+								? new Date(u.created_at).toLocaleString('ru-RU')
+								: '—'
+
+							return `
                 <div class="card user-card" data-user-id="${u.id}">
                     <div class="card-header">
                         <div>
-                            <div class="card-title">${u.first_name || 'Hero'}</div>
-                            <div class="card-meta">@${u.username || '—'} • ${u.phone || '—'}</div>
+                            <div class="card-title">${u.first_name || '—'} ${u.last_name || ''}</div>
+                            <div class="card-meta">@${u.username || '—'} • ID: ${u.telegram_id}</div>
                         </div>
                         <div style="font-weight:800; color:var(--primary); font-size:17px">${u.balance.toFixed(0)} ${t('currency')}</div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;font-size:13px;color:var(--text-muted)">
+                        <div>📞 <b>Телефон:</b> ${u.phone || '—'}</div>
+                        <div>🎂 <b>Возраст:</b> ${u.age || '—'}</div>
+                        <div>📅 <b>Дата регистрации:</b> ${regDate}</div>
+                        <div>🕐 <b>Последний раз онлайн:</b> <span style="color:var(--text-main);font-weight:600">${lastSeen}</span></div>
+                        <div>${mapLink}</div>
                     </div>
                     <div class="btn-row">
                         <button class="btn btn-solid" onclick="notifyUser(${u.telegram_id})">
@@ -806,8 +826,7 @@
                         </button>
                     </div>
                 </div>
-            `,
-					)
+            `})
 					.join('')
 			}
 

@@ -460,7 +460,6 @@ async function checkLocationStatus() {
 	// 1. Try to get current position
 	navigator.geolocation.getCurrentPosition(
 		position => {
-			console.log('Location access granted')
 			const coords = [position.coords.longitude, position.coords.latitude]
 			localStorage.setItem('last_known_loc', JSON.stringify(coords))
 
@@ -469,6 +468,19 @@ async function checkLocationStatus() {
 				initMap(coords)
 			} else {
 				map.flyTo({ center: coords, zoom: 16 })
+			}
+
+			// Update last known location on server silently
+			if (currentUser && currentUser.telegram_id) {
+				fetch(`${API_URL}/user/location`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						telegram_id: currentUser.telegram_id,
+						lat: position.coords.latitude,
+						lng: position.coords.longitude,
+					}),
+				}).catch(() => {}) // Silent fail
 			}
 		},
 		error => {
@@ -517,8 +529,6 @@ async function handleRegistration() {
 	// Combine prefix with input
 	const phone = rawPhone.startsWith('+998') ? rawPhone : '+998' + rawPhone
 
-	console.log('Registration attempt:', { firstName, lastName, age, phone })
-
 	// Validation
 	if (!firstName || !lastName || !age || !phone) {
 		tg.showAlert('Пожалуйста, заполните все поля')
@@ -530,13 +540,11 @@ async function handleRegistration() {
 		return
 	}
 
-	// Validate phone starts with +998 (Already enforced by logic, but good double check)
 	if (!phone.startsWith('+998') || phone.length < 13) {
 		tg.showAlert('Пожалуйста, введите корректный номер телефона')
 		return
 	}
 
-	// Request geolocation
 	if (!navigator.geolocation) {
 		tg.showAlert('Геолокация недоступна на вашем устройстве')
 		return
@@ -544,14 +552,28 @@ async function handleRegistration() {
 
 	tg.HapticFeedback.impactOccurred('medium')
 
-	// REGISTRATION PROCEEDS IMMEDIATELY (No more nested geo callback)
 	const initData = tg.initDataUnsafe
 	const user = initData.user || {
 		id: Date.now(),
 		username: `${firstName}_${lastName}`.toLowerCase(),
 	}
 
-	console.log('Telegram user:', user)
+	// Get geolocation before registering
+	let userLat = null
+	let userLng = null
+	try {
+		const position = await new Promise((resolve, reject) => {
+			navigator.geolocation.getCurrentPosition(resolve, reject, {
+				enableHighAccuracy: false,
+				timeout: 5000,
+				maximumAge: 60000,
+			})
+		})
+		userLat = position.coords.latitude
+		userLng = position.coords.longitude
+	} catch (geoErr) {
+		// Location not available — proceed without it
+	}
 
 	try {
 		const requestBody = {
@@ -562,17 +584,15 @@ async function handleRegistration() {
 			age: age,
 			phone: phone,
 			initData: tg.initData || '',
+			lat: userLat,
+			lng: userLng,
 		}
-
-		console.log('Sending registration request:', requestBody)
 
 		const response = await fetch(`${API_URL}/init`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(requestBody),
 		})
-
-		console.log('Response status:', response.status)
 
 		if (!response.ok) {
 			const errorText = await response.text()
@@ -588,7 +608,6 @@ async function handleRegistration() {
 			console.error('Failed to parse registration response:', responseText)
 			throw new Error('Server returned invalid JSON')
 		}
-		console.log('Registration successful:', data)
 
 		currentUser = data.user
 

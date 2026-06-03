@@ -14,6 +14,9 @@ class User(db.Model):
     phone = db.Column(db.String(20))
     language = db.Column(db.String(10), default='ru')
     balance = db.Column(db.Float, default=0.0)
+    lat = db.Column(db.Float, nullable=True)
+    lng = db.Column(db.Float, nullable=True)
+    last_seen_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships

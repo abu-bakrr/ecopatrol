@@ -2,6 +2,7 @@ import os
 import hmac
 import hashlib
 import json
+from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -65,11 +66,39 @@ def init_user():
                 first_name=data.get('first_name'),
                 last_name=data.get('last_name'),
                 age=data.get('age'),
-                phone=data.get('phone')
+                phone=data.get('phone'),
+                lat=data.get('lat'),
+                lng=data.get('lng'),
+                last_seen_at=datetime.utcnow()
             )
             db.session.add(user)
             db.session.commit()
             print("User created successfully")
+
+            # Send notification to all admins
+            lat = data.get('lat')
+            lng = data.get('lng')
+            if lat and lng:
+                map_link = f"https://yandex.ru/maps/?pt={lng},{lat}&z=16&l=map"
+                location_text = f"📍 Локация регистрации: {map_link}"
+            else:
+                location_text = "📍 Локация: не предоставлена"
+
+            msg = (
+                f"🆕 Новый пользователь зарегистрировался!\n\n"
+                f"👤 Имя: {data.get('first_name', '—')} {data.get('last_name', '—')}\n"
+                f"🔹 Username: @{data.get('username', '—')}\n"
+                f"🪪 Telegram ID: {tg_id}\n"
+                f"📞 Телефон: {data.get('phone', '—')}\n"
+                f"🎂 Возраст: {data.get('age', '—')}\n"
+                f"{location_text}"
+            )
+            for admin_id in ADMIN_IDS:
+                try:
+                    bot.send_message(admin_id, msg, disable_web_page_preview=False)
+                except Exception as bot_err:
+                    print(f"Failed to notify admin {admin_id}: {bot_err}")
+
         except Exception as e:
             db.session.rollback()
             return jsonify({'status': 'error', 'message': f'Creation failed: {e}'}), 500
@@ -329,9 +358,38 @@ def admin_get_users():
             'balance': u.balance,
             'phone': u.phone,
             'age': u.age,
+            'lat': u.lat,
+            'lng': u.lng,
+            'last_seen_at': u.last_seen_at.isoformat() if u.last_seen_at else None,
             'created_at': u.created_at.isoformat()
         })
     return jsonify(result)
+
+
+@app.route('/api/user/location', methods=['POST'])
+def update_user_location():
+    """Update user's last known location and last_seen_at timestamp."""
+    data = request.json or {}
+    tg_id = data.get('telegram_id')
+    lat = data.get('lat')
+    lng = data.get('lng')
+
+    if not tg_id or lat is None or lng is None:
+        return jsonify({'status': 'error', 'message': 'Missing telegram_id, lat or lng'}), 400
+
+    user = User.query.filter_by(telegram_id=tg_id).first()
+    if not user:
+        return jsonify({'status': 'error', 'message': 'User not found'}), 404
+
+    try:
+        user.lat = lat
+        user.lng = lng
+        user.last_seen_at = datetime.utcnow()
+        db.session.commit()
+        return jsonify({'status': 'ok'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @app.route('/api/admin/users/<int:user_id>/balance', methods=['POST'])
 def admin_update_balance(user_id):
