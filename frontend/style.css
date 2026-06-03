@@ -1772,7 +1772,8 @@ html {
 	background: var(--primary-dark);
 }
 
-#offline-overlay {
+#offline-overlay,
+#location-blocked-overlay {
 	z-index: 2100000 !important;
 }
 
