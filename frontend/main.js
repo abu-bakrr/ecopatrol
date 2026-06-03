@@ -496,13 +496,17 @@ async function checkLocationStatus() {
 	)
 }
 
+let isOnboardingEventAttached = false
 function showOnboarding() {
 	document.getElementById('onboarding').classList.remove('hidden')
 	const form = document.getElementById('onboarding-form')
-	form.addEventListener('submit', e => {
-		e.preventDefault()
-		handleRegistration()
-	})
+	if (!isOnboardingEventAttached) {
+		form.addEventListener('submit', e => {
+			e.preventDefault()
+			handleRegistration()
+		})
+		isOnboardingEventAttached = true
+	}
 }
 
 function hideOnboarding(data = null) {
@@ -522,31 +526,46 @@ function hideOnboarding(data = null) {
 }
 
 async function handleRegistration() {
+	const submitBtn = document.getElementById('submit-onboarding')
+	if (submitBtn.disabled) return // Prevent double click
+	submitBtn.disabled = true
+	submitBtn.innerText = 'Регистрация...'
+
 	const firstName = document.getElementById('first-name').value.trim()
 	const lastName = document.getElementById('last-name').value.trim()
 	const age = parseInt(document.getElementById('age').value)
+	const email = document.getElementById('email').value.trim()
+	const password = document.getElementById('password').value.trim()
 	const rawPhone = document.getElementById('phone').value.trim()
 	// Combine prefix with input
 	const phone = rawPhone.startsWith('+998') ? rawPhone : '+998' + rawPhone
 
 	// Validation
-	if (!firstName || !lastName || !age || !phone) {
+	if (!firstName || !lastName || !age || !phone || !email || !password) {
 		tg.showAlert('Пожалуйста, заполните все поля')
+		submitBtn.disabled = false
+		submitBtn.innerText = 'Продолжить'
 		return
 	}
 
 	if (age < 13 || age > 120) {
 		tg.showAlert('Пожалуйста, введите корректный возраст (13-120)')
+		submitBtn.disabled = false
+		submitBtn.innerText = 'Продолжить'
 		return
 	}
 
 	if (!phone.startsWith('+998') || phone.length < 13) {
 		tg.showAlert('Пожалуйста, введите корректный номер телефона')
+		submitBtn.disabled = false
+		submitBtn.innerText = 'Продолжить'
 		return
 	}
 
 	if (!navigator.geolocation) {
 		tg.showAlert('Геолокация недоступна на вашем устройстве')
+		submitBtn.disabled = false
+		submitBtn.innerText = 'Продолжить'
 		return
 	}
 
@@ -583,6 +602,8 @@ async function handleRegistration() {
 			last_name: lastName,
 			age: age,
 			phone: phone,
+			email: email,
+			password: password,
 			initData: tg.initData || '',
 			lat: userLat,
 			lng: userLng,
@@ -597,6 +618,8 @@ async function handleRegistration() {
 		if (!response.ok) {
 			const errorText = await response.text()
 			console.error(`Registration failed: ${response.status}`, errorText)
+			submitBtn.disabled = false
+			submitBtn.innerText = 'Продолжить'
 			throw new Error(`Registration failed: ${response.status}`)
 		}
 
@@ -606,6 +629,8 @@ async function handleRegistration() {
 			data = JSON.parse(responseText)
 		} catch (parseError) {
 			console.error('Failed to parse registration response:', responseText)
+			submitBtn.disabled = false
+			submitBtn.innerText = 'Продолжить'
 			throw new Error('Server returned invalid JSON')
 		}
 
@@ -633,6 +658,8 @@ async function handleRegistration() {
 	} catch (e) {
 		console.error('Registration error:', e)
 		tg.showAlert(`Ошибка регистрации: ${e.message}`)
+		submitBtn.disabled = false
+		submitBtn.innerText = 'Продолжить'
 	}
 }
 

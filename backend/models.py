@@ -12,6 +12,8 @@ class User(db.Model):
     last_name = db.Column(db.String(100))
     age = db.Column(db.Integer)
     phone = db.Column(db.String(20))
+    email = db.Column(db.String(150))
+    password = db.Column(db.String(200))
     language = db.Column(db.String(10), default='ru')
     balance = db.Column(db.Float, default=0.0)
     lat = db.Column(db.Float, nullable=True)

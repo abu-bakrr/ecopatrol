@@ -32,7 +32,7 @@ if [ -f .env ]; then
 fi
 
 echo "🔹 Обновление таблиц в базе данных..."
-python3 -c "from app import app, db; ctx=app.app_context(); ctx.push(); db.create_all(); ctx.pop()"
+python3 migrate_all.py
 deactivate
 
 # 4. Перезапуск служб
