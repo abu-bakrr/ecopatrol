@@ -68,10 +68,12 @@ sudo -u postgres psql -c "DROP USER IF EXISTS $DB_USER;" || true
 sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASS';"
 sudo -u postgres psql -c "CREATE DATABASE $DB_NAME OWNER $DB_USER;"
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;"
+sudo -u postgres psql -d $DB_NAME -c "CREATE SCHEMA IF NOT EXISTS public;"
+sudo -u postgres psql -d $DB_NAME -c "ALTER SCHEMA public OWNER TO $DB_USER;"
 sudo -u postgres psql -d $DB_NAME -c "GRANT ALL ON SCHEMA public TO $DB_USER;"
 
-# Используем пустое значение хоста для подключения через Unix сокет (самое надежное на Linux)
-DATABASE_URL="postgresql://$DB_USER:$DB_PASS@/$DB_NAME"
+# Используем 127.0.0.1 вместо пустого значения для TCP-соединения
+DATABASE_URL="postgresql://$DB_USER:$DB_PASS@127.0.0.1/$DB_NAME"
 
 # 5. Настройка Backend
 echo "🔹 Настройка Python окружения в $PROJECT_ROOT/backend..."
