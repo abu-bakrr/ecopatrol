@@ -31,6 +31,7 @@ def admin_command(message):
 
 @bot.message_handler(commands=['start'])
 def start(message):
+    print(f"--- BOT START --- User ID: {message.from_user.id}, Username: @{message.from_user.username}, Name: {message.from_user.first_name}")
     markup = types.InlineKeyboardMarkup(row_width=1)
     btn_uz = types.InlineKeyboardButton("🇺🇿 O'zbekcha", callback_data="lang_uz")
     btn_ru = types.InlineKeyboardButton("🇷🇺 Русский", callback_data="lang_ru")

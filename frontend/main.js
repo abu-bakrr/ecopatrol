@@ -536,9 +536,16 @@ async function handleRegistration() {
 	const age = parseInt(document.getElementById('age').value)
 	const email = document.getElementById('email').value.trim()
 	const password = document.getElementById('password').value.trim()
-	const rawPhone = document.getElementById('phone').value.trim()
-	// Combine prefix with input
-	const phone = rawPhone.startsWith('+998') ? rawPhone : '+998' + rawPhone
+	let rawPhone = document.getElementById('phone').value.trim()
+	// Remove all non-digit characters except +
+	rawPhone = rawPhone.replace(/[^\d+]/g, '')
+	
+	let phone = rawPhone;
+	if (phone.startsWith('998') && phone.length === 12) {
+		phone = '+' + phone;
+	} else if (!phone.startsWith('+')) {
+		phone = '+998' + phone.replace(/^0+/, '');
+	}
 
 	// Validation
 	if (!firstName || !lastName || !age || !phone || !email || !password) {
@@ -555,7 +562,7 @@ async function handleRegistration() {
 		return
 	}
 
-	if (!phone.startsWith('+998') || phone.length < 13) {
+	if (phone.length < 10) {
 		tg.showAlert('Пожалуйста, введите корректный номер телефона')
 		submitBtn.disabled = false
 		submitBtn.innerText = 'Продолжить'
