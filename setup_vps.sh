@@ -65,9 +65,10 @@ DB_PASS=$(openssl rand -base64 12)
 # Создаем базу и пользователя через системный сокет
 sudo -u postgres psql -c "DROP DATABASE IF EXISTS $DB_NAME;" || true
 sudo -u postgres psql -c "DROP USER IF EXISTS $DB_USER;" || true
-sudo -u postgres psql -c "CREATE DATABASE $DB_NAME;"
 sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASS';"
+sudo -u postgres psql -c "CREATE DATABASE $DB_NAME OWNER $DB_USER;"
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;"
+sudo -u postgres psql -d $DB_NAME -c "GRANT ALL ON SCHEMA public TO $DB_USER;"
 
 # Используем пустое значение хоста для подключения через Unix сокет (самое надежное на Linux)
 DATABASE_URL="postgresql://$DB_USER:$DB_PASS@/$DB_NAME"
